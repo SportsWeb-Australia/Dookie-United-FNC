@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
-import { club as clubConfig } from "./content/club.config";
+import { club as staticClub } from "./content/club.config";
+import { getClubConfig } from "./lib/loadClub";
 import { ClubContext } from "./components/ClubContext";
-import type { DesignVariant } from "./content/types";
+import type { ClubConfig, DesignVariant } from "./content/types";
 
 import { Header } from "./components/layout/Header";
 import { Footer } from "./components/layout/Footer";
@@ -31,24 +32,38 @@ function ScrollToTop() {
 }
 
 export default function App() {
-  const [variant, setVariant] = useState<DesignVariant>(clubConfig.variant);
+  // Static config renders instantly; live Supabase content swaps in when ready.
+  const [club, setClub] = useState<ClubConfig>(staticClub);
+  const [variant, setVariant] = useState<DesignVariant>(staticClub.variant);
 
-  // Inject brand colours (the only runtime-themed tokens) + active variant.
+  useEffect(() => {
+    let active = true;
+    getClubConfig().then((c) => {
+      if (!active) return;
+      setClub(c);
+      setVariant(c.variant);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  // Inject brand colours (the only runtime-themed tokens) from the live config.
   useEffect(() => {
     const root = document.documentElement;
-    const c = clubConfig.identity.colours;
+    const c = club.identity.colours;
     root.style.setProperty("--club-ink", c.ink);
     root.style.setProperty("--club-paper", c.paper);
     root.style.setProperty("--club-accent", c.accent);
     root.style.setProperty("--club-silver", c.silver);
-  }, []);
+  }, [club]);
 
   useEffect(() => {
     document.documentElement.setAttribute("data-variant", variant);
   }, [variant]);
 
   return (
-    <ClubContext.Provider value={{ club: clubConfig, variant, setVariant }}>
+    <ClubContext.Provider value={{ club, variant, setVariant }}>
       <a href="#main" className="sw-skip">
         Skip to content
       </a>
@@ -71,7 +86,7 @@ export default function App() {
         </Routes>
       </main>
       <Footer />
-      {clubConfig.showVariantSwitcher && <VariantSwitcher />}
+      {club.showVariantSwitcher && <VariantSwitcher />}
     </ClubContext.Provider>
   );
 }

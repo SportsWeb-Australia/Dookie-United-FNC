@@ -1,6 +1,7 @@
 import { useClub } from "../components/ClubContext";
 import { PageHero } from "../components/layout/PageHero";
 import { AccentBars } from "../components/layout/Chevron";
+import { PresidentWelcome } from "../components/blocks/PresidentWelcome";
 import { Committee } from "../components/blocks/Committee";
 
 export function About() {
@@ -14,6 +15,8 @@ export function About() {
         title={about.heading}
         intro={`Football & netball in ${identity.location}, competing in the ${identity.league}.`}
       />
+
+      <PresidentWelcome />
 
       <section className="sw-section">
         <div className="sw-container">

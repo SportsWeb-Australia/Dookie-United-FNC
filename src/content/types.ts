@@ -40,8 +40,8 @@ export interface NavItem {
 export interface Sponsor {
   name: string;
   href?: string;
-  /** Tier controls placement + size. Set real tiers with the club. */
-  tier: "major" | "gold" | "community";
+  /** Tier controls placement + size. Matches the DB sponsor_level enum. */
+  tier: "platinum" | "gold" | "silver";
   /** Optional logo path under /public. Falls back to a styled name plate. */
   logo?: string;
   placeholder?: boolean;
@@ -176,6 +176,7 @@ export interface ClubConfig {
 
   identity: {
     name: string;
+    slug?: string;
     shortName: string;
     initials: string;
     nickname: string;

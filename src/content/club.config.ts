@@ -15,6 +15,7 @@ export const club: ClubConfig = {
 
   identity: {
     name: "Dookie United Football & Netball Club",
+    slug: "dookie-united",
     shortName: "Dookie United",
     initials: "DUFNC",
     nickname: "the Dooks",
@@ -119,15 +120,15 @@ export const club: ClubConfig = {
 
   // Tiers below are a starting placement — confirm real packages with the club.
   sponsors: [
-    { name: "GrainCorp", href: "https://www.graincorp.com.au/", tier: "major" },
-    { name: "Nutrien Ag Solutions", href: "https://www.nutrienagsolutions.com.au/branch/shepparton", tier: "major" },
+    { name: "GrainCorp", href: "https://www.graincorp.com.au/", tier: "platinum" },
+    { name: "Nutrien Ag Solutions", href: "https://www.nutrienagsolutions.com.au/branch/shepparton", tier: "platinum" },
     { name: "GV Hotel", href: "https://gvhotel.com/", tier: "gold" },
     { name: "Choices Flooring", href: "https://www.choicesflooring.com.au/", tier: "gold" },
     { name: "Shepparton Real Estate", href: "https://www.sheppartonrealestate.com.au/", tier: "gold" },
-    { name: "Animal Mineral Solutions", href: "https://www.animalmineralsolutions.com.au/", tier: "community" },
-    { name: "Rankin Plumbing", href: "https://www.rankinplumbing.com.au/", tier: "community" },
-    { name: "MSK Engineering", href: "https://mskengineeringvic.com.au/", tier: "community" },
-    { name: "JVella Builders", href: "https://www.jvellabuilders.com.au/", tier: "community" },
+    { name: "Animal Mineral Solutions", href: "https://www.animalmineralsolutions.com.au/", tier: "silver" },
+    { name: "Rankin Plumbing", href: "https://www.rankinplumbing.com.au/", tier: "silver" },
+    { name: "MSK Engineering", href: "https://mskengineeringvic.com.au/", tier: "silver" },
+    { name: "JVella Builders", href: "https://www.jvellabuilders.com.au/", tier: "silver" },
   ],
 
   // TODO: replace with real club news. Marked placeholder so it's obvious in the UI.

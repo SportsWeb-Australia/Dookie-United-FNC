@@ -4,9 +4,9 @@ import { AccentBars } from "../layout/Chevron";
 import type { Sponsor } from "../../content/types";
 
 const TIERS: { id: Sponsor["tier"]; label: string }[] = [
-  { id: "major", label: "Major partners" },
+  { id: "platinum", label: "Platinum partners" },
   { id: "gold", label: "Gold sponsors" },
-  { id: "community", label: "Community supporters" },
+  { id: "silver", label: "Silver supporters" },
 ];
 
 interface Props {

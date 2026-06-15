@@ -1,9 +1,16 @@
 import { useClub } from "../ClubContext";
+import { SmartLink } from "../SmartLink";
 import { AccentBars } from "../layout/Chevron";
 
-export function PresidentWelcome() {
+interface Props {
+  /** Show a shortened welcome (first two paragraphs) with a link to About. */
+  condensed?: boolean;
+}
+
+export function PresidentWelcome({ condensed }: Props) {
   const { club } = useClub();
   const { president, identity } = club;
+  const paras = condensed ? president.body.slice(0, 2) : president.body;
 
   return (
     <section className="sw-section sw-section--alt">
@@ -23,10 +30,16 @@ export function PresidentWelcome() {
             <div className="sw-welcome-role">{president.role}</div>
           </aside>
           <div className="sw-welcome-body">
-            {president.body.map((p, i) => (
+            {paras.map((p, i) => (
               <p key={i}>{p}</p>
             ))}
-            {president.signoff && <p className="sw-signoff">{president.signoff}</p>}
+            {condensed ? (
+              <SmartLink href="/about" className="sw-link-arrow">
+                More about the club →
+              </SmartLink>
+            ) : (
+              president.signoff && <p className="sw-signoff">{president.signoff}</p>
+            )}
           </div>
         </div>
       </div>

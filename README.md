@@ -56,6 +56,68 @@ No component or CSS edits needed for a standard reskin.
 `src/content/types.ts` is the schema the future SportsWeb One admin dashboard maps
 onto. `blocks` toggles turn whole homepage sections on/off per club.
 
+## Connect to SportsWeb One (Supabase)
+
+The site reads live content from the SportsWeb One Supabase project and falls back
+to the bundled `club.config.ts` for anything the DB doesn't hold — so the site is
+always complete, and works even before any env vars are set.
+
+- `src/lib/supabase.ts` — the client (env-driven, with a fallback to the SportsWeb
+  One project so it works out of the box).
+- `src/lib/loadClub.ts` — fetches the club + its news / events / sponsors / teams /
+  committee by `clubs.slug`, maps them to `ClubConfig`, and merges over the static
+  defaults. Any failure → bundled config.
+
+### Setup
+
+Set these in Vercel (Project → Settings → Environment Variables) and locally in `.env`:
+
+```
+VITE_SUPABASE_URL=https://uzibfawcwoapfbigpzum.supabase.co
+VITE_SUPABASE_ANON_KEY=your-publishable-anon-key
+VITE_CLUB_SLUG=dookie-united   # which club this deployment renders
+```
+
+The anon key is the publishable key (safe in the browser, RLS-protected). The
+service-role key must never go in front-end code.
+
+### Table → template mapping
+
+| Supabase | ClubConfig |
+| --- | --- |
+| `clubs` | identity (name, slug, logo_url, colours from primary/secondary), contact |
+| `clubs.selected_template_id` → `templates.template_key` | design `variant` |
+| `news` (published) | news (title, summary→excerpt, published_at→date) |
+| `events` (published, upcoming) | events |
+| `sponsors` (published) | sponsors (sponsor_level→tier) |
+| `teams` (published) | teams (grouped by sport) |
+| `people` (committee-type roles) | committee |
+
+`template_key` → variant is set in `loadClub.ts` (`default`→heritage,
+`afl-classic`→arena, `club-modern`→broadcast). Add a row whose key maps to
+`classic` to expose the fourth design.
+
+### Known gaps (need a schema/admin decision)
+
+1. **Colours** — `clubs` stores two (primary/secondary); this template themes on
+   four (ink/paper/accent/silver). It derives ink + accent heuristically; for
+   precise control, add explicit `accent_colour` / `ink_colour` columns.
+2. **Multi-sport clubs** — `clubs.sport_type` is single and `teams` has no sport
+   column, so football + netball can't be grouped separately. Add `teams.sport_type`
+   (or `sport`) for clubs like Dookie that run both.
+3. **News** — no `category` or `image_url` columns (defaults to "News", no image).
+4. **Club documents/policies** — no club-level documents table (volunteer_documents
+   is volunteer-only). Add one (label, kind, file_url, status, display_order).
+5. **Freeform copy** — hero text, President's welcome, About, nav and footer come
+   from the bundled config. Wire these to the `pages` table once its columns are
+   confirmed.
+6. **Committee** — `people.roles` is used with a keyword filter; a `display_on_website`
+   flag (and order) would be cleaner.
+7. **Match centre** — stays on the GameDay/PlayHQ embed; no fixtures tables needed.
+
+Editing still happens in the SportsWeb One admin (which writes to these tables);
+this site reflects those edits live.
+
 ## Match Centre
 
 Three modes, set by `matchCentre.mode` in the config:
