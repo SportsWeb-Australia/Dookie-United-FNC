@@ -10,7 +10,7 @@
  *   - Layout, tokens logic, and component structure = locked/global (see styles + components).
  */
 
-export type DesignVariant = "heritage" | "broadcast";
+export type DesignVariant = "heritage" | "broadcast" | "arena" | "classic";
 
 export interface BrandColours {
   /** Primary ink / dominant colour (Dookie: black). */
@@ -236,6 +236,19 @@ export interface ClubConfig {
   about: {
     heading: string;
     body: string[];
+    /** Club values shown as a small grid. */
+    values?: { title: string; text: string }[];
+    /** History timeline milestones. */
+    history?: { year: string; text: string }[];
+    /** Quick club facts (founded, ground, league, colours, etc.). */
+    facts?: { label: string; value: string }[];
+  };
+
+  /** Extra content for the Register / get-involved page. */
+  register?: {
+    steps: string[];
+    feesNote?: string;
+    faqs?: { q: string; a: string }[];
   };
 
   join: {

@@ -5,17 +5,14 @@ import { Chevron } from "../components/layout/Chevron";
 
 export function Register() {
   const { club } = useClub();
-  const { join, quickLinks, identity } = club;
+  const { join, quickLinks, identity, register } = club;
 
   const merch = quickLinks.find((l) => /merch|store/i.test(l.label));
 
   return (
     <>
-      <PageHero
-        eyebrow="Join the Dooks"
-        title="Register & Get Involved"
-        intro={join.blurb}
-      />
+      <PageHero eyebrow="Join the Dooks" title="Register & Get Involved" intro={join.blurb} />
+
       <section className="sw-section">
         <div className="sw-container">
           <div className="sw-tiles">
@@ -27,10 +24,34 @@ export function Register() {
               </SmartLink>
             ))}
           </div>
+        </div>
+      </section>
 
+      {register?.steps && (
+        <section className="sw-section sw-section--alt">
+          <div className="sw-container">
+            <span className="sw-eyebrow">How it works</span>
+            <h2 style={{ fontSize: "var(--fs-h2)", margin: "0.6rem 0 0.5rem" }}>Registering in four steps</h2>
+            <div className="sw-steps">
+              {register.steps.map((s, i) => (
+                <div className="sw-step" key={i}>
+                  <p>{s}</p>
+                </div>
+              ))}
+            </div>
+            {register.feesNote && (
+              <p className="sw-social-embed-note" style={{ marginTop: "1.5rem" }}>
+                {register.feesNote}
+              </p>
+            )}
+          </div>
+        </section>
+      )}
+
+      <section className="sw-section">
+        <div className="sw-container">
           <div
             style={{
-              marginTop: "2.5rem",
               padding: "2rem",
               border: "1px solid var(--border)",
               borderRadius: "var(--radius-lg)",
@@ -54,6 +75,21 @@ export function Register() {
               </SmartLink>
             )}
           </div>
+
+          {register?.faqs && (
+            <div style={{ marginTop: "2.5rem" }}>
+              <span className="sw-eyebrow">Good to know</span>
+              <h2 style={{ fontSize: "var(--fs-h2)", margin: "0.6rem 0 0.5rem" }}>Questions</h2>
+              <div className="sw-faq">
+                {register.faqs.map((f, i) => (
+                  <details key={i}>
+                    <summary>{f.q}</summary>
+                    <p>{f.a}</p>
+                  </details>
+                ))}
+              </div>
+            </div>
+          )}
 
           <p className="sw-social-embed-note" style={{ marginTop: "2rem" }}>
             Registration links currently point to the club's sign-up pages. Confirm the live

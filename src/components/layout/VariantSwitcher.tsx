@@ -4,6 +4,8 @@ import type { DesignVariant } from "../../content/types";
 const OPTIONS: { id: DesignVariant; label: string }[] = [
   { id: "heritage", label: "Heritage" },
   { id: "broadcast", label: "Broadcast" },
+  { id: "arena", label: "Arena" },
+  { id: "classic", label: "Classic" },
 ];
 
 /**

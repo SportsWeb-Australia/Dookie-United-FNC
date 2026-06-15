@@ -281,6 +281,49 @@ export const club: ClubConfig = {
       "Football in the town traces back to 1887. In 1977, the Dookie Agricultural College merged with the Dookie Football Club to become Dookie United. Since then the club has worked together as a community to welcome new people into the Dookie family.",
       "Today the club fields senior and reserves football, a full junior pathway from Auskick to Under 17, and netball from Net Set Go through to seniors — all competing in the Picola & District Football Netball League.",
     ],
+    values: [
+      { title: "Community first", text: "A place where families come together and lifelong friendships are formed." },
+      { title: "Every age, every ability", text: "Genuine pathways from Auskick and Net Set Go through to seniors." },
+      { title: "Run by volunteers", text: "The backbone of the club — and always room for more hands." },
+      { title: "Inclusive & welcoming", text: "A positive environment where everyone can contribute and belong." },
+    ],
+    history: [
+      { year: "1887", text: "Football first played in Dookie." },
+      { year: "1977", text: "Dookie College and Dookie FC merge to form Dookie United." },
+      { year: "2006", text: "Dookie United joins the Picola & District league." }, // TODO: confirm exact year/details with club
+      { year: "Today", text: "Football and netball across all grades at the Rec Reserve." },
+    ],
+    facts: [
+      { label: "Nickname", value: "The Dooks" },
+      { label: "Home ground", value: "Dookie Recreation Reserve" },
+      { label: "League", value: "Picola & District FNL" },
+      { label: "Colours", value: "Black, White, Teal & Silver" },
+    ],
+  },
+
+  register: {
+    steps: [
+      "Choose football or netball and the right age group.",
+      "Complete the online registration via the club's sign-up link.",
+      "Pay your fees online to finalise your spot for the season.",
+      "Come down to training at the Rec Reserve and meet the team.",
+    ],
+    feesNote:
+      "Season fees vary by age group and grade. Confirm current fees with the club — financial assistance options like the Get Active Kids Voucher may be available.", // TODO: add real 2026 fee amounts
+    faqs: [
+      {
+        q: "When does the season start?",
+        a: "The home-and-away season runs across winter. Pre-season training starts earlier in the year — check the events page and our socials for dates.",
+      },
+      {
+        q: "I'm new to the area — can I just come down?",
+        a: "Absolutely. New players and families are always welcome. Get in touch or come to training and we'll make sure you're looked after.",
+      },
+      {
+        q: "How can I volunteer?",
+        a: "From game-day roles to committee positions, there's a spot for everyone. Email the club and we'll find the right fit.",
+      },
+    ],
   },
 
   join: {

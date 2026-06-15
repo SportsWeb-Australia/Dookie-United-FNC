@@ -93,3 +93,47 @@
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px rgba(0, 0, 0, 0.45);
   --accent-on-bg: color-mix(in srgb, var(--club-accent) 86%, #ffffff);
 }
+
+/* ---------- ARENA (bold, sharp, high-contrast sporting) ---------- */
+[data-variant="arena"] {
+  --bg: color-mix(in srgb, var(--club-accent) 4%, var(--club-paper));
+  --bg-alt: color-mix(in srgb, var(--club-accent) 11%, var(--club-paper));
+  --bg-invert: var(--club-ink);
+  --surface: var(--club-paper);
+  --surface-2: color-mix(in srgb, var(--club-accent) 9%, var(--club-paper));
+  --text: var(--club-ink);
+  --text-soft: color-mix(in srgb, var(--club-ink) 66%, var(--club-paper));
+  --text-invert: var(--club-paper);
+  --border: color-mix(in srgb, var(--club-ink) 24%, var(--club-paper));
+  --hero-bg: var(--club-ink);
+  --hero-text: #ffffff;
+  --header-bg: color-mix(in srgb, var(--club-paper) 90%, transparent);
+  --header-text: var(--club-ink);
+  --shadow: none;
+  --accent-on-bg: var(--accent-deep);
+  /* Sharp, flat shape language. */
+  --radius: 0px;
+  --radius-lg: 0px;
+}
+
+/* ---------- CLASSIC (premium, soft, silver-toned heritage) ---------- */
+[data-variant="classic"] {
+  --bg: color-mix(in srgb, var(--club-silver) 7%, var(--club-paper));
+  --bg-alt: color-mix(in srgb, var(--club-silver) 16%, var(--club-paper));
+  --bg-invert: color-mix(in srgb, var(--club-ink) 88%, var(--club-accent));
+  --surface: var(--club-paper);
+  --surface-2: color-mix(in srgb, var(--club-silver) 12%, var(--club-paper));
+  --text: color-mix(in srgb, var(--club-ink) 92%, var(--club-paper));
+  --text-soft: color-mix(in srgb, var(--club-ink) 58%, var(--club-paper));
+  --text-invert: var(--club-paper);
+  --border: color-mix(in srgb, var(--club-silver) 52%, var(--club-paper));
+  --hero-bg: color-mix(in srgb, var(--club-silver) 18%, var(--club-paper));
+  --hero-text: var(--club-ink);
+  --header-bg: color-mix(in srgb, var(--club-paper) 86%, transparent);
+  --header-text: var(--club-ink);
+  --shadow: 0 2px 6px rgba(0, 0, 0, 0.05), 0 18px 40px rgba(0, 0, 0, 0.09);
+  --accent-on-bg: var(--accent-deep);
+  /* Soft, rounded, premium shape language. */
+  --radius: 8px;
+  --radius-lg: 16px;
+}

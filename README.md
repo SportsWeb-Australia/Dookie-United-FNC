@@ -26,16 +26,19 @@ npm run build    # production build to /dist
 npm run preview  # preview the production build
 ```
 
-## Two design variants
+## Design variants
 
-The same content renders in two visual templates, chosen by `variant` in the config:
+The same content renders in four visual templates, chosen by `variant` in the config:
 
 - **`heritage`** — light, clean, community/sponsor-friendly (default).
 - **`broadcast`** — dark, bold, match-day broadcast energy.
+- **`arena`** — sharp-edged, flat, high-contrast sporting look with a black hero.
+- **`classic`** — silver-toned, rounded, soft premium-heritage feel.
 
-While `showVariantSwitcher: true`, a floating **Design** toggle (bottom-right) lets a
-club preview both live before choosing. **Set `showVariantSwitcher: false` for
-production** once a design is locked in.
+All four share identical content and structure; only the design tokens (colours,
+surfaces, corner radius, shadow) change. While `showVariantSwitcher: true`, a
+floating **Design** toggle (bottom-right) lets a club preview all four live before
+choosing. **Set `showVariantSwitcher: false` for production** once a design is locked.
 
 ## Make a new club from this template
 
