@@ -1,5 +1,6 @@
 import { useClub } from "../ClubContext";
 import { SmartLink } from "../SmartLink";
+import { EditableText } from "../edit/Editable";
 
 export function JoinCTA() {
   const { club } = useClub();
@@ -13,8 +14,8 @@ export function JoinCTA() {
         <i />
       </div>
       <div className="sw-container">
-        <h2>{join.heading}</h2>
-        <p>{join.blurb}</p>
+        <EditableText as="h2" k="join.heading" value={join.heading} />
+        <EditableText as="p" k="join.blurb" value={join.blurb} />
         <div className="sw-join-options">
           {join.options.map((o) => (
             <SmartLink key={o.label} href={o.href} className="sw-btn">

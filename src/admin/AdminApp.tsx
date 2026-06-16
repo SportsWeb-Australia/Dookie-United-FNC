@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { AuthProvider, useAuth } from "../lib/auth";
+import { useAuth } from "../lib/auth";
 import { supabase } from "../lib/supabase";
 import { RESOURCES } from "./resources";
 import { ResourceManager } from "./ResourceManager";
@@ -88,9 +88,5 @@ function AdminInner() {
 }
 
 export function AdminApp() {
-  return (
-    <AuthProvider>
-      <AdminInner />
-    </AuthProvider>
-  );
+  return <AdminInner />;
 }

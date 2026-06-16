@@ -1,4 +1,6 @@
 import { useClub } from "../components/ClubContext";
+import { useEdit } from "../lib/edit";
+import { EditableText, EditableImage } from "../components/edit/Editable";
 import { PageHero } from "../components/layout/PageHero";
 import { AccentBars } from "../components/layout/Chevron";
 import { MediaPlaceholder } from "../components/blocks/MediaPlaceholder";
@@ -7,7 +9,9 @@ import { Committee } from "../components/blocks/Committee";
 
 export function About() {
   const { club } = useClub();
+  const { canEdit, editing, value } = useEdit();
   const { about, identity } = club;
+  const aboutPhoto = value("about.photo", "");
 
   return (
     <>
@@ -21,7 +25,11 @@ export function About() {
 
       <section className="sw-section">
         <div className="sw-container">
-          <MediaPlaceholder label="Club / clubrooms photo" className="sw-media-band" />
+          {aboutPhoto || (canEdit && editing) ? (
+            <EditableImage k="about.photo" value={aboutPhoto} alt="Club photo" className="sw-media-band" />
+          ) : (
+            <MediaPlaceholder label="Club / clubrooms photo" className="sw-media-band" />
+          )}
         </div>
       </section>
 
@@ -29,7 +37,7 @@ export function About() {
         <div className="sw-container">
           <div className="sw-prose">
             {about.body.map((p, i) => (
-              <p key={i}>{p}</p>
+              <EditableText key={i} as="p" k={`about.body.${i}`} value={p} />
             ))}
           </div>
 
@@ -53,10 +61,10 @@ export function About() {
             <span className="sw-eyebrow">What we stand for</span>
             <h2 style={{ fontSize: "var(--fs-h2)", margin: "0.6rem 0 2rem" }}>Our values</h2>
             <div className="sw-values">
-              {about.values.map((v) => (
+              {about.values.map((v, i) => (
                 <div className="sw-value" key={v.title}>
-                  <h4>{v.title}</h4>
-                  <p>{v.text}</p>
+                  <EditableText as="h4" k={`about.values.${i}.title`} value={v.title} />
+                  <EditableText as="p" k={`about.values.${i}.text`} value={v.text} />
                 </div>
               ))}
             </div>
@@ -73,8 +81,8 @@ export function About() {
             <div className="sw-timeline">
               {about.history.map((m, i) => (
                 <div className="sw-tl-row" key={i}>
-                  <span className="sw-tl-year">{m.year}</span>
-                  <p>{m.text}</p>
+                  <EditableText as="span" className="sw-tl-year" k={`about.history.${i}.year`} value={String(m.year)} />
+                  <EditableText as="p" k={`about.history.${i}.text`} value={m.text} />
                 </div>
               ))}
             </div>

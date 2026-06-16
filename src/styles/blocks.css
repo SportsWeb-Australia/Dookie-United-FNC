@@ -1827,3 +1827,46 @@
   margin: 1rem 0; padding: 0.5rem 1.1rem; border-left: 3px solid var(--accent);
   color: var(--text-soft); font-style: italic;
 }
+
+/* ============================================================
+   Inline edit mode
+   ============================================================ */
+.sw-edit-toggle-wrap {
+  position: fixed; right: 16px; bottom: 84px; z-index: 1200;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 6px;
+}
+@media (min-width: 900px) { .sw-edit-toggle-wrap { bottom: 24px; } }
+.sw-edit-toggle {
+  border: none; border-radius: 999px; padding: 0.7rem 1.2rem; cursor: pointer;
+  background: var(--club-ink, #14191f); color: #fff; font-weight: 700;
+  font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: 0.02em;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+.sw-edit-toggle.on { background: var(--accent); color: var(--club-on-primary, #fff); }
+.sw-edit-toggle-err {
+  background: #fee2e2; color: #b91c1c; font-size: 0.78rem;
+  padding: 0.35rem 0.6rem; border-radius: 8px; max-width: 240px;
+}
+
+/* Editable affordances — only visible while in edit mode */
+.sw-editable {
+  outline: 2px dashed transparent; outline-offset: 3px; border-radius: 3px;
+  transition: outline-color 0.15s, background 0.15s; cursor: text;
+}
+.sw-editable:hover { outline-color: color-mix(in srgb, var(--accent) 55%, transparent); background: color-mix(in srgb, var(--accent) 6%, transparent); }
+.sw-editable:focus { outline-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); }
+.sw-editable[data-busy] { opacity: 0.55; }
+
+.sw-editable-img { position: relative; display: inline-block; }
+.sw-editable-img-empty {
+  display: grid; place-items: center; min-width: 120px; min-height: 120px;
+  background: var(--surface-2); color: var(--text-soft); border-radius: var(--radius);
+  font-size: 0.85rem;
+}
+.sw-editable-img-btn {
+  position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%);
+  background: var(--club-ink, #14191f); color: #fff; cursor: pointer;
+  font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700;
+  padding: 0.4rem 0.7rem; border-radius: 999px; white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}

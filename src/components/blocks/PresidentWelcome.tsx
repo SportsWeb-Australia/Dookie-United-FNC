@@ -1,6 +1,8 @@
 import { useClub } from "../ClubContext";
 import { SmartLink } from "../SmartLink";
 import { AccentBars } from "../layout/Chevron";
+import { useEdit } from "../../lib/edit";
+import { EditableText, EditableImage } from "../edit/Editable";
 
 interface Props {
   /** Show a shortened welcome (first two paragraphs) with a link to About. */
@@ -9,6 +11,7 @@ interface Props {
 
 export function PresidentWelcome({ condensed }: Props) {
   const { club } = useClub();
+  const { canEdit, editing } = useEdit();
   const { president, identity } = club;
   const paras = condensed ? president.body.slice(0, 2) : president.body;
 
@@ -20,25 +23,25 @@ export function PresidentWelcome({ condensed }: Props) {
         <div className="sw-welcome-grid" style={{ marginTop: "1.5rem" }}>
           <aside className="sw-welcome-aside">
             <div className="sw-welcome-portrait">
-              {president.portrait ? (
-                <img src={president.portrait} alt={president.name} />
+              {president.portrait || (canEdit && editing) ? (
+                <EditableImage k="president.portrait" value={president.portrait ?? ""} alt={president.name} />
               ) : (
                 identity.initials
               )}
             </div>
-            <div className="sw-welcome-name">{president.name}</div>
-            <div className="sw-welcome-role">{president.role}</div>
+            <EditableText as="div" className="sw-welcome-name" k="president.name" value={president.name} />
+            <EditableText as="div" className="sw-welcome-role" k="president.role" value={president.role} />
           </aside>
           <div className="sw-welcome-body">
             {paras.map((p, i) => (
-              <p key={i}>{p}</p>
+              <EditableText key={i} as="p" k={`president.body.${i}`} value={p} />
             ))}
             {condensed ? (
               <SmartLink href="/about" className="sw-link-arrow">
                 More about the club →
               </SmartLink>
             ) : (
-              president.signoff && <p className="sw-signoff">{president.signoff}</p>
+              president.signoff && <EditableText as="p" className="sw-signoff" k="president.signoff" value={president.signoff} />
             )}
           </div>
         </div>

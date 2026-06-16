@@ -180,6 +180,29 @@ create policy club_modules_member_write on public.club_modules
 -- on conflict (club_id, module_key) do update set status = excluded.status;
 
 -- ============================================================
--- 6. Tell PostgREST to refresh its schema cache
+-- 6. Inline page-content overrides (live-site text + image edits)
+-- ============================================================
+create table if not exists public.club_content (
+  club_id     uuid not null references public.clubs(id) on delete cascade,
+  content_key text not null,
+  value       text,
+  updated_at  timestamptz not null default now(),
+  primary key (club_id, content_key)
+);
+
+alter table public.club_content enable row level security;
+
+drop policy if exists club_content_public_read on public.club_content;
+create policy club_content_public_read on public.club_content
+  for select using (true);
+
+drop policy if exists club_content_member_write on public.club_content;
+create policy club_content_member_write on public.club_content
+  for all
+  using (club_id in (select public.my_club_ids()))
+  with check (club_id in (select public.my_club_ids()));
+
+-- ============================================================
+-- 7. Tell PostgREST to refresh its schema cache
 -- ============================================================
 notify pgrst, 'reload schema';

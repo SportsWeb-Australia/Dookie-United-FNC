@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { useClub } from "../ClubContext";
 import { SmartLink } from "../SmartLink";
+import { EditableText } from "../edit/Editable";
 
 export function Footer() {
   const { club } = useClub();
@@ -62,7 +63,7 @@ export function Footer() {
           </div>
         </div>
 
-        <p className="sw-ack">{footer.acknowledgement}</p>
+        <EditableText as="p" className="sw-ack" k="footer.acknowledgement" value={footer.acknowledgement} />
 
         <div className="sw-footer-bottom">
           <span>

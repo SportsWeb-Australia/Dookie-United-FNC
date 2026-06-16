@@ -278,6 +278,17 @@ export async function getClubConfig(): Promise<ClubConfig> {
     }
     cfg.enabledModules = [...enabledKeys];
 
+    // Inline content overrides (hero copy, images, etc.) edited on the live site.
+    const { data: contentRows, error: contentErr } = await supabase
+      .from("club_content")
+      .select("content_key,value")
+      .eq("club_id", clubId);
+    if (!contentErr && contentRows && contentRows.length) {
+      const map: Record<string, string> = {};
+      for (const r of contentRows) if (r.value != null) map[r.content_key] = r.value;
+      cfg.content = map;
+    }
+
     return cfg;
   } catch {
     // Any failure → safe, complete static config.

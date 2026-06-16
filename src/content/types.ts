@@ -314,6 +314,8 @@ export interface ClubConfig {
 
   /** Module keys this club has switched on (from lib/modules.ts catalog). */
   enabledModules?: string[];
+  /** Inline page-content overrides (text + image URLs) keyed by content_key. */
+  content?: Record<string, string>;
   /** Platform/sales settings used by the module upgrade pages. */
   platform?: {
     salesEmail?: string;

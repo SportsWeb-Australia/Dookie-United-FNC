@@ -3,6 +3,9 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import { club as staticClub } from "./content/club.config";
 import { getClubConfig } from "./lib/loadClub";
 import { ClubContext } from "./components/ClubContext";
+import { AuthProvider } from "./lib/auth";
+import { EditProvider } from "./lib/edit";
+import { EditToggle } from "./components/edit/Editable";
 import { registerServiceWorker } from "./lib/pwa";
 import type { ClubConfig, DesignVariant } from "./content/types";
 
@@ -79,46 +82,53 @@ export default function App() {
   // Admin runs as its own full-screen app, without the public site chrome.
   if (isAdmin) {
     return (
-      <ClubContext.Provider value={{ club, variant, setVariant }}>
-        <Routes>
-          <Route path="/admin/*" element={<AdminApp />} />
-        </Routes>
-      </ClubContext.Provider>
+      <AuthProvider>
+        <ClubContext.Provider value={{ club, variant, setVariant }}>
+          <Routes>
+            <Route path="/admin/*" element={<AdminApp />} />
+          </Routes>
+        </ClubContext.Provider>
+      </AuthProvider>
     );
   }
 
   return (
-    <ClubContext.Provider value={{ club, variant, setVariant }}>
-      <a href="#main" className="sw-skip">
-        Skip to content
-      </a>
-      <ScrollToTop />
-      <SeoManager />
-      <AnnouncementBar />
-      <Header />
-      <main id="main">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/teams" element={<Teams />} />
-          <Route path="/football" element={<Sport sport="Football" />} />
-          <Route path="/netball" element={<Sport sport="Netball" />} />
-          <Route path="/program/:slug" element={<Program />} />
-          <Route path="/fixtures" element={<Fixtures />} />
-          <Route path="/news" element={<News />} />
-          <Route path="/news/:slug" element={<NewsArticle />} />
-          <Route path="/events" element={<Events />} />
-          <Route path="/events/:slug" element={<EventDetail />} />
-          <Route path="/sponsors" element={<Sponsors />} />
-          <Route path="/documents" element={<Documents />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </main>
-      <Footer />
-      <MobileTabBar />
-      <AppPrompts />
-    </ClubContext.Provider>
+    <AuthProvider>
+      <ClubContext.Provider value={{ club, variant, setVariant }}>
+        <EditProvider>
+          <a href="#main" className="sw-skip">
+            Skip to content
+          </a>
+          <ScrollToTop />
+          <SeoManager />
+          <AnnouncementBar />
+          <Header />
+          <main id="main">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/teams" element={<Teams />} />
+              <Route path="/football" element={<Sport sport="Football" />} />
+              <Route path="/netball" element={<Sport sport="Netball" />} />
+              <Route path="/program/:slug" element={<Program />} />
+              <Route path="/fixtures" element={<Fixtures />} />
+              <Route path="/news" element={<News />} />
+              <Route path="/news/:slug" element={<NewsArticle />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/events/:slug" element={<EventDetail />} />
+              <Route path="/sponsors" element={<Sponsors />} />
+              <Route path="/documents" element={<Documents />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </main>
+          <Footer />
+          <MobileTabBar />
+          <AppPrompts />
+          <EditToggle />
+        </EditProvider>
+      </ClubContext.Provider>
+    </AuthProvider>
   );
 }

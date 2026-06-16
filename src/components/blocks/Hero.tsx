@@ -1,6 +1,7 @@
 import { useClub } from "../ClubContext";
 import { SmartLink } from "../SmartLink";
 import { AccentBars } from "../layout/Chevron";
+import { EditableText } from "../edit/Editable";
 import type { ClubConfig, DesignVariant } from "../../content/types";
 
 const MEDIA_VARIANTS: DesignVariant[] = ["stadium", "editorial", "momentum", "coastal"];
@@ -34,9 +35,7 @@ function HeroStandard({ club }: { club: ClubConfig }) {
       <div className="sw-container">
         <div className="sw-hero-inner">
           <AccentBars />
-          <span className="sw-eyebrow">{hero.eyebrow}</span>
-          <h1>{hero.title}</h1>
-          <p className="sw-hero-sub">{hero.subtitle}</p>
+          <HeroCopy hero={hero} />
           <HeroCtas club={club} />
         </div>
       </div>
@@ -65,9 +64,7 @@ function HeroMedia({ club, variant }: { club: ClubConfig; variant: DesignVariant
       <div className="sw-container">
         <div className="sw-hero-inner">
           <AccentBars />
-          <span className="sw-eyebrow">{hero.eyebrow}</span>
-          <h1>{hero.title}</h1>
-          <p className="sw-hero-sub">{hero.subtitle}</p>
+          <HeroCopy hero={hero} />
           <HeroCtas club={club} />
         </div>
       </div>
@@ -91,6 +88,16 @@ function HeroMedia({ club, variant }: { club: ClubConfig; variant: DesignVariant
         </div>
       )}
     </section>
+  );
+}
+
+function HeroCopy({ hero }: { hero: ClubConfig["hero"] }) {
+  return (
+    <>
+      <EditableText as="span" className="sw-eyebrow" k="hero.eyebrow" value={hero.eyebrow} />
+      <EditableText as="h1" k="hero.title" value={hero.title} />
+      <EditableText as="p" className="sw-hero-sub" k="hero.subtitle" value={hero.subtitle} />
+    </>
   );
 }
 
