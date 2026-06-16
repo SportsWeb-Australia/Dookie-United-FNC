@@ -8,7 +8,6 @@ import type { ClubConfig, DesignVariant } from "./content/types";
 
 import { Header } from "./components/layout/Header";
 import { Footer } from "./components/layout/Footer";
-import { VariantSwitcher } from "./components/layout/VariantSwitcher";
 import { MobileTabBar } from "./components/layout/MobileTabBar";
 import { AnnouncementBar } from "./components/blocks/AnnouncementBar";
 import { AppPrompts } from "./components/pwa/AppPrompts";
@@ -24,8 +23,6 @@ import { NewsArticle } from "./pages/NewsArticle";
 import { Events } from "./pages/Events";
 import { EventDetail } from "./pages/EventDetail";
 import { Sponsors } from "./pages/Sponsors";
-import { Modules } from "./pages/Modules";
-import { ModulePage } from "./pages/ModulePage";
 import { Documents } from "./pages/Documents";
 import { Contact } from "./pages/Contact";
 import { Register } from "./pages/Register";
@@ -113,8 +110,6 @@ export default function App() {
           <Route path="/events" element={<Events />} />
           <Route path="/events/:slug" element={<EventDetail />} />
           <Route path="/sponsors" element={<Sponsors />} />
-          <Route path="/modules" element={<Modules />} />
-          <Route path="/modules/:key" element={<ModulePage />} />
           <Route path="/documents" element={<Documents />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/register" element={<Register />} />
@@ -124,7 +119,6 @@ export default function App() {
       <Footer />
       <MobileTabBar />
       <AppPrompts />
-      {club.showVariantSwitcher && <VariantSwitcher />}
     </ClubContext.Provider>
   );
 }

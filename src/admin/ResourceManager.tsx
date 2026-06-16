@@ -400,7 +400,11 @@ function UploadField({ field, value, onChange, clubId, folder }: { field: Field;
 
   const onPick = async (e: { target: { files: FileList | null; value: string } }) => {
     const file = e.target.files?.[0];
-    if (!file || !clubId) return;
+    if (!file) return;
+    if (!clubId) {
+      setErr("Your account isn't linked to a club yet, so uploads are disabled.");
+      return;
+    }
     setBusy(true);
     setErr(null);
     try {
@@ -426,7 +430,7 @@ function UploadField({ field, value, onChange, clubId, folder }: { field: Field;
           <video src={value} className="sw-admin-thumb" controls preload="metadata" />
         ))}
       <div className="sw-admin-uploadrow">
-        <input type="file" accept={isImage ? "image/*" : "video/*"} onChange={onPick} disabled={busy || !clubId} />
+        <input type="file" accept={isImage ? "image/*" : "video/*"} onChange={onPick} disabled={busy} />
         {busy && <span className="sw-admin-uploadbusy">Uploading…</span>}
         {value && !busy && (
           <button type="button" className="sw-admin-clear" onClick={() => onChange("")}>

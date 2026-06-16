@@ -253,6 +253,18 @@ export async function getClubConfig(): Promise<ClubConfig> {
       };
     }
 
+    // Module entitlement — which add-ons this club has. Falls back to the
+    // static config list if the club_modules table isn't present yet.
+    const { data: moduleRows, error: moduleErr } = await supabase
+      .from("club_modules")
+      .select("module_key,status")
+      .eq("club_id", clubId);
+    if (!moduleErr && moduleRows) {
+      cfg.enabledModules = moduleRows
+        .filter((m) => m.status === "enabled" || m.status === "trial")
+        .map((m) => m.module_key);
+    }
+
     return cfg;
   } catch {
     // Any failure → safe, complete static config.

@@ -40,7 +40,6 @@ export function Footer() {
             <Link to="/register">Register to play</Link>
             <Link to="/register">Volunteer</Link>
             <Link to="/sponsors">Become a sponsor</Link>
-            <Link to="/modules">Club tools</Link>
             <Link to="/contact">Contact us</Link>
           </div>
 

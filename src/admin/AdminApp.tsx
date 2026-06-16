@@ -4,6 +4,8 @@ import { AuthProvider, useAuth } from "../lib/auth";
 import { supabase } from "../lib/supabase";
 import { RESOURCES } from "./resources";
 import { ResourceManager } from "./ResourceManager";
+import { AdminWebsite } from "./AdminWebsite";
+import { AdminModules } from "./AdminModules";
 import { Login } from "./Login";
 
 function AdminInner() {
@@ -56,6 +58,13 @@ function AdminInner() {
               {r.label}
             </button>
           ))}
+          <div className="sw-admin-navgroup">Setup</div>
+          <button data-active={active === "__website"} onClick={() => setActive("__website")}>
+            Website style
+          </button>
+          <button data-active={active === "__modules"} onClick={() => setActive("__modules")}>
+            Modules
+          </button>
         </nav>
         <div className="sw-admin-side-foot">
           <Link to="/" className="sw-link-arrow">View site →</Link>
@@ -66,7 +75,13 @@ function AdminInner() {
         <div className="sw-admin-userbar">
           <span>{email}{membership.role ? ` · ${membership.role}` : ""}</span>
         </div>
-        <ResourceManager resource={resource} />
+        {active === "__website" ? (
+          <AdminWebsite />
+        ) : active === "__modules" ? (
+          <AdminModules />
+        ) : (
+          <ResourceManager resource={resource} />
+        )}
       </main>
     </div>
   );

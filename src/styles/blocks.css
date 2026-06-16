@@ -1590,3 +1590,28 @@
   background: var(--ink); color: #fff; font-family: var(--font-mono); font-weight: 700;
 }
 .sw-msteps li span { color: var(--muted, #555); }
+
+/* Admin — login breathing room */
+.sw-admin-login-card .sw-admin-field { margin-bottom: 1.1rem; }
+.sw-admin-login-card .sw-btn { margin-top: 1.5rem; }
+
+/* Admin — nav group label + setup views */
+.sw-admin-navgroup {
+  margin: 1.25rem 0 0.4rem; padding: 0 0.25rem;
+  font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: rgba(255, 255, 255, 0.45);
+}
+.sw-admin-styles { display: grid; gap: 0.75rem; grid-template-columns: 1fr; }
+@media (min-width: 560px) { .sw-admin-styles { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 900px) { .sw-admin-styles { grid-template-columns: repeat(3, 1fr); } }
+.sw-admin-style {
+  display: flex; flex-direction: column; gap: 0.25rem; text-align: left;
+  padding: 1rem 1.1rem; border: 1px solid #e4e4e7; border-radius: 10px;
+  background: #fff; cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
+}
+.sw-admin-style strong { font-size: 1rem; }
+.sw-admin-style span { font-size: 0.82rem; color: #71717a; }
+.sw-admin-style[data-active="true"] {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 30%, transparent);
+}
