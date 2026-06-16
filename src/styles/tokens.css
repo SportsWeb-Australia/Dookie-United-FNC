@@ -291,3 +291,53 @@
   --head-align: center;
   --section-pad: clamp(4.5rem, 9vw, 8rem);
 }
+
+/* ---- Structural variants: typographic flavour (layout lives in blocks.css) ---- */
+[data-variant="broadsheet"] {
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --heading-transform: none;
+  --heading-tracking: -0.01em;
+  --heading-weight: 800;
+}
+[data-variant="matchday"] {
+  --font-display: "Anton", Impact, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --heading-transform: uppercase;
+  --heading-tracking: 0.01em;
+  --heading-weight: 400;
+}
+[data-variant="appshell"] {
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --heading-transform: none;
+  --heading-tracking: -0.02em;
+  --heading-weight: 700;
+  --radius: 14px;
+  --radius-lg: 20px;
+}
+[data-variant="bento"] {
+  --font-display: "Archivo", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --heading-transform: none;
+  --heading-tracking: -0.02em;
+  --heading-weight: 800;
+  --radius: 12px;
+  --radius-lg: 18px;
+}
+[data-variant="sponsorforward"] {
+  --font-display: "Saira Condensed", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --heading-transform: uppercase;
+  --heading-tracking: 0.01em;
+  --heading-weight: 700;
+}
+[data-variant="portal"] {
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --heading-transform: none;
+  --heading-tracking: -0.01em;
+  --heading-weight: 700;
+  --radius: 10px;
+  --radius-lg: 14px;
+}

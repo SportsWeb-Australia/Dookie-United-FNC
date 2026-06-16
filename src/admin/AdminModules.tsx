@@ -19,6 +19,8 @@ export function AdminModules() {
 
   if (mod) {
     const on = enabled.has(mod.key);
+    const appUrl = mod.key === "volunteers" ? club.platform?.volunteerAppUrl || "" : mod.appUrl ?? "";
+    const canEmbed = mod.key === "volunteers" && !!appUrl;
     return (
       <div className="sw-admin-panel">
         <div className="sw-admin-formhead">
@@ -34,10 +36,12 @@ export function AdminModules() {
               <strong>This module is active for {club.identity.shortName}.</strong>
               <p>Jump in below, or follow the quick start if you&apos;re new to it.</p>
             </div>
-            {mod.appUrl ? (
-              <a className="sw-btn" href={mod.appUrl} target="_blank" rel="noopener noreferrer">
+            {appUrl ? (
+              <a className="sw-btn" href={appUrl} target="_blank" rel="noopener noreferrer">
                 Open {mod.name} ↗
               </a>
+            ) : mod.key === "volunteers" ? (
+              <span className="sw-flag">Set volunteerAppUrl in config to open it</span>
             ) : (
               <span className="sw-flag">Launching soon</span>
             )}
@@ -55,6 +59,18 @@ export function AdminModules() {
               <a className="sw-btn sw-btn--ghost" href={mailto(`Upgrade — ${mod.name}`, mod.name)}>
                 Upgrade plan
               </a>
+            </div>
+          </div>
+        )}
+
+        {on && canEmbed && (
+          <div className="sw-module-section">
+            <h2>Live preview</h2>
+            <p className="sw-admin-note">
+              The Volunteer Manager running inside your admin. You may need to sign in to it the first time.
+            </p>
+            <div className="sw-module-embed">
+              <iframe src={appUrl} title="Volunteer Manager" loading="lazy" />
             </div>
           </div>
         )}

@@ -10,6 +10,12 @@ const STYLES: { id: DesignVariant; label: string; note: string }[] = [
   { id: "editorial", label: "Editorial", note: "Magazine-style overlap." },
   { id: "momentum", label: "Momentum", note: "Diagonal split, energetic." },
   { id: "coastal", label: "Coastal", note: "Airy, light, relaxed." },
+  { id: "broadsheet", label: "Broadsheet", note: "News-led newspaper front page." },
+  { id: "matchday", label: "Matchday", note: "Next match + scores up top." },
+  { id: "appshell", label: "App shell", note: "Member-app card feed." },
+  { id: "bento", label: "Bento", note: "Asymmetric magazine grid." },
+  { id: "sponsorforward", label: "Sponsor-forward", note: "Partners front and centre." },
+  { id: "portal", label: "Portal", note: "Sidebar nav + dashboard." },
 ];
 
 export function AdminWebsite() {

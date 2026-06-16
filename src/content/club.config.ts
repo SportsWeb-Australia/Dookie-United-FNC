@@ -366,6 +366,8 @@ export const club: ClubConfig = {
   platform: {
     salesEmail: "carson@clicksportsmedia.com",
     trialDays: 14,
+    // Set this to your deployed Volunteer Manager URL to open/embed it here.
+    volunteerAppUrl: "https://volunteer-manager-e8ti.vercel.app/",
   },
 
   footer: {

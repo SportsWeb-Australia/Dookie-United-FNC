@@ -18,7 +18,13 @@ export type DesignVariant =
   | "stadium"
   | "editorial"
   | "momentum"
-  | "coastal";
+  | "coastal"
+  | "broadsheet"
+  | "matchday"
+  | "appshell"
+  | "bento"
+  | "sponsorforward"
+  | "portal";
 
 export interface BrandColours {
   /** Primary ink / dominant colour (Dookie: black). */
@@ -125,6 +131,7 @@ export interface DocItem {
 export interface Fixture {
   round: string;
   date: string;
+  iso?: string;
   opponent: string;
   opponentLogo?: string;
   venue: "Home" | "Away";
@@ -310,6 +317,8 @@ export interface ClubConfig {
   platform?: {
     salesEmail?: string;
     trialDays?: number;
+    /** Deployed Volunteer Manager app URL — opened/embedded from the admin. */
+    volunteerAppUrl?: string;
   };
 
   footer: {

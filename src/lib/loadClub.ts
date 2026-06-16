@@ -206,6 +206,7 @@ export async function getClubConfig(): Promise<ClubConfig> {
           (r): Fixture => ({
             round: r.round ?? "",
             date: formatMatchDate(r.match_date),
+            iso: r.match_date ?? undefined,
             opponent: r.opponent ?? "",
             opponentLogo: r.opponent_logo ?? undefined,
             venue: r.home_away === "Away" ? "Away" : "Home",
@@ -253,17 +254,30 @@ export async function getClubConfig(): Promise<ClubConfig> {
       };
     }
 
-    // Module entitlement — which add-ons this club has. Falls back to the
-    // static config list if the club_modules table isn't present yet.
-    const { data: moduleRows, error: moduleErr } = await supabase
+    // Module entitlement. Two sources, merged:
+    //  - club_modules: the generic per-club add-on table (Learn/Books/etc.)
+    //  - modules:      the core table that governs Volunteer Manager and other
+    //                  first-party modules (module_name + enabled).
+    // Both are read defensively so a missing table never breaks the load.
+    const enabledKeys = new Set<string>(cfg.enabledModules ?? []);
+    const { data: cmRows, error: cmErr } = await supabase
       .from("club_modules")
       .select("module_key,status")
       .eq("club_id", clubId);
-    if (!moduleErr && moduleRows) {
-      cfg.enabledModules = moduleRows
-        .filter((m) => m.status === "enabled" || m.status === "trial")
-        .map((m) => m.module_key);
+    if (!cmErr && cmRows && cmRows.length) {
+      enabledKeys.clear();
+      for (const m of cmRows) {
+        if (m.status === "enabled" || m.status === "trial") enabledKeys.add(m.module_key);
+      }
     }
+    const { data: modRows, error: modErr } = await supabase
+      .from("modules")
+      .select("module_name,enabled")
+      .eq("club_id", clubId);
+    if (!modErr && modRows) {
+      for (const m of modRows) if (m.enabled) enabledKeys.add(m.module_name as string);
+    }
+    cfg.enabledModules = [...enabledKeys];
 
     return cfg;
   } catch {
