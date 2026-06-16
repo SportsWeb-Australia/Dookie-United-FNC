@@ -1967,3 +1967,27 @@
   background: #14191f; color: #e7e7ea; border-radius: 10px; padding: 1rem 1.1rem;
   overflow-x: auto; font-size: 0.82rem; line-height: 1.6; white-space: pre;
 }
+
+/* ============================================================
+   SportsWeb platform brand scope
+   Overriding the two source tokens re-skins everything inside.
+   ============================================================ */
+.sw-brandwrap {
+  --club-accent: #2563EB;   /* SportsWeb chrome blue */
+  --club-ink: #0E1320;      /* SportsWeb ink */
+  --club-paper: #ffffff;
+  --club-silver: #9AA3B2;
+}
+
+/* Login — SportsWeb wordmark */
+.sw-login-brand { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 1.1rem; }
+.sw-login-mark {
+  display: grid; place-items: center; width: 38px; height: 38px; border-radius: 9px;
+  background: var(--accent); color: #fff; font-family: var(--font-display, sans-serif);
+  font-weight: 800; font-size: 1rem; letter-spacing: 0.02em;
+}
+.sw-login-word {
+  font-family: var(--font-display, sans-serif); font-weight: 800; font-size: 1.35rem;
+  text-transform: uppercase; letter-spacing: 0.04em; color: var(--club-ink);
+}
+.sw-login-sub { color: var(--text-soft); font-size: 0.82rem; margin-top: 0.4rem; }

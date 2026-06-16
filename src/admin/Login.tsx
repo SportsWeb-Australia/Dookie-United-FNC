@@ -1,10 +1,8 @@
 import { useState } from "react";
 import { useAuth } from "../lib/auth";
-import { useClub } from "../components/ClubContext";
 
 export function Login() {
   const { signIn } = useAuth();
-  const { club } = useClub();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -19,15 +17,14 @@ export function Login() {
   };
 
   return (
-    <div className="sw-admin-login">
+    <div className="sw-admin-login sw-brandwrap">
       <div className="sw-admin-login-card">
-        <div className="sw-accent-bars" aria-hidden="true">
-          <i />
-          <i />
-          <i />
+        <div className="sw-login-brand">
+          <span className="sw-login-mark">S1</span>
+          <span className="sw-login-word">SportsWeb</span>
         </div>
-        <h1>{club.identity.shortName} Admin</h1>
-        <p>Sign in to manage {club.identity.name}.</p>
+        <h1>Club admin</h1>
+        <p>Sign in to manage your club.</p>
         {error && <p className="sw-admin-error">{error}</p>}
         <label className="sw-admin-field">
           <span>Email</span>
@@ -52,6 +49,7 @@ export function Login() {
         <button className="sw-btn" onClick={submit} disabled={busy}>
           {busy ? "Signing in…" : "Sign in"}
         </button>
+        <p className="sw-login-sub">SportsWeb One · club management platform</p>
       </div>
     </div>
   );

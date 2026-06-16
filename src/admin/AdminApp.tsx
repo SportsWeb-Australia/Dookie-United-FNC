@@ -50,9 +50,12 @@ function AdminInner() {
   const isSuperView = active === "__super_clubs" || active === "__super_integrations";
   // A platform operator with no club of their own lands on the platform views.
   const effectiveActive = !membership && !isSuperView ? "__super_clubs" : active;
+  // The dedicated operator console (platform admin, no club) wears SportsWeb colours;
+  // a club admin keeps their own club colours.
+  const operatorConsole = isPlatformAdmin && !membership;
 
   return (
-    <div className="sw-admin">
+    <div className={`sw-admin${operatorConsole ? " sw-brandwrap" : ""}`}>
       <aside className="sw-admin-side">
         <div className="sw-admin-brand">
           <strong>{membership ? "Club Admin" : "Platform Admin"}</strong>

@@ -283,9 +283,10 @@ grant execute on function public.admin_list_clubs() to authenticated;
 grant execute on function public.admin_list_modules() to authenticated;
 grant execute on function public.admin_set_module(uuid, text, text) to authenticated;
 
--- >>> RUN ONCE to make yourself the platform admin (replace the email): <<<
+-- >>> RUN ONCE to make yourself the platform admin. <<<
+-- The account must already exist in Supabase Auth (create it first — see notes).
 -- insert into public.platform_admins (user_id)
--- select id from auth.users where email = 'carson@clicksportsmedia.com'
+-- select id from auth.users where email = 'info@sportsweb.com.au'
 -- on conflict do nothing;
 
 -- ============================================================
