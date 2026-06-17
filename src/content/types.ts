@@ -34,7 +34,11 @@ export type DesignVariant =
   | "fastbreak"
   | "leaguefooty"
   | "courtside"
-  | "juniors";
+  | "juniors"
+  | "rugbyunion"
+  | "rugbyleague"
+  | "oztag"
+  | "touch";
 
 export interface BrandColours {
   /** Primary ink / dominant colour (Dookie: black). */

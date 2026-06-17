@@ -35,6 +35,10 @@ const HERO_FAMILY: Record<DesignVariant, string> = {
   leaguefooty: "dark",
   courtside: "soft",
   juniors: "soft",
+  rugbyunion: "serif",
+  rugbyleague: "dark",
+  oztag: "bold",
+  touch: "soft",
 };
 
 export function PageHero({ eyebrow, title, intro }: Props) {

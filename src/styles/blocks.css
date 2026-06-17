@@ -2460,3 +2460,139 @@
   .sw-lf-grades, .sw-jr-grades, .sw-jr-info, .sw-lf-news, .sw-cs-grid { grid-template-columns: 1fr; }
   .sw-cs-grades { flex-direction: column; align-items: stretch; }
 }
+
+/* ---------------------------------------------------------------- RugbyUnion */
+.sw-ru-hero { background: var(--hero-bg); color: var(--hero-text); padding: clamp(3.5rem, 8vw, 6rem) 0; text-align: center; }
+.sw-ru-hero .sw-btn-ghost { color: var(--hero-text); border-color: color-mix(in srgb, var(--hero-text) 45%, transparent); }
+.sw-ru-crest { width: 84px; height: 84px; margin: 0 auto 1.25rem; display: grid; place-items: center; border-radius: 50%; border: 3px solid var(--accent); color: var(--accent); font-family: var(--font-display); font-weight: 700; font-size: 1.9rem; }
+.sw-ru-eyebrow { text-transform: uppercase; letter-spacing: 0.22em; font-size: 0.75rem; color: var(--accent); margin: 0 0 0.7rem; }
+.sw-ru-hero h1 { font-family: var(--font-display); font-weight: 700; font-size: var(--fs-h1); line-height: 1; margin: 0; }
+.sw-ru-sub { max-width: 48ch; margin: 1rem auto 1.75rem; font-size: var(--fs-lead); color: color-mix(in srgb, var(--hero-text) 84%, transparent); }
+.sw-ru-herocta { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+.sw-ru-honours { background: var(--accent); color: #1a1408; }
+.sw-ru-honours .sw-container { display: flex; gap: 2.5rem; justify-content: center; flex-wrap: wrap; padding-top: 0.85rem; padding-bottom: 0.85rem; }
+.sw-ru-honours span { font-family: var(--font-display); font-weight: 700; letter-spacing: 0.04em; font-size: 0.95rem; }
+.sw-ru-gradehead { text-align: center; margin-bottom: 1.75rem; }
+.sw-ru-gradehead h2, .sw-ru-newshead h2 { font-family: var(--font-display); font-weight: 700; margin: 0; }
+.sw-ru-grades { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.25rem; }
+.sw-ru-grade { display: flex; flex-direction: column; gap: 0.3rem; align-items: center; text-align: center; background: var(--surface); border: 1px solid var(--border); border-bottom: 4px solid var(--ru-green); border-radius: var(--radius-lg); padding: 1.5rem 1.25rem; box-shadow: var(--shadow); }
+.sw-ru-gradelabel { font-family: var(--font-display); font-weight: 700; font-size: 1.35rem; }
+.sw-ru-gradenote { color: var(--text-soft); font-size: 0.9rem; }
+.sw-ru-bottom { display: grid; grid-template-columns: 1fr 1.6fr; gap: 2rem; align-items: start; }
+.sw-ru-matchcard { background: var(--bg-invert); color: var(--text-invert); border-radius: var(--radius-lg); padding: 1.75rem; text-align: center; }
+.sw-ru-tag { text-transform: uppercase; letter-spacing: 0.14em; font-size: 0.75rem; color: var(--accent); }
+.sw-ru-matchcard h3 { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; margin: 0.5rem 0; }
+.sw-ru-matchcard p { opacity: 0.85; margin: 0 0 1rem; }
+.sw-ru-matchcard .sw-link-arrow { color: var(--accent); }
+.sw-ru-newshead { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1rem; }
+.sw-ru-newsitem { display: block; padding: 1rem 0; border-bottom: 1px solid var(--border); }
+.sw-ru-cat { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-on-bg); }
+.sw-ru-newsitem h4 { font-family: var(--font-display); font-weight: 700; font-size: 1.2rem; margin: 0.2rem 0 0.35rem; }
+.sw-ru-newsitem p { color: var(--text-soft); margin: 0; }
+
+/* --------------------------------------------------------------- RugbyLeague */
+.sw-rl-clash { background: linear-gradient(180deg, color-mix(in srgb, var(--accent) 22%, var(--rl-ink)), var(--rl-ink)); color: #fff; padding: clamp(3.5rem, 8vw, 6rem) 0; text-align: center; }
+.sw-rl-clash .sw-btn-ghost { color: #fff; border-color: rgba(255,255,255,0.5); }
+.sw-rl-eyebrow { text-transform: uppercase; letter-spacing: 0.16em; font-size: 0.8rem; color: var(--accent-on-bg); margin: 0 0 1rem; font-family: var(--font-display); font-weight: 800; }
+.sw-rl-vs { display: flex; align-items: center; justify-content: center; gap: 1.5rem; flex-wrap: wrap; }
+.sw-rl-team { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; font-size: clamp(1.8rem, 5vw, 3.4rem); line-height: 0.9; }
+.sw-rl-v { font-family: var(--font-display); color: var(--accent); font-size: clamp(1.2rem, 3vw, 2rem); }
+.sw-rl-clash h1 { font-family: var(--font-display); text-transform: uppercase; font-size: var(--fs-h1); margin: 0; }
+.sw-rl-meta { font-family: var(--font-mono); color: rgba(255,255,255,0.8); margin: 1rem 0 1.5rem; }
+.sw-rl-cta { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; }
+.sw-rl-formwrap { background: var(--accent); }
+.sw-rl-form { display: flex; align-items: center; gap: 1.25rem; padding-top: 1rem; padding-bottom: 1rem; flex-wrap: wrap; }
+.sw-rl-formlabel { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #fff; }
+.sw-rl-chips { display: flex; gap: 0.5rem; }
+.sw-rl-chip { width: 2rem; height: 2rem; display: grid; place-items: center; border-radius: 50%; font-family: var(--font-display); font-weight: 800; color: #fff; background: rgba(0,0,0,0.35); }
+.sw-rl-chip--w { background: #1f9d55; }
+.sw-rl-chip--l { background: #14110f; }
+.sw-rl-chip--d { background: #6b6358; }
+.sw-rl-form .sw-link-arrow { color: #fff; margin-left: auto; }
+.sw-rl-mid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.sw-rl-laddercard, .sw-rl-gradecard { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.5rem; }
+.sw-rl-laddercard h2, .sw-rl-gradecard h2, .sw-rl-newshead h2 { font-family: var(--font-display); text-transform: uppercase; margin: 0 0 1rem; }
+.sw-rl-ladder { list-style: none; margin: 0; padding: 0; }
+.sw-rl-ladder li { display: grid; grid-template-columns: auto 1fr auto; gap: 0.9rem; padding: 0.6rem 0.5rem; border-bottom: 1px solid var(--border); }
+.sw-rl-ladder li.is-club { background: color-mix(in srgb, var(--accent) 22%, transparent); font-weight: 700; border-radius: var(--radius); }
+.sw-rl-empty { color: var(--text-soft); }
+.sw-rl-gradegrid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.sw-rl-grade { display: block; background: var(--surface-2); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: var(--radius); padding: 0.9rem 1.1rem; font-family: var(--font-display); text-transform: uppercase; font-weight: 800; }
+.sw-rl-newshead { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.25rem; }
+.sw-rl-news { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+.sw-rl-card { display: block; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+.sw-rl-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+.sw-rl-cardbody { padding: 1.1rem 1.25rem; }
+.sw-rl-cat { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-on-bg); }
+.sw-rl-card h3 { font-family: var(--font-display); text-transform: uppercase; font-size: 1.15rem; margin: 0.3rem 0 0.4rem; }
+.sw-rl-card p { color: var(--text-soft); margin: 0; font-size: 0.92rem; }
+
+/* --------------------------------------------------------------------- Oztag */
+.sw-oz-hero { background: radial-gradient(circle at 80% -20%, color-mix(in srgb, var(--oz-cyan) 55%, transparent), transparent 55%), radial-gradient(circle at 0% 120%, color-mix(in srgb, var(--accent) 55%, transparent), transparent 50%), var(--hero-bg); color: #fff; padding: clamp(4rem, 9vw, 7rem) 0; text-align: center; }
+.sw-oz-eyebrow { text-transform: uppercase; letter-spacing: 0.18em; font-size: 0.8rem; color: var(--oz-cyan); margin: 0 0 0.7rem; font-family: var(--font-display); }
+.sw-oz-hero h1 { font-family: var(--font-display); text-transform: uppercase; font-weight: 700; font-size: var(--fs-h1); line-height: 0.92; margin: 0; }
+.sw-oz-sub { max-width: 46ch; margin: 1rem auto 2rem; font-size: var(--fs-lead); color: rgba(255,255,255,0.88); }
+.sw-oz-bigbtn { font-size: 1.1rem; padding: 1rem 2rem; border-radius: 999px; }
+.sw-oz-divhead { text-align: center; margin-bottom: 2rem; }
+.sw-oz-divhead h2 { font-family: var(--font-display); text-transform: uppercase; font-weight: 700; margin: 0 0 0.3rem; }
+.sw-oz-divhead p { color: var(--text-soft); margin: 0; }
+.sw-oz-divs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; }
+.sw-oz-div { display: flex; flex-direction: column; gap: 0.3rem; background: var(--surface); border: 2px solid var(--border); border-radius: var(--radius-lg); padding: 1.4rem 1.25rem; box-shadow: var(--shadow); transition: border-color var(--dur) var(--ease), transform var(--dur) var(--ease); }
+.sw-oz-div:hover { border-color: var(--accent); transform: translateY(-3px); }
+.sw-oz-divlabel { font-family: var(--font-display); text-transform: uppercase; font-weight: 700; font-size: 1.2rem; }
+.sw-oz-divnote { color: var(--text-soft); font-size: 0.85rem; }
+.sw-oz-nightswrap { padding: clamp(2.5rem, 5vw, 4rem) 0; background: var(--bg-alt); }
+.sw-oz-nightshead, .sw-oz-newshead { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.25rem; }
+.sw-oz-nightshead h2, .sw-oz-newshead h2 { font-family: var(--font-display); text-transform: uppercase; font-weight: 700; margin: 0; }
+.sw-oz-nights { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.sw-oz-night { background: var(--surface); border: 1px solid var(--border); border-top: 5px solid var(--accent); border-radius: var(--radius-lg); padding: 1.5rem; display: flex; flex-direction: column; gap: 0.3rem; }
+.sw-oz-nightday { font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent-on-bg); font-weight: 700; }
+.sw-oz-night strong { font-size: 1.2rem; }
+.sw-oz-nighttime { color: var(--text-soft); font-size: 0.9rem; }
+.sw-oz-news { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+.sw-oz-card { display: block; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.4rem; }
+.sw-oz-cat { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-on-bg); }
+.sw-oz-card h3 { font-family: var(--font-display); text-transform: uppercase; font-weight: 700; font-size: 1.15rem; margin: 0.3rem 0 0.4rem; }
+.sw-oz-card p { color: var(--text-soft); margin: 0; font-size: 0.92rem; }
+
+/* --------------------------------------------------------------------- Touch */
+.sw-to-hero { background: radial-gradient(circle at 90% 110%, color-mix(in srgb, var(--accent) 50%, transparent), transparent 50%), var(--hero-bg); color: #fff; padding: clamp(4rem, 9vw, 7rem) 0; }
+.sw-to-hero .sw-btn-ghost { color: #fff; border-color: rgba(255,255,255,0.55); }
+.sw-to-eyebrow { text-transform: uppercase; letter-spacing: 0.16em; font-size: 0.8rem; color: var(--accent-soft); margin: 0 0 0.7rem; }
+.sw-to-hero h1 { font-family: var(--font-display); font-weight: 800; font-size: var(--fs-h1); line-height: 0.96; margin: 0; }
+.sw-to-sub { max-width: 48ch; margin: 1rem 0 1.75rem; font-size: var(--fs-lead); color: rgba(255,255,255,0.9); }
+.sw-to-herocta { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+.sw-to-stepshead { text-align: center; margin-bottom: 2rem; }
+.sw-to-stepshead h2, .sw-to-drawhead h2, .sw-to-newshead h2 { font-family: var(--font-display); font-weight: 800; margin: 0; }
+.sw-to-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.sw-to-step { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 2rem 1.75rem; box-shadow: var(--shadow); }
+.sw-to-stepnum { display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%; background: var(--accent); color: #fff; font-family: var(--font-display); font-weight: 800; font-size: 1.4rem; margin-bottom: 1rem; }
+.sw-to-step h3 { font-family: var(--font-display); font-weight: 800; font-size: 1.4rem; margin: 0 0 0.5rem; }
+.sw-to-step p { color: var(--text-soft); margin: 0; }
+.sw-to-drawwrap { padding: clamp(2.5rem, 5vw, 4rem) 0; background: var(--bg-alt); }
+.sw-to-drawhead, .sw-to-newshead { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 1.25rem; }
+.sw-to-draw { display: flex; gap: 1rem; overflow-x: auto; padding-bottom: 0.5rem; }
+.sw-to-fix { flex: 0 0 240px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.4rem; display: flex; flex-direction: column; gap: 0.4rem; }
+.sw-to-round { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-on-bg); }
+.sw-to-fix strong { font-size: 1.05rem; }
+.sw-to-when { font-weight: 600; }
+.sw-to-where { font-size: 0.85rem; color: var(--text-soft); }
+.sw-to-empty { align-items: center; justify-content: center; color: var(--text-soft); }
+.sw-to-news { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+.sw-to-card { display: block; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+.sw-to-card img { width: 100%; aspect-ratio: 16/9; object-fit: cover; display: block; }
+.sw-to-cardbody { padding: 1.1rem 1.25rem; }
+.sw-to-cat { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent-on-bg); }
+.sw-to-card h3 { font-family: var(--font-display); font-weight: 800; font-size: 1.15rem; margin: 0.3rem 0 0.4rem; }
+.sw-to-card p { color: var(--text-soft); margin: 0; font-size: 0.92rem; }
+
+/* ----------------------------------------------- rugby/social codes: mobile */
+@media (max-width: 880px) {
+  .sw-ru-grades, .sw-rl-news, .sw-oz-news, .sw-to-news, .sw-oz-nights, .sw-to-steps { grid-template-columns: 1fr 1fr; }
+  .sw-ru-bottom, .sw-rl-mid { grid-template-columns: 1fr; }
+  .sw-oz-divs { grid-template-columns: 1fr 1fr 1fr; }
+}
+@media (max-width: 560px) {
+  .sw-ru-grades, .sw-rl-news, .sw-oz-news, .sw-to-news, .sw-oz-nights, .sw-to-steps, .sw-oz-divs { grid-template-columns: 1fr; }
+  .sw-rl-gradegrid { grid-template-columns: 1fr; }
+}

@@ -1174,6 +1174,293 @@ function Juniors() {
   );
 }
 
+/* ----------------------------------------------------------------- RugbyUnion */
+/* Rugby Union: traditional, centred crest hero, honours ribbon, grades. */
+function RugbyUnion() {
+  const { id, news, fixtures } = useData();
+  const next = fixtures[0];
+  const grades = [
+    { label: "Men's", note: "1st & 2nd XV" },
+    { label: "Women's", note: "15s & 7s" },
+    { label: "Junior Boys", note: "Under 8s – Colts" },
+    { label: "Junior Girls", note: "Under 10s – 18s" },
+  ];
+  const honours = ["Premiers 2024", "Club Champions 2023", "Est. 1925"];
+  const row = news.slice(0, 3);
+  return (
+    <>
+      <section className="sw-ru-hero">
+        <div className="sw-container">
+          <div className="sw-ru-crest" aria-hidden="true">{(id.shortName || "RU").slice(0, 2).toUpperCase()}</div>
+          <p className="sw-ru-eyebrow">{id.league ?? "Rugby Union Football Club"}</p>
+          <h1>{id.name}</h1>
+          <p className="sw-ru-sub">Tradition, mateship and the contest — rugby for all ages and abilities.</p>
+          <div className="sw-ru-herocta">
+            <SmartLink href="/register" className="sw-btn">Join the club</SmartLink>
+            <SmartLink href="/fixtures" className="sw-btn sw-btn-ghost">Fixtures</SmartLink>
+          </div>
+        </div>
+      </section>
+      <div className="sw-ru-honours">
+        <div className="sw-container">{honours.map((h) => <span key={h}>{h}</span>)}</div>
+      </div>
+      <section className="sw-section sw-ru-gradewrap">
+        <div className="sw-container">
+          <div className="sw-ru-gradehead"><h2>Our grades</h2></div>
+          <div className="sw-ru-grades">
+            {grades.map((g) => (
+              <SmartLink key={g.label} href="/teams" className="sw-ru-grade">
+                <span className="sw-ru-gradelabel">{g.label}</span>
+                <span className="sw-ru-gradenote">{g.note}</span>
+              </SmartLink>
+            ))}
+          </div>
+        </div>
+      </section>
+      <section className="sw-section sw-ru-bottomwrap">
+        <div className="sw-container sw-ru-bottom">
+          <div className="sw-ru-matchcard">
+            <span className="sw-ru-tag">Next fixture</span>
+            {next ? (<><h3>{id.shortName} v {next.opponent}</h3><p>{next.round && `${next.round} · `}{next.date} · {next.venue}</p></>) : <h3>Fixtures coming soon</h3>}
+            <SmartLink href="/fixtures" className="sw-link-arrow">Match centre →</SmartLink>
+          </div>
+          <div className="sw-ru-news">
+            <div className="sw-ru-newshead"><h2>Club news</h2><SmartLink href="/news" className="sw-link-arrow">All news →</SmartLink></div>
+            {row.map((p) => (
+              <SmartLink key={p.id} href={newsHref(p)} className="sw-ru-newsitem">
+                <span className="sw-ru-cat">{p.category}</span>
+                <h4>{p.title}</h4>
+                <p>{p.excerpt}</p>
+              </SmartLink>
+            ))}
+          </div>
+        </div>
+      </section>
+      <SponsorStrip onlyCarousel />
+    </>
+  );
+}
+
+/* ---------------------------------------------------------------- RugbyLeague */
+/* Rugby League: dark clash banner, recent-form chips, ladder + grades. */
+function RugbyLeague() {
+  const { id, news, fixtures, results, ladder } = useData();
+  const next = fixtures[0];
+  const form = results.slice(0, 5);
+  const grades = ["Men's", "Women's", "Junior Boys", "Junior Girls"];
+  const row = news.slice(0, 3);
+  return (
+    <>
+      <section className="sw-rl-clash">
+        <div className="sw-container">
+          <p className="sw-rl-eyebrow">{next ? "Next clash" : id.league ?? "Rugby League"}</p>
+          {next ? (
+            <div className="sw-rl-vs">
+              <span className="sw-rl-team">{id.shortName}</span>
+              <span className="sw-rl-v">v</span>
+              <span className="sw-rl-team">{next.opponent}</span>
+            </div>
+          ) : <h1>{id.name}</h1>}
+          {next && <p className="sw-rl-meta">{next.round && `${next.round} · `}{next.date} · {next.venue}</p>}
+          <div className="sw-rl-cta">
+            <SmartLink href="/fixtures" className="sw-btn">Match centre</SmartLink>
+            <SmartLink href="/register" className="sw-btn sw-btn-ghost">Play in 2026</SmartLink>
+          </div>
+        </div>
+      </section>
+      {form.length > 0 && (
+        <section className="sw-rl-formwrap">
+          <div className="sw-container sw-rl-form">
+            <span className="sw-rl-formlabel">Recent form</span>
+            <div className="sw-rl-chips">
+              {form.map((r, i) => (
+                <span key={i} className={`sw-rl-chip sw-rl-chip--${r.outcome.toLowerCase()}`}>{r.outcome}</span>
+              ))}
+            </div>
+            <SmartLink href="/fixtures" className="sw-link-arrow">Results →</SmartLink>
+          </div>
+        </section>
+      )}
+      <section className="sw-section sw-rl-midwrap">
+        <div className="sw-container sw-rl-mid">
+          <div className="sw-rl-laddercard">
+            <h2>Ladder</h2>
+            <ol className="sw-rl-ladder">
+              {ladder.length ? ladder.slice(0, 6).map((r, i) => (
+                <li key={i} className={r.isClub ? "is-club" : undefined}><span>{i + 1}</span><span>{r.team}</span><span>{r.points}</span></li>
+              )) : <li className="sw-rl-empty">Ladder in-season</li>}
+            </ol>
+          </div>
+          <div className="sw-rl-gradecard">
+            <h2>Grades</h2>
+            <div className="sw-rl-gradegrid">
+              {grades.map((g) => (<SmartLink key={g} href="/teams" className="sw-rl-grade">{g}</SmartLink>))}
+            </div>
+          </div>
+        </div>
+      </section>
+      <section className="sw-section">
+        <div className="sw-container">
+          <div className="sw-rl-newshead"><h2>Club news</h2><SmartLink href="/news" className="sw-link-arrow">All news →</SmartLink></div>
+          <div className="sw-rl-news">
+            {row.map((p) => (
+              <SmartLink key={p.id} href={newsHref(p)} className="sw-rl-card">
+                {p.image && <img src={p.image} alt="" />}
+                <div className="sw-rl-cardbody"><span className="sw-rl-cat">{p.category}</span><h3>{p.title}</h3><p>{p.excerpt}</p></div>
+              </SmartLink>
+            ))}
+          </div>
+        </div>
+      </section>
+      <SponsorStrip onlyCarousel />
+    </>
+  );
+}
+
+/* ---------------------------------------------------------------------- Oztag */
+/* Oztag: social night comp — register-a-team CTA, divisions, comp nights. */
+function Oztag() {
+  const { id, news } = useData();
+  const divisions = [
+    { label: "Mixed", note: "The classic Oztag comp" },
+    { label: "Men's", note: "All skill levels" },
+    { label: "Women's", note: "Social & competitive" },
+    { label: "Junior Boys", note: "Under 8s – 16s" },
+    { label: "Junior Girls", note: "Under 8s – 16s" },
+  ];
+  const nights = [
+    { night: "Monday", div: "Mixed Social" },
+    { night: "Wednesday", div: "Men's & Women's" },
+    { night: "Friday", div: "Juniors" },
+  ];
+  const row = news.slice(0, 3);
+  return (
+    <>
+      <section className="sw-oz-hero">
+        <div className="sw-container">
+          <p className="sw-oz-eyebrow">{id.league ?? "Oztag"}</p>
+          <h1>{id.name}</h1>
+          <p className="sw-oz-sub">Fast, social, no tackling — grab your mates and get a team in.</p>
+          <SmartLink href="/register" className="sw-btn sw-oz-bigbtn">Register your team →</SmartLink>
+        </div>
+      </section>
+      <section className="sw-section sw-oz-divwrap">
+        <div className="sw-container">
+          <div className="sw-oz-divhead"><h2>Divisions</h2><p>A comp for everyone.</p></div>
+          <div className="sw-oz-divs">
+            {divisions.map((d) => (
+              <SmartLink key={d.label} href="/teams" className="sw-oz-div">
+                <span className="sw-oz-divlabel">{d.label}</span>
+                <span className="sw-oz-divnote">{d.note}</span>
+              </SmartLink>
+            ))}
+          </div>
+        </div>
+      </section>
+      <section className="sw-oz-nightswrap">
+        <div className="sw-container">
+          <div className="sw-oz-nightshead"><h2>Comp nights</h2><SmartLink href="/fixtures" className="sw-link-arrow">Draw →</SmartLink></div>
+          <div className="sw-oz-nights">
+            {nights.map((n) => (
+              <div key={n.night} className="sw-oz-night">
+                <span className="sw-oz-nightday">{n.night}</span>
+                <strong>{n.div}</strong>
+                <span className="sw-oz-nighttime">From 6:30pm</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      <section className="sw-section">
+        <div className="sw-container">
+          <div className="sw-oz-newshead"><h2>Latest</h2><SmartLink href="/news" className="sw-link-arrow">All news →</SmartLink></div>
+          <div className="sw-oz-news">
+            {row.map((p) => (
+              <SmartLink key={p.id} href={newsHref(p)} className="sw-oz-card">
+                <span className="sw-oz-cat">{p.category}</span>
+                <h3>{p.title}</h3>
+                <p>{p.excerpt}</p>
+              </SmartLink>
+            ))}
+          </div>
+        </div>
+      </section>
+      <SponsorStrip onlyCarousel />
+    </>
+  );
+}
+
+/* ---------------------------------------------------------------------- Touch */
+/* Touch Football: summery social — numbered come-and-try steps + draw. */
+function Touch() {
+  const { id, news, fixtures } = useData();
+  const rail = fixtures.slice(0, 5);
+  const steps = [
+    { n: "1", h: "Grab a team", t: "Round up 6–10 mates, or join solo and we'll place you in a side." },
+    { n: "2", h: "Pick a night", t: "Mixed, men's, women's and junior comps across the week." },
+    { n: "3", h: "Play", t: "Fast, social games. Your first run is a free come-and-try." },
+  ];
+  const row = news.slice(0, 3);
+  return (
+    <>
+      <section className="sw-to-hero">
+        <div className="sw-container">
+          <p className="sw-to-eyebrow">{id.league ?? "Touch Football"}</p>
+          <h1>{id.name}</h1>
+          <p className="sw-to-sub">Summer nights, fast footy and a run-around for all ages — no tackling, all fun.</p>
+          <div className="sw-to-herocta">
+            <SmartLink href="/register" className="sw-btn">Come and try</SmartLink>
+            <SmartLink href="/fixtures" className="sw-btn sw-btn-ghost">This week&apos;s draw</SmartLink>
+          </div>
+        </div>
+      </section>
+      <section className="sw-section sw-to-stepswrap">
+        <div className="sw-container">
+          <div className="sw-to-stepshead"><h2>How it works</h2></div>
+          <div className="sw-to-steps">
+            {steps.map((s) => (
+              <div key={s.n} className="sw-to-step">
+                <span className="sw-to-stepnum">{s.n}</span>
+                <h3>{s.h}</h3>
+                <p>{s.t}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+      <section className="sw-to-drawwrap">
+        <div className="sw-container">
+          <div className="sw-to-drawhead"><h2>This week</h2><SmartLink href="/fixtures" className="sw-link-arrow">Full draw →</SmartLink></div>
+          <div className="sw-to-draw">
+            {rail.length ? rail.map((f, i) => (
+              <div key={i} className="sw-to-fix">
+                <span className="sw-to-round">{f.round || "Round"}</span>
+                <strong>{id.shortName} v {f.opponent}</strong>
+                <span className="sw-to-when">{f.date}</span>
+                <span className="sw-to-where">{f.venue}</span>
+              </div>
+            )) : <div className="sw-to-fix sw-to-empty">Draw out soon</div>}
+          </div>
+        </div>
+      </section>
+      <section className="sw-section">
+        <div className="sw-container">
+          <div className="sw-to-newshead"><h2>Club news</h2><SmartLink href="/news" className="sw-link-arrow">All news →</SmartLink></div>
+          <div className="sw-to-news">
+            {row.map((p) => (
+              <SmartLink key={p.id} href={newsHref(p)} className="sw-to-card">
+                {p.image && <img src={p.image} alt="" />}
+                <div className="sw-to-cardbody"><span className="sw-to-cat">{p.category}</span><h3>{p.title}</h3><p>{p.excerpt}</p></div>
+              </SmartLink>
+            ))}
+          </div>
+        </div>
+      </section>
+      <SponsorStrip onlyCarousel />
+    </>
+  );
+}
+
 /** Default home layout (the original block stack) for the existing variants. */
 function Classic({ club }: { club: ClubConfig }) {
   const b = club.blocks;
@@ -1206,6 +1493,10 @@ const LAYOUTS: Partial<Record<DesignVariant, () => ReactNode>> = {
   leaguefooty: LeagueFooty,
   courtside: Courtside,
   juniors: Juniors,
+  rugbyunion: RugbyUnion,
+  rugbyleague: RugbyLeague,
+  oztag: Oztag,
+  touch: Touch,
 };
 
 export function HomeLayout() {

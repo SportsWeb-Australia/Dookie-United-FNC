@@ -23,6 +23,10 @@ const TEMPLATE_VARIANT: Record<string, DesignVariant> = {
   leaguefooty: "leaguefooty",
   courtside: "courtside",
   juniors: "juniors",
+  rugbyunion: "rugbyunion",
+  rugbyleague: "rugbyleague",
+  oztag: "oztag",
+  touch: "touch",
 };
 
 function toISODate(value: string | null): string {

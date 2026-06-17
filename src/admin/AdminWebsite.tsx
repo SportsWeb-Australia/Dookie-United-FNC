@@ -26,6 +26,10 @@ const STYLES: { id: DesignVariant; label: string; note: string }[] = [
   { id: "leaguefooty", label: "Leaguefooty (AFL)", note: "Guernsey hero, grade strip, match + ladder." },
   { id: "courtside", label: "Courtside (Netball)", note: "Airy, bib-style grade chips incl. Mixed." },
   { id: "juniors", label: "Juniors (Junior Football)", note: "Friendly, family-focused, parent info panel." },
+  { id: "rugbyunion", label: "Rugby Union", note: "Traditional, centred crest, honours ribbon." },
+  { id: "rugbyleague", label: "Rugby League", note: "Dark clash banner, form guide, ladder." },
+  { id: "oztag", label: "Oztag", note: "Social comp — register-a-team, divisions, nights." },
+  { id: "touch", label: "Touch Footy", note: "Summery social — come-and-try steps + draw." },
 ];
 
 export function AdminWebsite() {
