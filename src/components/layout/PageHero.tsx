@@ -26,6 +26,12 @@ const HERO_FAMILY: Record<DesignVariant, string> = {
   sponsorforward: "bold",
   portal: "rule",
   poster: "dark",
+  fieldcourt: "dark",
+  masters: "serif",
+  pitch: "dark",
+  scorecard: "serif",
+  hardcourt: "dark",
+  fastbreak: "bold",
 };
 
 export function PageHero({ eyebrow, title, intro }: Props) {

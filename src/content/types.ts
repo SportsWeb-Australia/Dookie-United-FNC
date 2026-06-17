@@ -25,7 +25,13 @@ export type DesignVariant =
   | "bento"
   | "sponsorforward"
   | "portal"
-  | "poster";
+  | "poster"
+  | "fieldcourt"
+  | "masters"
+  | "pitch"
+  | "scorecard"
+  | "hardcourt"
+  | "fastbreak";
 
 export interface BrandColours {
   /** Primary ink / dominant colour (Dookie: black). */

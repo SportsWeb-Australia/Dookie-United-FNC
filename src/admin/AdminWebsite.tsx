@@ -17,6 +17,12 @@ const STYLES: { id: DesignVariant; label: string; note: string }[] = [
   { id: "sponsorforward", label: "Sponsor-forward", note: "Partners front and centre." },
   { id: "portal", label: "Portal", note: "Sidebar nav + dashboard." },
   { id: "poster", label: "Poster", note: "Brutalist — huge type, colour blocks." },
+  { id: "fieldcourt", label: "Fieldcourt (AFL/Netball)", note: "Dual-code club — football + netball split." },
+  { id: "masters", label: "Masters (AFL Masters)", note: "Warm, social, events-first, photo-led." },
+  { id: "pitch", label: "Pitch (Soccer)", note: "Sleek, dark, horizontal fixture rail." },
+  { id: "scorecard", label: "Scorecard (Cricket)", note: "Scoreboard strip + fixtures | ladder split." },
+  { id: "hardcourt", label: "Hardcourt (Basketball)", note: "Dark stat bento, broadcast energy." },
+  { id: "fastbreak", label: "Fastbreak (Lacrosse)", note: "Energetic zig-zag feature rows." },
 ];
 
 export function AdminWebsite() {
