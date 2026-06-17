@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { supabase } from "./supabase";
+import type { PlatformRole } from "./roles";
 
 export interface ClubMembership {
   clubId: string;
@@ -13,7 +14,9 @@ interface AuthState {
   email: string | null;
   userId: string | null;
   membership: ClubMembership | null;
+  platformRole: PlatformRole | null;
   isPlatformAdmin: boolean;
+  isSuperadmin: boolean;
   signIn: (email: string, password: string) => Promise<string | null>;
   signOut: () => Promise<void>;
 }
@@ -40,10 +43,11 @@ async function resolveMembership(userId: string): Promise<ClubMembership | null>
   return { clubId: data.club_id, role: data.role ?? null, clubName };
 }
 
-async function resolvePlatformAdmin(): Promise<boolean> {
-  if (!supabase) return false;
-  const { data, error } = await supabase.rpc("is_platform_admin");
-  return !error && data === true;
+async function resolvePlatformRole(): Promise<PlatformRole | null> {
+  if (!supabase) return null;
+  const { data, error } = await supabase.rpc("my_platform_role");
+  if (error || !data) return null;
+  return data === "superadmin" || data === "sportsweb_admin" ? (data as PlatformRole) : null;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -52,7 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [email, setEmail] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [membership, setMembership] = useState<ClubMembership | null>(null);
-  const [isPlatformAdmin, setIsPlatformAdmin] = useState(false);
+  const [platformRole, setPlatformRole] = useState<PlatformRole | null>(null);
 
   useEffect(() => {
     if (!supabase) {
@@ -65,9 +69,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUserId(user?.id ?? null);
       if (user) {
         setResolving(true);
-        const [m, pa] = await Promise.all([resolveMembership(user.id), resolvePlatformAdmin()]);
+        const [m, pr] = await Promise.all([resolveMembership(user.id), resolvePlatformRole()]);
         setMembership(m);
-        setIsPlatformAdmin(pa);
+        setPlatformRole(pr);
         setResolving(false);
       }
       setReady(true);
@@ -78,13 +82,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUserId(user?.id ?? null);
       if (user) {
         setResolving(true);
-        const [m, pa] = await Promise.all([resolveMembership(user.id), resolvePlatformAdmin()]);
+        const [m, pr] = await Promise.all([resolveMembership(user.id), resolvePlatformRole()]);
         setMembership(m);
-        setIsPlatformAdmin(pa);
+        setPlatformRole(pr);
         setResolving(false);
       } else {
         setMembership(null);
-        setIsPlatformAdmin(false);
+        setPlatformRole(null);
       }
     });
     return () => sub.subscription.unsubscribe();
@@ -100,8 +104,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase?.auth.signOut();
   };
 
+  const isSuperadmin = platformRole === "superadmin";
+  const isPlatformAdmin = platformRole !== null;
+
   return (
-    <Ctx.Provider value={{ ready, resolving, email, userId, membership, isPlatformAdmin, signIn, signOut }}>
+    <Ctx.Provider
+      value={{ ready, resolving, email, userId, membership, platformRole, isPlatformAdmin, isSuperadmin, signIn, signOut }}
+    >
       {children}
     </Ctx.Provider>
   );

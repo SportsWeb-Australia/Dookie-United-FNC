@@ -290,6 +290,187 @@ grant execute on function public.admin_set_module(uuid, text, text) to authentic
 -- on conflict do nothing;
 
 -- ============================================================
--- 9. Tell PostgREST to refresh its schema cache
+-- 9. Role hierarchy (RBAC foundation)
+-- ============================================================
+-- Two scopes:
+--   platform_user_roles : superadmin, sportsweb_admin   (global, no club)
+--   user_club_roles     : club_senior_admin, club_admin  (one role per club)
+-- A user may appear in user_club_roles for many clubs, with a different role
+-- in each. Platform roles are separate from club roles by design.
+
+create table if not exists public.platform_user_roles (
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  role       text not null check (role in ('superadmin', 'sportsweb_admin')),
+  created_at timestamptz not null default now(),
+  primary key (user_id, role)
+);
+
+create table if not exists public.user_club_roles (
+  user_id    uuid not null references auth.users(id) on delete cascade,
+  club_id    uuid not null references public.clubs(id) on delete cascade,
+  role       text not null check (role in ('club_senior_admin', 'club_admin')),
+  created_at timestamptz not null default now(),
+  primary key (user_id, club_id)
+);
+
+-- Migrate what already exists into the new model (safe to re-run):
+--  platform_admins        -> superadmin
+--  club_users.super_admin -> club_senior_admin (senior of that club, NOT platform)
+--  club_users.club_admin  -> club_admin
+insert into public.platform_user_roles (user_id, role)
+  select user_id, 'superadmin' from public.platform_admins
+  on conflict (user_id, role) do nothing;
+
+insert into public.user_club_roles (user_id, club_id, role)
+  select user_id, club_id,
+         case role::text when 'super_admin' then 'club_senior_admin' else 'club_admin' end
+  from public.club_users
+  on conflict (user_id, club_id) do nothing;
+
+-- Safeguard: the final Superadmin can never be removed or demoted.
+create or replace function public.protect_last_superadmin()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare others int;
+begin
+  if tg_op = 'DELETE' and old.role = 'superadmin' then
+    select count(*) into others from public.platform_user_roles
+      where role = 'superadmin' and user_id <> old.user_id;
+    if others = 0 then raise exception 'Cannot remove the final Superadmin.'; end if;
+    return old;
+  end if;
+  if tg_op = 'UPDATE' and old.role = 'superadmin' and new.role <> 'superadmin' then
+    select count(*) into others from public.platform_user_roles
+      where role = 'superadmin' and user_id <> old.user_id;
+    if others = 0 then raise exception 'Cannot demote the final Superadmin.'; end if;
+  end if;
+  return new;
+end $$;
+
+drop trigger if exists trg_protect_last_superadmin on public.platform_user_roles;
+create trigger trg_protect_last_superadmin
+  before update or delete on public.platform_user_roles
+  for each row execute function public.protect_last_superadmin();
+
+-- Role-check helpers (SECURITY DEFINER so they bypass RLS cleanly).
+create or replace function public.my_platform_role()
+returns text language sql stable security definer set search_path = public as $$
+  select role from public.platform_user_roles
+  where user_id = auth.uid()
+  order by case role when 'superadmin' then 1 else 2 end
+  limit 1
+$$;
+
+create or replace function public.is_superadmin()
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.platform_user_roles
+                 where user_id = auth.uid() and role = 'superadmin')
+$$;
+
+-- A platform admin is the SportsWeb operator layer: superadmin OR sportsweb_admin.
+create or replace function public.is_platform_admin()
+returns boolean language sql stable security definer set search_path = public as $$
+  select exists (select 1 from public.platform_user_roles where user_id = auth.uid())
+$$;
+
+create or replace function public.club_role(p_club uuid)
+returns text language sql stable security definer set search_path = public as $$
+  select role from public.user_club_roles where user_id = auth.uid() and club_id = p_club limit 1
+$$;
+
+-- Widen club membership to include the new table. This is a UNION, so it can
+-- only ADD access, never remove it — existing club access is unaffected.
+create or replace function public.my_club_ids()
+returns setof uuid language sql security definer set search_path = public as $$
+  select club_id from public.club_users where user_id = auth.uid()
+  union
+  select club_id from public.user_club_roles where user_id = auth.uid()
+$$;
+
+alter table public.platform_user_roles enable row level security;
+alter table public.user_club_roles enable row level security;
+
+drop policy if exists pur_read on public.platform_user_roles;
+create policy pur_read on public.platform_user_roles
+  for select using (user_id = auth.uid() or public.is_superadmin());
+
+drop policy if exists pur_write on public.platform_user_roles;
+create policy pur_write on public.platform_user_roles
+  for all using (public.is_superadmin()) with check (public.is_superadmin());
+
+drop policy if exists ucr_read on public.user_club_roles;
+create policy ucr_read on public.user_club_roles
+  for select using (
+    user_id = auth.uid()
+    or public.is_platform_admin()
+    or club_id in (select public.my_club_ids())
+  );
+
+drop policy if exists ucr_write on public.user_club_roles;
+create policy ucr_write on public.user_club_roles
+  for all using (public.is_platform_admin()) with check (public.is_platform_admin());
+
+grant execute on function public.my_platform_role() to authenticated;
+grant execute on function public.is_superadmin() to authenticated;
+grant execute on function public.club_role(uuid) to authenticated;
+
+-- >>> Optional: add a SportsWeb Admin (staff/contractor) later. <<<
+-- insert into public.platform_user_roles (user_id, role)
+-- select id, 'sportsweb_admin' from auth.users where email = 'staff@sportsweb.com.au'
+-- on conflict do nothing;
+
+-- ============================================================
+-- ============================================================
+-- 10. RBAC enforcement (database-level, not just UI)
+-- ============================================================
+-- Senior-vs-operational helper. True for platform admins, the club's senior
+-- admin (new model), or a legacy club_users 'super_admin' for that club.
+create or replace function public.is_club_senior(p_club uuid)
+returns boolean language sql stable security definer set search_path = public as $$
+  select public.is_platform_admin()
+    or exists (select 1 from public.user_club_roles
+               where user_id = auth.uid() and club_id = p_club and role = 'club_senior_admin')
+    or exists (select 1 from public.club_users
+               where user_id = auth.uid() and club_id = p_club and role::text = 'super_admin')
+$$;
+grant execute on function public.is_club_senior(uuid) to authenticated;
+
+-- Module entitlement is a paid/commercial surface: only the platform may change
+-- it. (Operational and senior club admins can no longer write club_modules
+-- directly — closing the hole where any member could grant their own modules.)
+drop policy if exists club_modules_member_write on public.club_modules;
+drop policy if exists club_modules_platform_write on public.club_modules;
+create policy club_modules_platform_write on public.club_modules
+  for all to authenticated
+  using (public.is_platform_admin())
+  with check (public.is_platform_admin());
+
+-- Role assignment within a club: a Club Senior Admin may manage only the
+-- operational (club_admin) rows of their own club — never create or remove
+-- another senior (that stays with the platform). Platform writes already
+-- covered by ucr_write above.
+drop policy if exists ucr_senior_write on public.user_club_roles;
+create policy ucr_senior_write on public.user_club_roles
+  for all to authenticated
+  using (public.is_club_senior(club_id) and role = 'club_admin')
+  with check (public.is_club_senior(club_id) and role = 'club_admin');
+
+-- ------------------------------------------------------------
+-- OPTIONAL — lock club settings/branding to senior admins.
+-- The clubs table predates this migration, so its existing write policy isn't
+-- managed here. To see what's currently allowed, run:
+--     select polname, polcmd from pg_policy
+--     where polrelid = 'public.clubs'::regclass;
+-- If you see a broad "members can write" style policy, drop it by name, then
+-- enable the senior-only policy below:
+--
+-- drop policy if exists clubs_senior_write on public.clubs;
+-- create policy clubs_senior_write on public.clubs
+--   for update to authenticated
+--   using (public.is_club_senior(id))
+--   with check (public.is_club_senior(id));
+-- ------------------------------------------------------------
+
+-- ============================================================
+-- 11. Tell PostgREST to refresh its schema cache
 -- ============================================================
 notify pgrst, 'reload schema';

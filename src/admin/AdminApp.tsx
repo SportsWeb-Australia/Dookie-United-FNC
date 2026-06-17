@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../lib/auth";
+import { ROLE_LABELS } from "../lib/roles";
+import { usePermissions } from "../lib/permissions";
 import { supabase } from "../lib/supabase";
 import { RESOURCES } from "./resources";
 import { ResourceManager } from "./ResourceManager";
@@ -12,7 +14,8 @@ import { SuperIntegrations } from "./SuperIntegrations";
 import { Login } from "./Login";
 
 function AdminInner() {
-  const { ready, resolving, email, membership, isPlatformAdmin, signOut } = useAuth();
+  const { ready, resolving, email, membership, platformRole, isPlatformAdmin, signOut } = useAuth();
+  const { can } = usePermissions();
   const [active, setActive] = useState(RESOURCES[0].key);
 
   if (!supabase) {
@@ -62,35 +65,51 @@ function AdminInner() {
           <span>{membership?.clubName ?? "SportsWeb"}</span>
         </div>
         <nav className="sw-admin-nav">
-          {membership && (
+          {membership && can("club.content") && (
             <>
               {RESOURCES.map((r) => (
                 <button key={r.key} data-active={r.key === active} onClick={() => setActive(r.key)}>
                   {r.label}
                 </button>
               ))}
+            </>
+          )}
+          {membership && can("club.comms") && (
+            <>
               <div className="sw-admin-navgroup">Communicate</div>
               <button data-active={active === "__comms"} onClick={() => setActive("__comms")}>
                 Send a message
               </button>
-              <div className="sw-admin-navgroup">Setup</div>
-              <button data-active={active === "__website"} onClick={() => setActive("__website")}>
-                Website style
-              </button>
-              <button data-active={active === "__modules"} onClick={() => setActive("__modules")}>
-                Modules
-              </button>
             </>
           )}
-          {isPlatformAdmin && (
+          {membership && (can("club.settings") || can("club.modules")) && (
+            <>
+              <div className="sw-admin-navgroup">Setup</div>
+              {can("club.settings") && (
+                <button data-active={active === "__website"} onClick={() => setActive("__website")}>
+                  Website style
+                </button>
+              )}
+              {can("club.modules") && (
+                <button data-active={active === "__modules"} onClick={() => setActive("__modules")}>
+                  Modules
+                </button>
+              )}
+            </>
+          )}
+          {(can("platform.clubs") || can("platform.integrations")) && (
             <>
               <div className="sw-admin-navgroup">Platform · SportsWeb</div>
-              <button data-active={active === "__super_clubs"} onClick={() => setActive("__super_clubs")}>
-                Clubs &amp; modules
-              </button>
-              <button data-active={active === "__super_integrations"} onClick={() => setActive("__super_integrations")}>
-                Integrations
-              </button>
+              {can("platform.clubs") && (
+                <button data-active={active === "__super_clubs"} onClick={() => setActive("__super_clubs")}>
+                  Clubs &amp; modules
+                </button>
+              )}
+              {can("platform.integrations") && (
+                <button data-active={active === "__super_integrations"} onClick={() => setActive("__super_integrations")}>
+                  Integrations
+                </button>
+              )}
             </>
           )}
         </nav>
@@ -101,22 +120,33 @@ function AdminInner() {
       </aside>
       <main className="sw-admin-main">
         <div className="sw-admin-userbar">
-          <span>{email}{membership?.role ? ` · ${membership.role}` : isPlatformAdmin ? " · platform" : ""}</span>
+          <span>
+            {email}
+            {platformRole
+              ? ` · ${ROLE_LABELS[platformRole]}`
+              : membership?.role === "super_admin"
+                ? " · Club Senior Admin"
+                : membership?.role === "club_admin"
+                  ? " · Club Admin"
+                  : membership?.role
+                    ? ` · ${membership.role}`
+                    : ""}
+          </span>
         </div>
-        {effectiveActive === "__website" ? (
+        {effectiveActive === "__website" && can("club.settings") ? (
           <AdminWebsite />
-        ) : effectiveActive === "__modules" ? (
+        ) : effectiveActive === "__modules" && can("club.modules") ? (
           <AdminModules />
-        ) : effectiveActive === "__comms" ? (
+        ) : effectiveActive === "__comms" && can("club.comms") ? (
           <Communications />
-        ) : effectiveActive === "__super_clubs" && isPlatformAdmin ? (
+        ) : effectiveActive === "__super_clubs" && can("platform.clubs") ? (
           <SuperClubs />
-        ) : effectiveActive === "__super_integrations" && isPlatformAdmin ? (
+        ) : effectiveActive === "__super_integrations" && can("platform.integrations") ? (
           <SuperIntegrations />
-        ) : membership ? (
+        ) : membership && can("club.content") ? (
           <ResourceManager resource={resource} />
         ) : (
-          <SuperClubs />
+          <div className="sw-admin-loading">You don't have access to this area.</div>
         )}
       </main>
     </div>
