@@ -112,6 +112,12 @@ export async function getClubConfig(): Promise<ClubConfig> {
     const key = (templateRes.data as { template_key?: string } | null)?.template_key;
     if (key && TEMPLATE_VARIANT[key]) cfg.variant = TEMPLATE_VARIANT[key];
 
+    // Trial status (drives the countdown banner). is_trial / trial_ends_at are
+    // added by supabase/trial-club.sql; read defensively in case they're absent.
+    if (clubRow.is_trial === true) {
+      cfg.trial = { active: true, endsAt: clubRow.trial_ends_at ?? null };
+    }
+
     // News
     const news = (newsRes.data ?? []).map((r): NewsPost => {
       const slug = r.slug || slugify(r.title ?? "");

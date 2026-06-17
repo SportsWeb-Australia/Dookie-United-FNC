@@ -329,6 +329,8 @@ export interface ClubConfig {
   enabledModules?: string[];
   /** Inline page-content overrides (text + image URLs) keyed by content_key. */
   content?: Record<string, string>;
+  /** Trial status for this club (drives the countdown banner). */
+  trial?: { active: boolean; endsAt?: string | null };
   /** Platform/sales settings used by the module upgrade pages. */
   platform?: {
     salesEmail?: string;

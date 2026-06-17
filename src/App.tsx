@@ -13,6 +13,7 @@ import { Header } from "./components/layout/Header";
 import { Footer } from "./components/layout/Footer";
 import { MobileTabBar } from "./components/layout/MobileTabBar";
 import { AnnouncementBar } from "./components/blocks/AnnouncementBar";
+import { TrialBanner } from "./components/blocks/TrialBanner";
 import { AppPrompts } from "./components/pwa/AppPrompts";
 
 import { Home } from "./pages/Home";
@@ -116,6 +117,7 @@ export default function App() {
           </a>
           <ScrollToTop />
           <SeoManager />
+          <TrialBanner />
           <AnnouncementBar />
           <Header />
           <main id="main">
