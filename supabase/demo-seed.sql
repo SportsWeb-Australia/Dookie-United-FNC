@@ -27,70 +27,57 @@ delete from teams where club_id in (select id from clubs where slug in ('northsi
 delete from matches where club_id in (select id from clubs where slug in ('northside-lions','eastside-united','riverside-cricket','parkville-netball','metro-city-basketball','bayside-lacrosse','brighton-rugby','riverstone-rugby-league','sunset-oztag','coastal-touch','westvale-juniors','vintage-masters','lakes-united-fnc'));
 delete from ladder where club_id in (select id from clubs where slug in ('northside-lions','eastside-united','riverside-cricket','parkville-netball','metro-city-basketball','bayside-lacrosse','brighton-rugby','riverstone-rugby-league','sunset-oztag','coastal-touch','westvale-juniors','vintage-masters','lakes-united-fnc'));
 
--- 2) Create clubs if missing (sport_type resolved against the enum) ----------
+-- 2) Create clubs if missing (sport_type uses valid enum values) -----------
 insert into clubs (name, slug, sport_type, primary_colour, secondary_colour, contact_email)
-select 'Northside Lions FC','northside-lions',
-  coalesce((select e.enumlabel::sport_type from pg_enum e join pg_type t on t.oid=e.enumtypid where t.typname='sport_type' and e.enumlabel = any(array['football','afl']) limit 1),'football'::sport_type),
+select 'Northside Lions FC','northside-lions','afl'::sport_type,
   '#0a1a3f','#c8102e','info+northside-lions@sportsweb.com.au'
 where not exists (select 1 from clubs where slug='northside-lions');
 insert into clubs (name, slug, sport_type, primary_colour, secondary_colour, contact_email)
-select 'Eastside United SC','eastside-united',
-  coalesce((select e.enumlabel::sport_type from pg_enum e join pg_type t on t.oid=e.enumtypid where t.typname='sport_type' and e.enumlabel = any(array['soccer','football']) limit 1),'football'::sport_type),
+select 'Eastside United SC','eastside-united','soccer'::sport_type,
   '#0b6b3a','#b6f24a','info+eastside-united@sportsweb.com.au'
 where not exists (select 1 from clubs where slug='eastside-united');
 insert into clubs (name, slug, sport_type, primary_colour, secondary_colour, contact_email)
-select 'Riverside Cricket Club','riverside-cricket',
-  coalesce((select e.enumlabel::sport_type from pg_enum e join pg_type t on t.oid=e.enumtypid where t.typname='sport_type' and e.enumlabel = any(array['cricket']) limit 1),'football'::sport_type),
+select 'Riverside Cricket Club','riverside-cricket','cricket'::sport_type,
   '#14532d','#9b2226','info+riverside-cricket@sportsweb.com.au'
 where not exists (select 1 from clubs where slug='riverside-cricket');
 insert into clubs (name, slug, sport_type, primary_colour, secondary_colour, contact_email)
-select 'Parkville Netball Club','parkville-netball',
-  coalesce((select e.enumlabel::sport_type from pg_enum e join pg_type t on t.oid=e.enumtypid where t.typname='sport_type' and e.enumlabel = any(array['netball']) limit 1),'football'::sport_type),
+select 'Parkville Netball Club','parkville-netball','netball'::sport_type,
   '#0e7c7b','#ff6f61','info+parkville-netball@sportsweb.com.au'
 where not exists (select 1 from clubs where slug='parkville-netball');
 insert into clubs (name, slug, sport_type, primary_colour, secondary_colour, contact_email)
-select 'Metro City Basketball','metro-city-basketball',
-  coalesce((select e.enumlabel::sport_type from pg_enum e join pg_type t on t.oid=e.enumtypid where t.typname='sport_type' and e.enumlabel = any(array['basketball']) limit 1),'football'::sport_type),
+select 'Metro City Basketball','metro-city-basketball','basketball'::sport_type,
   '#ff6b1a','#0d0d10','info+metro-city-basketball@sportsweb.com.au'
 where not exists (select 1 from clubs where slug='metro-city-basketball');
 insert into clubs (name, slug, sport_type, primary_colour, secondary_colour, contact_email)
-select 'Bayside Lacrosse Club','bayside-lacrosse',
-  coalesce((select e.enumlabel::sport_type from pg_enum e join pg_type t on t.oid=e.enumtypid where t.typname='sport_type' and e.enumlabel = any(array['lacrosse']) limit 1),'football'::sport_type),
+select 'Bayside Lacrosse Club','bayside-lacrosse','other'::sport_type,
   '#00c2b3','#2b1a55','info+bayside-lacrosse@sportsweb.com.au'
 where not exists (select 1 from clubs where slug='bayside-lacrosse');
 insert into clubs (name, slug, sport_type, primary_colour, secondary_colour, contact_email)
-select 'Brighton Rugby Union','brighton-rugby',
-  coalesce((select e.enumlabel::sport_type from pg_enum e join pg_type t on t.oid=e.enumtypid where t.typname='sport_type' and e.enumlabel = any(array['rugby_union','rugbyunion','rugby union','union']) limit 1),'football'::sport_type),
+select 'Brighton Rugby Union','brighton-rugby','rugby_union'::sport_type,
   '#0b3d2e','#c9a227','info+brighton-rugby@sportsweb.com.au'
 where not exists (select 1 from clubs where slug='brighton-rugby');
 insert into clubs (name, slug, sport_type, primary_colour, secondary_colour, contact_email)
-select 'Riverstone Rugby League','riverstone-rugby-league',
-  coalesce((select e.enumlabel::sport_type from pg_enum e join pg_type t on t.oid=e.enumtypid where t.typname='sport_type' and e.enumlabel = any(array['rugby_league','rugbyleague','rugby league','league']) limit 1),'football'::sport_type),
+select 'Riverstone Rugby League','riverstone-rugby-league','rugby_league'::sport_type,
   '#d62828','#14110f','info+riverstone-rugby-league@sportsweb.com.au'
 where not exists (select 1 from clubs where slug='riverstone-rugby-league');
 insert into clubs (name, slug, sport_type, primary_colour, secondary_colour, contact_email)
-select 'Sunset Oztag','sunset-oztag',
-  coalesce((select e.enumlabel::sport_type from pg_enum e join pg_type t on t.oid=e.enumtypid where t.typname='sport_type' and e.enumlabel = any(array['oztag','oz_tag','oz tag']) limit 1),'football'::sport_type),
+select 'Sunset Oztag','sunset-oztag','other'::sport_type,
   '#b5179e','#4cc9f0','info+sunset-oztag@sportsweb.com.au'
 where not exists (select 1 from clubs where slug='sunset-oztag');
 insert into clubs (name, slug, sport_type, primary_colour, secondary_colour, contact_email)
-select 'Coastal Touch','coastal-touch',
-  coalesce((select e.enumlabel::sport_type from pg_enum e join pg_type t on t.oid=e.enumtypid where t.typname='sport_type' and e.enumlabel = any(array['touch','touch_football','touch football']) limit 1),'football'::sport_type),
+select 'Coastal Touch','coastal-touch','other'::sport_type,
   '#2ec4b6','#ff9f1c','info+coastal-touch@sportsweb.com.au'
 where not exists (select 1 from clubs where slug='coastal-touch');
 insert into clubs (name, slug, sport_type, primary_colour, secondary_colour, contact_email)
-select 'Westvale Junior Football Club','westvale-juniors',
-  coalesce((select e.enumlabel::sport_type from pg_enum e join pg_type t on t.oid=e.enumtypid where t.typname='sport_type' and e.enumlabel = any(array['football','afl']) limit 1),'football'::sport_type),
+select 'Westvale Junior Football Club','westvale-juniors','afl'::sport_type,
   '#2aa7ff','#ffc83d','info+westvale-juniors@sportsweb.com.au'
 where not exists (select 1 from clubs where slug='westvale-juniors');
 insert into clubs (name, slug, sport_type, primary_colour, secondary_colour, contact_email)
-select 'Vintage Reds Masters','vintage-masters',
-  coalesce((select e.enumlabel::sport_type from pg_enum e join pg_type t on t.oid=e.enumtypid where t.typname='sport_type' and e.enumlabel = any(array['football','afl']) limit 1),'football'::sport_type),
+select 'Vintage Reds Masters','vintage-masters','afl'::sport_type,
   '#6e1f2a','#c79a3a','info+vintage-masters@sportsweb.com.au'
 where not exists (select 1 from clubs where slug='vintage-masters');
 insert into clubs (name, slug, sport_type, primary_colour, secondary_colour, contact_email)
-select 'Lakes United FNC','lakes-united-fnc',
-  coalesce((select e.enumlabel::sport_type from pg_enum e join pg_type t on t.oid=e.enumtypid where t.typname='sport_type' and e.enumlabel = any(array['football','afl_netball','football_netball']) limit 1),'football'::sport_type),
+select 'Lakes United FNC','lakes-united-fnc','afl'::sport_type,
   '#16284a','#e0533d','info+lakes-united-fnc@sportsweb.com.au'
 where not exists (select 1 from clubs where slug='lakes-united-fnc');
 
@@ -106,11 +93,11 @@ insert into events (club_id,status,title,slug,event_date,location,description,fe
 insert into sponsors (club_id,status,name,sponsor_level,blurb,display_order,in_carousel) values
   ((select id from clubs where slug='northside-lions'),'published','Northside Toyota','platinum','Proud major partner of the Lions.',1,true),
   ((select id from clubs where slug='northside-lions'),'published','The Commercial Hotel','gold','Post-match home of the Lions faithful.',2,true);
-insert into teams (club_id,status,name,age_group,gender,grade,display_order) values
-  ((select id from clubs where slug='northside-lions'),'published','Seniors','Open','Men','Men''s',1),
-  ((select id from clubs where slug='northside-lions'),'published','Women''s','Open','Women','Women''s',2),
-  ((select id from clubs where slug='northside-lions'),'published','Under 18 Boys','U18','Men','Junior Boys',3),
-  ((select id from clubs where slug='northside-lions'),'published','Under 16 Girls','U16','Women','Junior Girls',4);
+insert into teams (club_id,status,name,slug,age_group,gender,grade,display_order) values
+  ((select id from clubs where slug='northside-lions'),'published','Seniors','northside-lions-seniors','Open','Men','Men''s',1),
+  ((select id from clubs where slug='northside-lions'),'published','Women''s','northside-lions-women-s','Open','Women','Women''s',2),
+  ((select id from clubs where slug='northside-lions'),'published','Under 18 Boys','northside-lions-under-18-boys','U18','Men','Junior Boys',3),
+  ((select id from clubs where slug='northside-lions'),'published','Under 16 Girls','northside-lions-under-16-girls','U16','Women','Junior Girls',4);
 insert into matches (club_id,status,grade,round,match_date,opponent,home_away,our_score,opponent_score) values
   ((select id from clubs where slug='northside-lions'),'completed','Seniors','Round 1', now() - interval '2 days','Westvale Hawks','Home',96,78),
   ((select id from clubs where slug='northside-lions'),'scheduled','Seniors','Round 2', now() + interval '5 days','Riverbend Saints','Away',null,null),
@@ -134,11 +121,11 @@ insert into events (club_id,status,title,slug,event_date,location,description,fe
 insert into sponsors (club_id,status,name,sponsor_level,blurb,display_order,in_carousel) values
   ((select id from clubs where slug='eastside-united'),'published','Eastside Sports Physio','platinum','Keeping United on the park.',1,true),
   ((select id from clubs where slug='eastside-united'),'published','Corner Flag Cafe','gold','Match-day coffee partner.',2,true);
-insert into teams (club_id,status,name,age_group,gender,grade,display_order) values
-  ((select id from clubs where slug='eastside-united'),'published','Men''s First XI','Open','Men','Men''s',1),
-  ((select id from clubs where slug='eastside-united'),'published','Women''s First XI','Open','Women','Women''s',2),
-  ((select id from clubs where slug='eastside-united'),'published','Junior Boys','U13','Men','Junior Boys',3),
-  ((select id from clubs where slug='eastside-united'),'published','Junior Girls','U13','Women','Junior Girls',4);
+insert into teams (club_id,status,name,slug,age_group,gender,grade,display_order) values
+  ((select id from clubs where slug='eastside-united'),'published','Men''s First XI','eastside-united-men-s-first-xi','Open','Men','Men''s',1),
+  ((select id from clubs where slug='eastside-united'),'published','Women''s First XI','eastside-united-women-s-first-xi','Open','Women','Women''s',2),
+  ((select id from clubs where slug='eastside-united'),'published','Junior Boys','eastside-united-junior-boys','U13','Men','Junior Boys',3),
+  ((select id from clubs where slug='eastside-united'),'published','Junior Girls','eastside-united-junior-girls','U13','Women','Junior Girls',4);
 insert into matches (club_id,status,grade,round,match_date,opponent,home_away,our_score,opponent_score) values
   ((select id from clubs where slug='eastside-united'),'completed','Men''s','Round 1', now() - interval '2 days','Harbour City FC','Home',3,2),
   ((select id from clubs where slug='eastside-united'),'scheduled','Men''s','Round 2', now() + interval '5 days','Parkside Rovers','Away',null,null),
@@ -162,11 +149,11 @@ insert into events (club_id,status,title,slug,event_date,location,description,fe
 insert into sponsors (club_id,status,name,sponsor_level,blurb,display_order,in_carousel) values
   ((select id from clubs where slug='riverside-cricket'),'published','Riverside Hardware','platinum','Proudly backing local cricket.',1,true),
   ((select id from clubs where slug='riverside-cricket'),'published','The Boundary Bakehouse','gold','Fuelling the long days in the field.',2,true);
-insert into teams (club_id,status,name,age_group,gender,grade,display_order) values
-  ((select id from clubs where slug='riverside-cricket'),'published','First XI','Open','Men','Men''s',1),
-  ((select id from clubs where slug='riverside-cricket'),'published','Women''s XI','Open','Women','Women''s',2),
-  ((select id from clubs where slug='riverside-cricket'),'published','Under 16 Boys','U16','Men','Junior Boys',3),
-  ((select id from clubs where slug='riverside-cricket'),'published','Under 14 Girls','U14','Women','Junior Girls',4);
+insert into teams (club_id,status,name,slug,age_group,gender,grade,display_order) values
+  ((select id from clubs where slug='riverside-cricket'),'published','First XI','riverside-cricket-first-xi','Open','Men','Men''s',1),
+  ((select id from clubs where slug='riverside-cricket'),'published','Women''s XI','riverside-cricket-women-s-xi','Open','Women','Women''s',2),
+  ((select id from clubs where slug='riverside-cricket'),'published','Under 16 Boys','riverside-cricket-under-16-boys','U16','Men','Junior Boys',3),
+  ((select id from clubs where slug='riverside-cricket'),'published','Under 14 Girls','riverside-cricket-under-14-girls','U14','Women','Junior Girls',4);
 insert into matches (club_id,status,grade,round,match_date,opponent,home_away,our_score,opponent_score) values
   ((select id from clubs where slug='riverside-cricket'),'completed','First XI','Round 1', now() - interval '2 days','Glenmore CC','Home',241,238),
   ((select id from clubs where slug='riverside-cricket'),'scheduled','First XI','Round 2', now() + interval '5 days','Bayswater CC','Away',null,null),
@@ -190,11 +177,11 @@ insert into events (club_id,status,title,slug,event_date,location,description,fe
 insert into sponsors (club_id,status,name,sponsor_level,blurb,display_order,in_carousel) values
   ((select id from clubs where slug='parkville-netball'),'published','Parkville Physio','platinum','Keeping our players on court.',1,true),
   ((select id from clubs where slug='parkville-netball'),'published','Court Side Cafe','gold','Match-day coffee partner.',2,true);
-insert into teams (club_id,status,name,age_group,gender,grade,display_order) values
-  ((select id from clubs where slug='parkville-netball'),'published','A Grade','Open','Women','A Grade',1),
-  ((select id from clubs where slug='parkville-netball'),'published','B Grade','Open','Women','B Grade',2),
-  ((select id from clubs where slug='parkville-netball'),'published','Under 17','U17','Women','Junior Girls',3),
-  ((select id from clubs where slug='parkville-netball'),'published','Mixed Social','Open','Mixed','Mixed',4);
+insert into teams (club_id,status,name,slug,age_group,gender,grade,display_order) values
+  ((select id from clubs where slug='parkville-netball'),'published','A Grade','parkville-netball-a-grade','Open','Women','A Grade',1),
+  ((select id from clubs where slug='parkville-netball'),'published','B Grade','parkville-netball-b-grade','Open','Women','B Grade',2),
+  ((select id from clubs where slug='parkville-netball'),'published','Under 17','parkville-netball-under-17','U17','Women','Junior Girls',3),
+  ((select id from clubs where slug='parkville-netball'),'published','Mixed Social','parkville-netball-mixed-social','Open','Mixed','Mixed',4);
 insert into matches (club_id,status,grade,round,match_date,opponent,home_away,our_score,opponent_score) values
   ((select id from clubs where slug='parkville-netball'),'completed','A Grade','Round 1', now() - interval '2 days','Hawthorn Stars','Home',54,49),
   ((select id from clubs where slug='parkville-netball'),'scheduled','A Grade','Round 2', now() + interval '5 days','Eastern Eagles','Away',null,null),
@@ -218,11 +205,11 @@ insert into events (club_id,status,title,slug,event_date,location,description,fe
 insert into sponsors (club_id,status,name,sponsor_level,blurb,display_order,in_carousel) values
   ((select id from clubs where slug='metro-city-basketball'),'published','Metro Sports Store','platinum','Proudly outfitting the club.',1,true),
   ((select id from clubs where slug='metro-city-basketball'),'published','The Free Throw Cafe','gold','Courtside coffee.',2,true);
-insert into teams (club_id,status,name,age_group,gender,grade,display_order) values
-  ((select id from clubs where slug='metro-city-basketball'),'published','Men''s Div 1','Open','Men','Men''s',1),
-  ((select id from clubs where slug='metro-city-basketball'),'published','Women''s Div 1','Open','Women','Women''s',2),
-  ((select id from clubs where slug='metro-city-basketball'),'published','Under 16 Boys','U16','Men','Junior Boys',3),
-  ((select id from clubs where slug='metro-city-basketball'),'published','Under 16 Girls','U16','Women','Junior Girls',4);
+insert into teams (club_id,status,name,slug,age_group,gender,grade,display_order) values
+  ((select id from clubs where slug='metro-city-basketball'),'published','Men''s Div 1','metro-city-basketball-men-s-div-1','Open','Men','Men''s',1),
+  ((select id from clubs where slug='metro-city-basketball'),'published','Women''s Div 1','metro-city-basketball-women-s-div-1','Open','Women','Women''s',2),
+  ((select id from clubs where slug='metro-city-basketball'),'published','Under 16 Boys','metro-city-basketball-under-16-boys','U16','Men','Junior Boys',3),
+  ((select id from clubs where slug='metro-city-basketball'),'published','Under 16 Girls','metro-city-basketball-under-16-girls','U16','Women','Junior Girls',4);
 insert into matches (club_id,status,grade,round,match_date,opponent,home_away,our_score,opponent_score) values
   ((select id from clubs where slug='metro-city-basketball'),'completed','Men''s Div 1','Round 1', now() - interval '2 days','Riverside Hawks','Home',88,81),
   ((select id from clubs where slug='metro-city-basketball'),'scheduled','Men''s Div 1','Round 2', now() + interval '5 days','Lakeside Lakers','Away',null,null),
@@ -246,11 +233,11 @@ insert into events (club_id,status,title,slug,event_date,location,description,fe
 insert into sponsors (club_id,status,name,sponsor_level,blurb,display_order,in_carousel) values
   ((select id from clubs where slug='bayside-lacrosse'),'published','Bayside Health','platinum','Backing local lacrosse.',1,true),
   ((select id from clubs where slug='bayside-lacrosse'),'published','The Crease Cafe','gold','Game-day eats.',2,true);
-insert into teams (club_id,status,name,age_group,gender,grade,display_order) values
-  ((select id from clubs where slug='bayside-lacrosse'),'published','Men''s Seniors','Open','Men','Men''s',1),
-  ((select id from clubs where slug='bayside-lacrosse'),'published','Women''s Seniors','Open','Women','Women''s',2),
-  ((select id from clubs where slug='bayside-lacrosse'),'published','Junior Boys','U15','Men','Junior Boys',3),
-  ((select id from clubs where slug='bayside-lacrosse'),'published','Junior Girls','U15','Women','Junior Girls',4);
+insert into teams (club_id,status,name,slug,age_group,gender,grade,display_order) values
+  ((select id from clubs where slug='bayside-lacrosse'),'published','Men''s Seniors','bayside-lacrosse-men-s-seniors','Open','Men','Men''s',1),
+  ((select id from clubs where slug='bayside-lacrosse'),'published','Women''s Seniors','bayside-lacrosse-women-s-seniors','Open','Women','Women''s',2),
+  ((select id from clubs where slug='bayside-lacrosse'),'published','Junior Boys','bayside-lacrosse-junior-boys','U15','Men','Junior Boys',3),
+  ((select id from clubs where slug='bayside-lacrosse'),'published','Junior Girls','bayside-lacrosse-junior-girls','U15','Women','Junior Girls',4);
 insert into matches (club_id,status,grade,round,match_date,opponent,home_away,our_score,opponent_score) values
   ((select id from clubs where slug='bayside-lacrosse'),'completed','Seniors','Round 1', now() - interval '2 days','Coburg Cobras','Home',12,9),
   ((select id from clubs where slug='bayside-lacrosse'),'scheduled','Seniors','Round 2', now() + interval '5 days','Eltham Eagles','Away',null,null),
@@ -274,11 +261,11 @@ insert into events (club_id,status,title,slug,event_date,location,description,fe
 insert into sponsors (club_id,status,name,sponsor_level,blurb,display_order,in_carousel) values
   ((select id from clubs where slug='brighton-rugby'),'published','Brighton Cellars','platinum','Proud club partner.',1,true),
   ((select id from clubs where slug='brighton-rugby'),'published','The Lineout Bar','gold','Post-match home of the club.',2,true);
-insert into teams (club_id,status,name,age_group,gender,grade,display_order) values
-  ((select id from clubs where slug='brighton-rugby'),'published','1st XV','Open','Men','Men''s',1),
-  ((select id from clubs where slug='brighton-rugby'),'published','Women''s XV','Open','Women','Women''s',2),
-  ((select id from clubs where slug='brighton-rugby'),'published','Colts','U18','Men','Junior Boys',3),
-  ((select id from clubs where slug='brighton-rugby'),'published','Junior Girls','U16','Women','Junior Girls',4);
+insert into teams (club_id,status,name,slug,age_group,gender,grade,display_order) values
+  ((select id from clubs where slug='brighton-rugby'),'published','1st XV','brighton-rugby-1st-xv','Open','Men','Men''s',1),
+  ((select id from clubs where slug='brighton-rugby'),'published','Women''s XV','brighton-rugby-women-s-xv','Open','Women','Women''s',2),
+  ((select id from clubs where slug='brighton-rugby'),'published','Colts','brighton-rugby-colts','U18','Men','Junior Boys',3),
+  ((select id from clubs where slug='brighton-rugby'),'published','Junior Girls','brighton-rugby-junior-girls','U16','Women','Junior Girls',4);
 insert into matches (club_id,status,grade,round,match_date,opponent,home_away,our_score,opponent_score) values
   ((select id from clubs where slug='brighton-rugby'),'completed','1st XV','Round 1', now() - interval '2 days','Camberwell','Home',27,19),
   ((select id from clubs where slug='brighton-rugby'),'scheduled','1st XV','Round 2', now() + interval '5 days','Box Hill','Away',null,null),
@@ -302,11 +289,11 @@ insert into events (club_id,status,title,slug,event_date,location,description,fe
 insert into sponsors (club_id,status,name,sponsor_level,blurb,display_order,in_carousel) values
   ((select id from clubs where slug='riverstone-rugby-league'),'published','Riverstone Leagues Club','platinum','The heart of the club.',1,true),
   ((select id from clubs where slug='riverstone-rugby-league'),'published','Westside Tyres','gold','Keeping us rolling.',2,true);
-insert into teams (club_id,status,name,age_group,gender,grade,display_order) values
-  ((select id from clubs where slug='riverstone-rugby-league'),'published','First Grade','Open','Men','Men''s',1),
-  ((select id from clubs where slug='riverstone-rugby-league'),'published','Women''s','Open','Women','Women''s',2),
-  ((select id from clubs where slug='riverstone-rugby-league'),'published','Under 18 Boys','U18','Men','Junior Boys',3),
-  ((select id from clubs where slug='riverstone-rugby-league'),'published','Under 16 Girls','U16','Women','Junior Girls',4);
+insert into teams (club_id,status,name,slug,age_group,gender,grade,display_order) values
+  ((select id from clubs where slug='riverstone-rugby-league'),'published','First Grade','riverstone-rugby-league-first-grade','Open','Men','Men''s',1),
+  ((select id from clubs where slug='riverstone-rugby-league'),'published','Women''s','riverstone-rugby-league-women-s','Open','Women','Women''s',2),
+  ((select id from clubs where slug='riverstone-rugby-league'),'published','Under 18 Boys','riverstone-rugby-league-under-18-boys','U18','Men','Junior Boys',3),
+  ((select id from clubs where slug='riverstone-rugby-league'),'published','Under 16 Girls','riverstone-rugby-league-under-16-girls','U16','Women','Junior Girls',4);
 insert into matches (club_id,status,grade,round,match_date,opponent,home_away,our_score,opponent_score) values
   ((select id from clubs where slug='riverstone-rugby-league'),'completed','First Grade','Round 1', now() - interval '2 days','Penrith Pumas','Home',24,18),
   ((select id from clubs where slug='riverstone-rugby-league'),'scheduled','First Grade','Round 2', now() + interval '5 days','Windsor Wolves','Away',null,null),
@@ -330,11 +317,11 @@ insert into events (club_id,status,title,slug,event_date,location,description,fe
 insert into sponsors (club_id,status,name,sponsor_level,blurb,display_order,in_carousel) values
   ((select id from clubs where slug='sunset-oztag'),'published','Sunset Sports','platinum','Backing social sport.',1,true),
   ((select id from clubs where slug='sunset-oztag'),'published','The Halftime Bar','gold','Post-game refreshments.',2,true);
-insert into teams (club_id,status,name,age_group,gender,grade,display_order) values
-  ((select id from clubs where slug='sunset-oztag'),'published','Mixed Open','Open','Mixed','Mixed',1),
-  ((select id from clubs where slug='sunset-oztag'),'published','Men''s Open','Open','Men','Men''s',2),
-  ((select id from clubs where slug='sunset-oztag'),'published','Women''s Open','Open','Women','Women''s',3),
-  ((select id from clubs where slug='sunset-oztag'),'published','Juniors','U14','Men','Junior Boys',4);
+insert into teams (club_id,status,name,slug,age_group,gender,grade,display_order) values
+  ((select id from clubs where slug='sunset-oztag'),'published','Mixed Open','sunset-oztag-mixed-open','Open','Mixed','Mixed',1),
+  ((select id from clubs where slug='sunset-oztag'),'published','Men''s Open','sunset-oztag-men-s-open','Open','Men','Men''s',2),
+  ((select id from clubs where slug='sunset-oztag'),'published','Women''s Open','sunset-oztag-women-s-open','Open','Women','Women''s',3),
+  ((select id from clubs where slug='sunset-oztag'),'published','Juniors','sunset-oztag-juniors','U14','Men','Junior Boys',4);
 insert into matches (club_id,status,grade,round,match_date,opponent,home_away,our_score,opponent_score) values
   ((select id from clubs where slug='sunset-oztag'),'completed','Mixed Open','Round 1', now() - interval '2 days','Coastal Crew','Home',8,6),
   ((select id from clubs where slug='sunset-oztag'),'scheduled','Mixed Open','Round 2', now() + interval '5 days','City Slickers','Away',null,null),
@@ -358,11 +345,11 @@ insert into events (club_id,status,title,slug,event_date,location,description,fe
 insert into sponsors (club_id,status,name,sponsor_level,blurb,display_order,in_carousel) values
   ((select id from clubs where slug='coastal-touch'),'published','Coastal Surf Co','platinum','Riding with the club.',1,true),
   ((select id from clubs where slug='coastal-touch'),'published','The Try Line Kiosk','gold','Game-night feeds.',2,true);
-insert into teams (club_id,status,name,age_group,gender,grade,display_order) values
-  ((select id from clubs where slug='coastal-touch'),'published','Mixed Open','Open','Mixed','Mixed',1),
-  ((select id from clubs where slug='coastal-touch'),'published','Men''s Open','Open','Men','Men''s',2),
-  ((select id from clubs where slug='coastal-touch'),'published','Women''s Open','Open','Women','Women''s',3),
-  ((select id from clubs where slug='coastal-touch'),'published','Junior Mixed','U12','Mixed','Junior Mixed',4);
+insert into teams (club_id,status,name,slug,age_group,gender,grade,display_order) values
+  ((select id from clubs where slug='coastal-touch'),'published','Mixed Open','coastal-touch-mixed-open','Open','Mixed','Mixed',1),
+  ((select id from clubs where slug='coastal-touch'),'published','Men''s Open','coastal-touch-men-s-open','Open','Men','Men''s',2),
+  ((select id from clubs where slug='coastal-touch'),'published','Women''s Open','coastal-touch-women-s-open','Open','Women','Women''s',3),
+  ((select id from clubs where slug='coastal-touch'),'published','Junior Mixed','coastal-touch-junior-mixed','U12','Mixed','Junior Mixed',4);
 insert into matches (club_id,status,grade,round,match_date,opponent,home_away,our_score,opponent_score) values
   ((select id from clubs where slug='coastal-touch'),'completed','Mixed Open','Round 1', now() - interval '2 days','Harbour Heat','Home',7,5),
   ((select id from clubs where slug='coastal-touch'),'scheduled','Mixed Open','Round 2', now() + interval '5 days','Bayline','Away',null,null),
@@ -386,11 +373,11 @@ insert into events (club_id,status,title,slug,event_date,location,description,fe
 insert into sponsors (club_id,status,name,sponsor_level,blurb,display_order,in_carousel) values
   ((select id from clubs where slug='westvale-juniors'),'published','Westvale IGA','platinum','Feeding the future stars.',1,true),
   ((select id from clubs where slug='westvale-juniors'),'published','Kids Kicks Sports','gold','Boots and gear partner.',2,true);
-insert into teams (club_id,status,name,age_group,gender,grade,display_order) values
-  ((select id from clubs where slug='westvale-juniors'),'published','Auskick','5-8','Mixed','Auskick',1),
-  ((select id from clubs where slug='westvale-juniors'),'published','Under 12 Boys','U12','Men','Junior Boys',2),
-  ((select id from clubs where slug='westvale-juniors'),'published','Under 12 Girls','U12','Women','Junior Girls',3),
-  ((select id from clubs where slug='westvale-juniors'),'published','Youth Girls','U16','Women','Youth',4);
+insert into teams (club_id,status,name,slug,age_group,gender,grade,display_order) values
+  ((select id from clubs where slug='westvale-juniors'),'published','Auskick','westvale-juniors-auskick','5-8','Mixed','Auskick',1),
+  ((select id from clubs where slug='westvale-juniors'),'published','Under 12 Boys','westvale-juniors-under-12-boys','U12','Men','Junior Boys',2),
+  ((select id from clubs where slug='westvale-juniors'),'published','Under 12 Girls','westvale-juniors-under-12-girls','U12','Women','Junior Girls',3),
+  ((select id from clubs where slug='westvale-juniors'),'published','Youth Girls','westvale-juniors-youth-girls','U16','Women','Youth',4);
 insert into matches (club_id,status,grade,round,match_date,opponent,home_away,our_score,opponent_score) values
   ((select id from clubs where slug='westvale-juniors'),'completed','Under 12s','Round 1', now() - interval '2 days','Highton','Home',48,33),
   ((select id from clubs where slug='westvale-juniors'),'scheduled','Under 12s','Round 2', now() + interval '5 days','Bell Park','Away',null,null),
@@ -414,11 +401,11 @@ insert into events (club_id,status,title,slug,event_date,location,description,fe
 insert into sponsors (club_id,status,name,sponsor_level,blurb,display_order,in_carousel) values
   ((select id from clubs where slug='vintage-masters'),'published','The Vintage Cellar','platinum','Refreshing the Reds since forever.',1,true),
   ((select id from clubs where slug='vintage-masters'),'published','Reds Bistro','gold','Post-match feeds.',2,true);
-insert into teams (club_id,status,name,age_group,gender,grade,display_order) values
-  ((select id from clubs where slug='vintage-masters'),'published','Over 35s','35+','Men','Over 35s',1),
-  ((select id from clubs where slug='vintage-masters'),'published','Over 45s','45+','Men','Over 45s',2),
-  ((select id from clubs where slug='vintage-masters'),'published','Supers 55+','55+','Men','Over 55s',3),
-  ((select id from clubs where slug='vintage-masters'),'published','Women''s Masters','Open','Women','Women''s',4);
+insert into teams (club_id,status,name,slug,age_group,gender,grade,display_order) values
+  ((select id from clubs where slug='vintage-masters'),'published','Over 35s','vintage-masters-over-35s','35+','Men','Over 35s',1),
+  ((select id from clubs where slug='vintage-masters'),'published','Over 45s','vintage-masters-over-45s','45+','Men','Over 45s',2),
+  ((select id from clubs where slug='vintage-masters'),'published','Supers 55+','vintage-masters-supers-55','55+','Men','Over 55s',3),
+  ((select id from clubs where slug='vintage-masters'),'published','Women''s Masters','vintage-masters-women-s-masters','Open','Women','Women''s',4);
 insert into matches (club_id,status,grade,round,match_date,opponent,home_away,our_score,opponent_score) values
   ((select id from clubs where slug='vintage-masters'),'completed','Over 35s','Round 1', now() - interval '2 days','Old Scotch','Home',56,50),
   ((select id from clubs where slug='vintage-masters'),'scheduled','Over 35s','Round 2', now() + interval '5 days','Yarra Valley','Away',null,null),
@@ -442,11 +429,11 @@ insert into events (club_id,status,title,slug,event_date,location,description,fe
 insert into sponsors (club_id,status,name,sponsor_level,blurb,display_order,in_carousel) values
   ((select id from clubs where slug='lakes-united-fnc'),'published','Lakes Real Estate','platinum','Proud major partner of the Lakes.',1,true),
   ((select id from clubs where slug='lakes-united-fnc'),'published','United Bakehouse','gold','Game-day pies and coffee.',2,true);
-insert into teams (club_id,status,name,age_group,gender,grade,display_order) values
-  ((select id from clubs where slug='lakes-united-fnc'),'published','Seniors (Football)','Open','Men','Men''s',1),
-  ((select id from clubs where slug='lakes-united-fnc'),'published','Netball A Grade','Open','Women','Women''s',2),
-  ((select id from clubs where slug='lakes-united-fnc'),'published','Junior Boys Football','U16','Men','Junior Boys',3),
-  ((select id from clubs where slug='lakes-united-fnc'),'published','Junior Girls Netball','U16','Women','Junior Girls',4);
+insert into teams (club_id,status,name,slug,age_group,gender,grade,display_order) values
+  ((select id from clubs where slug='lakes-united-fnc'),'published','Seniors (Football)','lakes-united-fnc-seniors-football','Open','Men','Men''s',1),
+  ((select id from clubs where slug='lakes-united-fnc'),'published','Netball A Grade','lakes-united-fnc-netball-a-grade','Open','Women','Women''s',2),
+  ((select id from clubs where slug='lakes-united-fnc'),'published','Junior Boys Football','lakes-united-fnc-junior-boys-football','U16','Men','Junior Boys',3),
+  ((select id from clubs where slug='lakes-united-fnc'),'published','Junior Girls Netball','lakes-united-fnc-junior-girls-netball','U16','Women','Junior Girls',4);
 insert into matches (club_id,status,grade,round,match_date,opponent,home_away,our_score,opponent_score) values
   ((select id from clubs where slug='lakes-united-fnc'),'completed','Seniors','Round 1', now() - interval '2 days','Shoreham','Home',72,65),
   ((select id from clubs where slug='lakes-united-fnc'),'scheduled','Seniors','Round 2', now() + interval '5 days','Devon Meadows','Away',null,null),
