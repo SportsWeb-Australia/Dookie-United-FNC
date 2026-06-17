@@ -37,6 +37,9 @@ begin
   if length(p_name) > 80 then
     raise exception 'That club name is too long';
   end if;
+  if p_email is null or position('@' in p_email) = 0 or position('.' in p_email) = 0 then
+    raise exception 'A valid email is required';
+  end if;
 
   -- Sport must be a real enum value; fall back to other if unknown.
   begin
