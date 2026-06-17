@@ -2626,3 +2626,33 @@
   gap: 0.75rem;
   margin-top: 0.5rem;
 }
+
+/* ===== Trial signup (/start) — SportsWeb-branded, standalone ===== */
+.sw-trial{min-height:100vh;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(1200px 600px at 50% -10%,#1b2540 0%,#0f1626 55%,#0b111d 100%);
+  padding:32px 18px;font-family:Inter,system-ui,sans-serif;color:#0f1626;}
+.sw-trial-card{width:100%;max-width:460px;background:#fff;border-radius:18px;
+  padding:30px 28px;box-shadow:0 24px 70px rgba(0,0,0,.45);}
+.sw-trial-brand{font-weight:800;letter-spacing:.04em;text-transform:uppercase;
+  font-size:.78rem;color:#C8102E;margin-bottom:14px;}
+.sw-trial-title{font-size:1.7rem;line-height:1.15;margin:0 0 8px;font-weight:800;color:#0f1626;}
+.sw-trial-sub{margin:0 0 20px;color:#475066;font-size:.95rem;line-height:1.5;}
+.sw-trial-label{display:block;font-size:.82rem;font-weight:600;color:#2a3148;margin:0 0 14px;}
+.sw-trial-input{display:block;width:100%;margin-top:6px;padding:11px 12px;font-size:1rem;
+  border:1px solid #cfd6e4;border-radius:10px;background:#fff;color:#0f1626;box-sizing:border-box;}
+.sw-trial-input:focus{outline:none;border-color:#1b2540;box-shadow:0 0 0 3px rgba(27,37,64,.15);}
+.sw-trial-colours{display:flex;gap:14px;}
+.sw-trial-colour{flex:1;}
+.sw-trial-colour input[type=color]{width:100%;height:42px;margin-top:6px;border:1px solid #cfd6e4;
+  border-radius:10px;background:#fff;padding:3px;cursor:pointer;}
+.sw-trial-btn{display:inline-block;width:100%;text-align:center;border:0;border-radius:11px;
+  padding:13px 16px;font-size:1rem;font-weight:700;cursor:pointer;text-decoration:none;
+  background:#C8102E;color:#fff;transition:transform .04s ease,opacity .15s ease;box-sizing:border-box;}
+.sw-trial-btn:hover{opacity:.93;}
+.sw-trial-btn:active{transform:translateY(1px);}
+.sw-trial-btn:disabled{opacity:.6;cursor:default;}
+.sw-trial-btn-ghost{background:#eef1f7;color:#1b2540;margin-top:10px;}
+.sw-trial-actions{display:flex;flex-direction:column;}
+.sw-trial-error{background:#fdecec;border:1px solid #f5b5b5;color:#9b1c1c;border-radius:10px;
+  padding:10px 12px;font-size:.88rem;margin:0 0 14px;}
+.sw-trial-fine{margin:14px 0 0;color:#6b7488;font-size:.78rem;line-height:1.45;text-align:center;}

@@ -306,6 +306,10 @@ export async function getClubConfig(): Promise<ClubConfig> {
       const map: Record<string, string> = {};
       for (const r of contentRows) if (r.value != null) map[r.content_key] = r.value;
       cfg.content = map;
+      // Trial/assigned template: an explicit variant in club_content wins over
+      // the one derived from selected_template_id (lets us assign a template
+      // without needing a matching row in the templates table).
+      if (map["site.variant"]) cfg.variant = map["site.variant"] as DesignVariant;
     }
 
     return cfg;

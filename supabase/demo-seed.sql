@@ -1,5 +1,5 @@
 -- ============================================================================
--- SportsWeb One — DEMO CLUBS (all 13, one per template). ONE file, safe to re-run.
+-- SportsWeb One - DEMO CLUBS (all 13, one per template). ONE file, safe to re-run.
 -- Uses plain INSERT..VALUES so enum columns (status, sport_type, etc.) cast cleanly.
 -- Creates each club if missing, then (re)seeds its content.
 -- View:  /?club=<slug>&variant=<variant>     (?club=reset to exit)
@@ -86,7 +86,7 @@ where not exists (select 1 from clubs where slug='lakes-united-fnc');
 insert into news (club_id,status,title,slug,author,summary,content,published_at) values
   ((select id from clubs where slug='northside-lions'),'published','Lions roar home in season opener','lions-roar-home','Match Committee','A four-goal final term sealed a stirring win to open the year.','<p>A four-goal final term sealed a stirring win to open the year.</p>', now() - interval '2 days'),
   ((select id from clubs where slug='northside-lions'),'published','Womens side names leadership group','womens-leadership','Club','Four players will steer the side in a big season.','<p>Four players will steer the side in a big season.</p>', now() - interval '6 days'),
-  ((select id from clubs where slug='northside-lions'),'published','Auskick registrations now open','auskick-open','Juniors','Friday-night Auskick is back — first session free.','<p>Friday-night Auskick is back — first session free.</p>', now() - interval '10 days');
+  ((select id from clubs where slug='northside-lions'),'published','Auskick registrations now open','auskick-open','Juniors','Friday-night Auskick is back - first session free.','<p>Friday-night Auskick is back - first session free.</p>', now() - interval '10 days');
 insert into events (club_id,status,title,slug,event_date,location,description,featured) values
   ((select id from clubs where slug='northside-lions'),'published','Season Launch & Sponsors Night','season-launch', now() + interval '9 days','Lions Clubrooms','Join us at the club.', true),
   ((select id from clubs where slug='northside-lions'),'published','Ladies Day','ladies-day', now() + interval '23 days','Northside Oval','Join us at the club.', false);
@@ -112,7 +112,7 @@ insert into ladder (club_id,grade,position,team,played,won,lost,drawn,points,per
 
 -- Eastside United SC
 insert into news (club_id,status,title,slug,author,summary,content,published_at) values
-  ((select id from clubs where slug='eastside-united'),'published','United edge a five-goal thriller','united-thriller','Match Report','A stoppage-time winner sent the home end into raptures.','<p>A stoppage-time winner sent the home end into raptures.</p>', now() - interval '2 days'),
+  ((select id from clubs where slug='eastside-united'),'published','United edge a five-goal thriller','united-thriller','Match Report','A stoppage-time winner settled a tense contest.','<p>A stoppage-time winner settled a tense contest.</p>', now() - interval '2 days'),
   ((select id from clubs where slug='eastside-united'),'published','New womens coach appointed','womens-coach','Club','A vastly experienced head coach joins for the new season.','<p>A vastly experienced head coach joins for the new season.</p>', now() - interval '6 days'),
   ((select id from clubs where slug='eastside-united'),'published','MiniRoos sign-on day this Saturday','miniroos-signon','Juniors','First touch of the ball for our youngest players.','<p>First touch of the ball for our youngest players.</p>', now() - interval '10 days');
 insert into events (club_id,status,title,slug,event_date,location,description,featured) values
@@ -365,7 +365,7 @@ insert into ladder (club_id,grade,position,team,played,won,lost,drawn,points,per
 -- Westvale Junior Football Club
 insert into news (club_id,status,title,slug,author,summary,content,published_at) values
   ((select id from clubs where slug='westvale-juniors'),'published','Under 12s salute in a tight one','u12s-salute','Team Manager','A great team effort got the kids home.','<p>A great team effort got the kids home.</p>', now() - interval '2 days'),
-  ((select id from clubs where slug='westvale-juniors'),'published','Auskick is back on Friday nights','auskick-back','Juniors','First session is free — bring the family.','<p>First session is free — bring the family.</p>', now() - interval '6 days'),
+  ((select id from clubs where slug='westvale-juniors'),'published','Auskick is back on Friday nights','auskick-back','Juniors','First session is free - bring the family.','<p>First session is free - bring the family.</p>', now() - interval '6 days'),
   ((select id from clubs where slug='westvale-juniors'),'published','Volunteer coaches needed','coaches-needed','Club','Many hands make a great season.','<p>Many hands make a great season.</p>', now() - interval '10 days');
 insert into events (club_id,status,title,slug,event_date,location,description,featured) values
   ((select id from clubs where slug='westvale-juniors'),'published','Family Season Launch','family-launch', now() + interval '8 days','Westvale Oval','Join us at the club.', true),
@@ -393,7 +393,7 @@ insert into ladder (club_id,grade,position,team,played,won,lost,drawn,points,per
 -- Vintage Reds Masters
 insert into news (club_id,status,title,slug,author,summary,content,published_at) values
   ((select id from clubs where slug='vintage-masters'),'published','Reds get the chocolates in the opener','reds-chocolates','Social Sec','A win, a sing-song and a long lunch afterwards.','<p>A win, a sing-song and a long lunch afterwards.</p>', now() - interval '2 days'),
-  ((select id from clubs where slug='vintage-masters'),'published','New faces welcome — no pressure, all fun','new-faces','Club','Over 35 and keen for a run? Come down.','<p>Over 35 and keen for a run? Come down.</p>', now() - interval '6 days'),
+  ((select id from clubs where slug='vintage-masters'),'published','New faces welcome - no pressure, all fun','new-faces','Club','Over 35 and keen for a run? Come down.','<p>Over 35 and keen for a run? Come down.</p>', now() - interval '6 days'),
   ((select id from clubs where slug='vintage-masters'),'published','Annual reunion weekend locked in','reunion-weekend','Club','Old teammates, new memories.','<p>Old teammates, new memories.</p>', now() - interval '10 days');
 insert into events (club_id,status,title,slug,event_date,location,description,featured) values
   ((select id from clubs where slug='vintage-masters'),'published','Season Launch & Long Lunch','launch-lunch', now() + interval '9 days','Reds Clubrooms','Join us at the club.', true),
@@ -421,7 +421,7 @@ insert into ladder (club_id,grade,position,team,played,won,lost,drawn,points,per
 -- Lakes United FNC
 insert into news (club_id,status,title,slug,author,summary,content,published_at) values
   ((select id from clubs where slug='lakes-united-fnc'),'published','Big day out as footy and netball both salute','big-day-out','Club','A clean sweep across the grounds and the courts.','<p>A clean sweep across the grounds and the courts.</p>', now() - interval '2 days'),
-  ((select id from clubs where slug='lakes-united-fnc'),'published','One club, two codes — rego now open','rego-open','Club','Football and netball sign-on is live.','<p>Football and netball sign-on is live.</p>', now() - interval '6 days'),
+  ((select id from clubs where slug='lakes-united-fnc'),'published','One club, two codes - rego now open','rego-open','Club','Football and netball sign-on is live.','<p>Football and netball sign-on is live.</p>', now() - interval '6 days'),
   ((select id from clubs where slug='lakes-united-fnc'),'published','Volunteers power our biggest season yet','volunteers-power','Club','Thank you to everyone pitching in.','<p>Thank you to everyone pitching in.</p>', now() - interval '10 days');
 insert into events (club_id,status,title,slug,event_date,location,description,featured) values
   ((select id from clubs where slug='lakes-united-fnc'),'published','Season Launch','season-launch', now() + interval '8 days','Lakes Reserve','Join us at the club.', true),

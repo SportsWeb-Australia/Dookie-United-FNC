@@ -30,6 +30,7 @@ import { Documents } from "./pages/Documents";
 import { Contact } from "./pages/Contact";
 import { Register } from "./pages/Register";
 import { NotFound } from "./pages/NotFound";
+import { StartTrial } from "./pages/StartTrial";
 import { AdminApp } from "./admin/AdminApp";
 import { SeoManager } from "./lib/seo";
 
@@ -48,6 +49,7 @@ export default function App() {
   const [variant, setVariant] = useState<DesignVariant>(staticClub.variant);
   const location = useLocation();
   const isAdmin = location.pathname.startsWith("/admin");
+  const isTrial = location.pathname.startsWith("/start");
 
   useEffect(() => {
     registerServiceWorker();
@@ -86,6 +88,11 @@ export default function App() {
   useEffect(() => {
     document.documentElement.setAttribute("data-variant", variant);
   }, [variant]);
+
+  // Public self-serve trial signup runs as its own clean page (no club chrome).
+  if (isTrial) {
+    return <StartTrial />;
+  }
 
   // Admin runs as its own full-screen app, without the public site chrome.
   if (isAdmin) {
