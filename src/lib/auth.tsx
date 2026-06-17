@@ -37,10 +37,39 @@ async function resolveMembership(userId: string): Promise<ClubMembership | null>
     .eq("user_id", userId)
     .limit(1)
     .maybeSingle();
-  if (!data) return null;
-  const clubs = data.clubs as { name?: string } | { name?: string }[] | null;
+  if (data) {
+    const clubs = data.clubs as { name?: string } | { name?: string }[] | null;
+    const clubName = Array.isArray(clubs) ? clubs[0]?.name : clubs?.name;
+    return { clubId: data.club_id, role: data.role ?? null, clubName };
+  }
+  // New RBAC model (self-signup trial owners land here, not in club_users).
+  const { data: ucr } = await supabase
+    .from("user_club_roles")
+    .select("club_id, role, clubs(name)")
+    .eq("user_id", userId)
+    .limit(1)
+    .maybeSingle();
+  if (!ucr) return null;
+  const clubs = ucr.clubs as { name?: string } | { name?: string }[] | null;
   const clubName = Array.isArray(clubs) ? clubs[0]?.name : clubs?.name;
-  return { clubId: data.club_id, role: data.role ?? null, clubName };
+  return { clubId: ucr.club_id, role: ucr.role ?? null, clubName };
+}
+
+/**
+ * Resolve membership, and if a logged-in user has none yet, try to claim a
+ * trial club created with their email (self-signup), then resolve again.
+ */
+async function resolveMembershipWithClaim(userId: string): Promise<ClubMembership | null> {
+  let m = await resolveMembership(userId);
+  if (!m && supabase) {
+    try {
+      const { data } = await supabase.rpc("claim_trial_clubs");
+      if (data && (data as { linked?: number }).linked) m = await resolveMembership(userId);
+    } catch {
+      /* claim is best-effort */
+    }
+  }
+  return m;
 }
 
 async function resolvePlatformRole(): Promise<PlatformRole | null> {
@@ -69,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUserId(user?.id ?? null);
       if (user) {
         setResolving(true);
-        const [m, pr] = await Promise.all([resolveMembership(user.id), resolvePlatformRole()]);
+        const [m, pr] = await Promise.all([resolveMembershipWithClaim(user.id), resolvePlatformRole()]);
         setMembership(m);
         setPlatformRole(pr);
         setResolving(false);
@@ -82,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUserId(user?.id ?? null);
       if (user) {
         setResolving(true);
-        const [m, pr] = await Promise.all([resolveMembership(user.id), resolvePlatformRole()]);
+        const [m, pr] = await Promise.all([resolveMembershipWithClaim(user.id), resolvePlatformRole()]);
         setMembership(m);
         setPlatformRole(pr);
         setResolving(false);

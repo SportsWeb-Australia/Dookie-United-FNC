@@ -32,6 +32,7 @@ import { Contact } from "./pages/Contact";
 import { Register } from "./pages/Register";
 import { NotFound } from "./pages/NotFound";
 import { StartTrial } from "./pages/StartTrial";
+import { Guide } from "./pages/Guide";
 import { AdminApp } from "./admin/AdminApp";
 import { SeoManager } from "./lib/seo";
 
@@ -51,6 +52,7 @@ export default function App() {
   const location = useLocation();
   const isAdmin = location.pathname.startsWith("/admin");
   const isTrial = location.pathname.startsWith("/start");
+  const isGuide = location.pathname.startsWith("/guide");
 
   useEffect(() => {
     registerServiceWorker();
@@ -93,6 +95,11 @@ export default function App() {
   // Public self-serve trial signup runs as its own clean page (no club chrome).
   if (isTrial) {
     return <StartTrial />;
+  }
+
+  // Standalone quick-start guide (linked from the welcome email).
+  if (isGuide) {
+    return <Guide />;
   }
 
   // Admin runs as its own full-screen app, without the public site chrome.

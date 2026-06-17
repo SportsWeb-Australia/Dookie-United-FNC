@@ -128,3 +128,43 @@ grant execute on function public.create_trial_club(text, text, text, text, text,
 
 -- 4) Refresh PostgREST schema cache
 notify pgrst, 'reload schema';
+
+-- ============================================================
+-- Self-signup: let a prospect claim (and then edit) their own trial.
+-- After they log in (magic link to the email used at signup), the admin app
+-- calls this. It links them as senior admin of any trial club whose contact
+-- email matches their login email. Uses user_club_roles (new RBAC model), so
+-- my_club_ids() picks it up and the admin RLS write policies allow edits.
+-- ============================================================
+create or replace function public.claim_trial_clubs()
+returns json
+language plpgsql
+security definer
+set search_path = public
+as $claim$
+declare
+  v_uid   uuid := auth.uid();
+  v_email text := lower(coalesce(auth.jwt() ->> 'email', ''));
+  v_n     int := 0;
+begin
+  if v_uid is null or v_email = '' then
+    return json_build_object('linked', 0);
+  end if;
+
+  insert into public.user_club_roles (user_id, club_id, role)
+  select v_uid, c.id, 'club_senior_admin'
+    from public.clubs c
+   where c.is_trial = true
+     and lower(coalesce(c.contact_email, '')) = v_email
+     and not exists (
+       select 1 from public.user_club_roles u
+       where u.user_id = v_uid and u.club_id = c.id
+     );
+  get diagnostics v_n = row_count;
+
+  return json_build_object('linked', v_n);
+end
+$claim$;
+
+grant execute on function public.claim_trial_clubs() to authenticated;
+notify pgrst, 'reload schema';

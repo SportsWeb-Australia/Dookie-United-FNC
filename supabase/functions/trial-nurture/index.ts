@@ -55,10 +55,15 @@ function buildStages(club: Club) {
       body:
         `Hi there,\n\n` +
         `Great news - your new ${name} website is live and ready to explore:\n${view}\n\n` +
-        `We have set it up with sample news, fixtures, teams and sponsors so it looks the part from day one. Three quick things to make it yours:\n\n` +
-        `1. Add your club logo and colours\n` +
-        `2. Swap in a few of your own photos\n` +
-        `3. Post your first real news update\n\n` +
+        `We have set it up with sample news, fixtures, teams and sponsors so it looks the part from day one.\n\n` +
+        `Your 5-minute quick start (cheat sheet + video):\n${BASE}/guide\n\n` +
+        `What you can try during your trial, and where:\n` +
+        `- Make it yours: add your logo and club colours (Website)\n` +
+        `- Post a news story with a photo (News)\n` +
+        `- Add fixtures, results and the ladder (Match Centre)\n` +
+        `- List your teams and sponsors (Teams, Sponsors)\n` +
+        `- Push news to your socials (Website > News & social)\n\n` +
+        `To start editing, use the login link from the signup screen, or reply here and we will set you up.\n\n` +
         `Your free trial runs for 7 days. Reply to this email any time and we will give you a hand.\n\n` +
         `- The SportsWeb One team`,
     },
