@@ -10,6 +10,7 @@ export type Permission =
   | "club.comms" //             send messages
   | "club.modules" //           view/manage the club's module status
   | "club.settings" //          website style, branding, club settings
+  | "club.website" //           edit website content (hero, text, images, video)
   | "club.billing" //           view billing / subscription
   | "club.users"; //            manage club users
 
@@ -21,6 +22,7 @@ const ALL: Permission[] = [
   "club.comms",
   "club.modules",
   "club.settings",
+  "club.website",
   "club.billing",
   "club.users",
 ];
@@ -29,11 +31,11 @@ export const ROLE_PERMISSIONS: Record<AnyRole, Permission[]> = {
   // Owner — everything.
   superadmin: ALL,
   // SportsWeb staff — all clubs and support, but never code/secrets or platform roles.
-  sportsweb_admin: ["platform.clubs", "club.content", "club.comms", "club.modules", "club.settings", "club.billing", "club.users"],
+  sportsweb_admin: ["platform.clubs", "club.content", "club.comms", "club.modules", "club.settings", "club.website", "club.billing", "club.users"],
   // Senior club role — full control of their own club.
-  club_senior_admin: ["club.content", "club.comms", "club.modules", "club.settings", "club.billing", "club.users"],
-  // Operational club role — content and messaging only.
-  club_admin: ["club.content", "club.comms"],
+  club_senior_admin: ["club.content", "club.comms", "club.modules", "club.settings", "club.website", "club.billing", "club.users"],
+  // Operational club role — content, messaging and website editing.
+  club_admin: ["club.content", "club.comms", "club.website"],
 };
 
 /** Map a stored role value (incl. the legacy club_users enum) to a model role. */

@@ -1,9 +1,9 @@
 {
-  "name": "sportsweb-ticketing",
+  "name": "sportsweb-one-club-template",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
-  "description": "SportsWeb One — Ticketing module (standalone app, connected to SportsWeb One via shared Supabase)",
+  "description": "SportsWeb One — reusable football/netball club website template. Client zero: Dookie United FNC.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -11,22 +11,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.0",
-    "html5-qrcode": "^2.3.8",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-qr-code": "^2.0.15",
-    "react-router-dom": "^6.26.0"
+    "react-router-dom": "^6.26.2",
+    "@supabase/supabase-js": "^2.45.0"
   },
   "devDependencies": {
-    "@types/react": "^18.3.3",
+    "@types/react": "^18.3.5",
     "@types/react-dom": "^18.3.0",
     "@vitejs/plugin-react": "^4.3.1",
-    "autoprefixer": "^10.4.19",
-    "postcss": "^8.4.40",
-    "tailwindcss": "^3.4.7",
     "typescript": "^5.5.4",
-    "vite": "^5.4.0",
-    "vite-plugin-pwa": "^0.20.5"
+    "vite": "^5.4.6"
   }
 }

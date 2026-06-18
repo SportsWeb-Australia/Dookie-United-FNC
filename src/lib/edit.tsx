@@ -30,7 +30,9 @@ export function EditProvider({ children }: { children: ReactNode }) {
   const [error, setError] = useState<string | null>(null);
 
   const base = club.content ?? {};
-  const canEdit = !!membership;
+  // On-page editing is disabled — the website is edited from the admin panel.
+  // We keep reading saved overrides so admin edits still appear on the live site.
+  const canEdit = false;
 
   const value = (key: string, fallback: string) =>
     key in overrides ? overrides[key] : key in base ? base[key] : fallback;

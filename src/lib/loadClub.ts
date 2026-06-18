@@ -316,6 +316,11 @@ export async function getClubConfig(): Promise<ClubConfig> {
       // the one derived from selected_template_id (lets us assign a template
       // without needing a matching row in the templates table).
       if (map["site.variant"]) cfg.variant = map["site.variant"] as DesignVariant;
+      // Hero media is rendered from cfg.hero (not via the content reader), so
+      // map the saved overrides onto it here.
+      if (map["hero.image"]) cfg.hero = { ...cfg.hero, backgroundImage: map["hero.image"] };
+      if (map["hero.video"]) cfg.hero = { ...cfg.hero, video: map["hero.video"] };
+      if (map["branding.logo"]) cfg.identity = { ...cfg.identity, logo: map["branding.logo"] };
     }
 
     return cfg;

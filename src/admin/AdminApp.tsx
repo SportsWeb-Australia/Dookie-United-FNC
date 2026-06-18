@@ -7,6 +7,7 @@ import { supabase } from "../lib/supabase";
 import { RESOURCES } from "./resources";
 import { ResourceManager } from "./ResourceManager";
 import { AdminWebsite } from "./AdminWebsite";
+import { AdminSiteEditor } from "./AdminSiteEditor";
 import { AdminModules } from "./AdminModules";
 import { Communications } from "./Communications";
 import { SuperClubs } from "./SuperClubs";
@@ -76,6 +77,14 @@ function AdminInner() {
               ))}
             </>
           )}
+          {membership && can("club.website") && (
+            <>
+              <div className="sw-admin-navgroup">Your website</div>
+              <button data-active={active === "__site"} onClick={() => setActive("__site")}>
+                Edit website
+              </button>
+            </>
+          )}
           {membership && can("club.comms") && (
             <>
               <div className="sw-admin-navgroup">Communicate</div>
@@ -140,7 +149,9 @@ function AdminInner() {
                     : ""}
           </span>
         </div>
-        {effectiveActive === "__website" && can("club.settings") ? (
+        {effectiveActive === "__site" && can("club.website") ? (
+          <AdminSiteEditor />
+        ) : effectiveActive === "__website" && can("club.settings") ? (
           <AdminWebsite />
         ) : effectiveActive === "__modules" && can("club.modules") ? (
           <AdminModules />
