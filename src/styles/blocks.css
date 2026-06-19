@@ -3199,3 +3199,45 @@
 }
 
 .sw-admin-stylebtn { margin-top: 0.35rem; }
+
+/* ── Role dashboard: key indicators ───────────────────────── */
+.sw-kpi { margin: 0.25rem 0 1.75rem; }
+.sw-kpi .sw-dash-panelhead { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; margin-bottom: 0.85rem; }
+.sw-kpi-note { font-size: 0.8rem; color: var(--text-soft, #667085); }
+.sw-kpi-grid {
+  display: grid; gap: 0.9rem;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+.sw-kpi-card {
+  position: relative;
+  display: flex; flex-direction: column; gap: 0.15rem;
+  padding: 1.1rem 1.15rem 1.05rem;
+  border: 1px solid var(--border, #e6e8ec);
+  border-left: 4px solid var(--border, #e6e8ec);
+  border-radius: 12px;
+  background: var(--surface, #fff);
+}
+.sw-kpi-val { font-family: var(--font-display, inherit); font-size: 2rem; line-height: 1.05; font-weight: 800; }
+.sw-kpi-label { font-size: 0.88rem; color: var(--text-soft, #475467); }
+.sw-kpi-hint { font-size: 0.74rem; color: var(--text-soft, #98a2b3); margin-top: 0.1rem; }
+.sw-kpi-connect {
+  margin-top: 0.35rem; align-self: flex-start;
+  font-family: var(--font-mono, monospace); font-size: 0.62rem; letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 0.18rem 0.5rem; border-radius: 999px;
+  background: var(--surface-2, #f4f5f7); color: var(--text-soft, #667085); border: 1px solid var(--border, #e6e8ec);
+}
+.sw-kpi-clickable { cursor: pointer; transition: border-color 0.15s, transform 0.15s; }
+.sw-kpi-clickable:hover { transform: translateY(-2px); }
+
+/* tones: accent the left rule + the number */
+.sw-kpi-good { border-left-color: #16a34a; }
+.sw-kpi-good  .sw-kpi-val { color: #15803d; }
+.sw-kpi-warn { border-left-color: #f59e0b; }
+.sw-kpi-warn  .sw-kpi-val { color: #b45309; }
+.sw-kpi-bad  { border-left-color: #ef4444; }
+.sw-kpi-bad   .sw-kpi-val { color: #b91c1c; }
+.sw-kpi-info { border-left-color: var(--accent, #2563eb); }
+.sw-kpi-info  .sw-kpi-val { color: var(--accent, #2563eb); }
+.sw-kpi-plain { border-left-color: #cbd5e1; }
+/* placeholder (no value yet) stays neutral regardless of tone */
+.sw-kpi-card .sw-kpi-val { min-height: 1.05em; }

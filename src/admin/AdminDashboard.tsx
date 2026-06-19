@@ -14,6 +14,7 @@ import {
   firstNameFrom,
   type CommitteeProfile,
 } from "../lib/committee";
+import { getDashboardMetrics, buildKpis, personaFromTitle, type Metrics } from "../lib/roleKpis";
 
 /* ---- tiny dependency-free charts -------------------------------------- */
 
@@ -132,6 +133,7 @@ export function AdminDashboard({ go }: { go: (key: string) => void }) {
   });
 
   const [profile, setProfile] = useState<CommitteeProfile>({ displayName: "", committeeTitle: "" });
+  const [metrics, setMetrics] = useState<Metrics>({ zohoConnected: false });
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ name: "", title: "" });
   const [saveMsg, setSaveMsg] = useState("");
@@ -184,6 +186,17 @@ export function AdminDashboard({ go }: { go: (key: string) => void }) {
     };
   }, [clubId, userId]);
 
+  useEffect(() => {
+    if (!clubId) return;
+    let alive = true;
+    getDashboardMetrics(clubId).then((m) => {
+      if (alive) setMetrics(m);
+    });
+    return () => {
+      alive = false;
+    };
+  }, [clubId]);
+
   const clubName = club.identity.shortName || "your club";
   const firstName = firstNameFrom(profile.displayName, email);
   const roleFallback = roleLabel(platformRole ?? toModelRole(activeRole));
@@ -202,6 +215,13 @@ export function AdminDashboard({ go }: { go: (key: string) => void }) {
   };
 
   const n = (k: string) => counts[k] ?? 0;
+
+  const persona = personaFromTitle(profile.committeeTitle);
+  const kpi = buildKpis(
+    persona,
+    { events: n("events"), sponsors: n("sponsors"), teams: n("teams"), news: n("news") },
+    metrics
+  );
 
   // Modules breakdown (real): active vs locked vs coming-soon.
   const enabled = new Set(club.enabledModules ?? []);
@@ -297,6 +317,41 @@ export function AdminDashboard({ go }: { go: (key: string) => void }) {
           )}
         </div>
       </div>
+
+      <section className="sw-kpi">
+        <header className="sw-dash-panelhead">
+          <h3>{kpi.heading}</h3>
+          {!metrics.zohoConnected && (
+            <span className="sw-kpi-note">Live from SportsWeb · finance &amp; registrations light up once Zoho is connected</span>
+          )}
+        </header>
+        <div className="sw-kpi-grid">
+          {kpi.cards.map((c, i) => {
+            const clickable = !!c.go;
+            return (
+              <div
+                key={i}
+                className={`sw-kpi-card sw-kpi-${c.tone ?? "plain"}${clickable ? " sw-kpi-clickable" : ""}`}
+                onClick={clickable ? () => go(c.go!) : undefined}
+                role={clickable ? "button" : undefined}
+                tabIndex={clickable ? 0 : undefined}
+              >
+                <span className="sw-kpi-val">{c.value === null ? "—" : c.value}</span>
+                <span className="sw-kpi-label">{c.label}</span>
+                {c.value === null ? (
+                  c.source === "zoho" ? (
+                    <span className="sw-kpi-connect">Connect Zoho</span>
+                  ) : (
+                    <span className="sw-kpi-hint">Not set up yet</span>
+                  )
+                ) : c.hint ? (
+                  <span className="sw-kpi-hint">{c.hint}</span>
+                ) : null}
+              </div>
+            );
+          })}
+        </div>
+      </section>
 
       <div className="sw-dash-charts">
         <section className="sw-dash-panel">
