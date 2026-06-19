@@ -29,6 +29,25 @@ export function StartTrial() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<Result | null>(null);
+  const [linkBusy, setLinkBusy] = useState(false);
+  const [linkMsg, setLinkMsg] = useState<string | null>(null);
+
+  async function sendLogin(toEmail: string) {
+    if (!supabase) return;
+    setLinkBusy(true);
+    setLinkMsg(null);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email: toEmail,
+        options: { emailRedirectTo: `${window.location.origin}/admin` },
+      });
+      setLinkMsg(error ? error.message : "Check your inbox for a login link to start editing.");
+    } catch {
+      setLinkMsg("Could not send the link just now. Please try again.");
+    } finally {
+      setLinkBusy(false);
+    }
+  }
 
   async function submit() {
     setError(null);
@@ -59,6 +78,12 @@ export function StartTrial() {
       const r = (data ?? {}) as { slug?: string; variant?: string };
       if (!r.slug) throw new Error("Could not create your trial. Please try again.");
       setResult({ slug: r.slug, variant: r.variant ?? t.variant });
+      // Send the welcome email straight away; the scheduled job is the backstop.
+      try {
+        await supabase.functions.invoke("trial-nurture", { body: {} });
+      } catch {
+        /* best-effort; the cron will still send it */
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Something went wrong. Please try again.");
     } finally {
@@ -78,6 +103,7 @@ export function StartTrial() {
               A complete, ready-to-go site in under a minute. Free for 7 days, no card required.
               Add your own logo and photos any time.
             </p>
+            <p className="sw-trial-urgency">EOFYS: free setup for clubs who start before 30 June.</p>
 
             <label className="sw-trial-label">
               Club name
@@ -142,16 +168,24 @@ export function StartTrial() {
             <h1 className="sw-trial-title">Your site is live.</h1>
             <p className="sw-trial-sub">
               We have set up your club with sample news, fixtures, teams and sponsors so you can see
-              it in action. Everything is editable.
+              it in action. We have emailed {email} a quick-start guide too.
             </p>
             <div className="sw-trial-actions">
               <a className="sw-trial-btn" href={`/?club=${result.slug}`}>
                 View my site
               </a>
-              <a className="sw-trial-btn sw-trial-btn-ghost" href={`/admin?club=${result.slug}`}>
-                Manage it
+              <button
+                className="sw-trial-btn sw-trial-btn-ghost"
+                onClick={() => sendLogin(email)}
+                disabled={linkBusy}
+              >
+                {linkBusy ? "Sending login link..." : "Create my login to edit it"}
+              </button>
+              <a className="sw-trial-btn sw-trial-btn-ghost" href="/guide">
+                Quick-start guide
               </a>
             </div>
+            {linkMsg && <p className="sw-trial-fine">{linkMsg}</p>}
             <p className="sw-trial-fine">
               Your free trial runs for 7 days. Add your logo and photos any time, and we will be in
               touch to help you get the most out of it.
