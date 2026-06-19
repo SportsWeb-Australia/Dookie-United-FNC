@@ -14,8 +14,8 @@ import {
 } from "../lib/comms";
 
 const CHANNELS: { key: Channel; label: string; needs: "email" | "mobile" | null; hint: string }[] = [
-  { key: "email", label: "Email", needs: "email", hint: "Sent via Zoho" },
-  { key: "sms", label: "SMS", needs: "mobile", hint: "Sent via Twilio" },
+  { key: "email", label: "Email", needs: "email", hint: "Sent via ClickSend" },
+  { key: "sms", label: "SMS", needs: "mobile", hint: "Sent via ClickSend" },
   { key: "push", label: "Push", needs: null, hint: "All app subscribers" },
 ];
 

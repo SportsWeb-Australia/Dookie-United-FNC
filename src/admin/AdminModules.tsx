@@ -193,7 +193,12 @@ export function AdminModules() {
         {MODULE_CATALOG.map((m) => {
           const isOn = isEnabled(m.key);
           return (
-            <button key={m.key} type="button" className="sw-module-card" onClick={() => setActiveKey(m.key)}>
+            <button
+              key={m.key}
+              type="button"
+              className={`sw-module-card${isOn ? "" : " sw-module-card--locked"}`}
+              onClick={() => setActiveKey(m.key)}
+            >
               <div className="sw-module-top">
                 <span className="sw-module-badge">{m.badge}</span>
                 <span className={`sw-module-state ${isOn ? "on" : "off"}`}>

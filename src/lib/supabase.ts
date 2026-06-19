@@ -121,4 +121,8 @@ export function hasPreviewClub(): boolean {
 }
 
 export const supabase =
-  url && anonKey ? createClient(url, anonKey, { auth: { persistSession: false } }) : null;
+  url && anonKey
+    ? createClient(url, anonKey, {
+        auth: { persistSession: true, autoRefreshToken: true, storageKey: "sw_admin_session" },
+      })
+    : null;

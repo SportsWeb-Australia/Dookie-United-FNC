@@ -39,3 +39,20 @@ end;
 $$;
 
 grant execute on function public.set_my_committee_profile(uuid, text, text) to authenticated;
+
+-- ----------------------------------------------------------------------------
+-- OPTIONAL: assign a committee title (and/or promote to the club's senior /
+-- "Exec Admin" role) directly, until the admin "assign to people" screen ships.
+-- Uncomment and edit the email + club slug, then run.
+-- ----------------------------------------------------------------------------
+-- update public.user_club_roles
+--    set committee_title = 'President',
+--        display_name    = 'Carson'
+--  where user_id = (select id from auth.users where email = 'you@example.com')
+--    and club_id = (select id from public.clubs where slug = 'dookie-united');
+
+-- Promote the club's signup administrator to senior (can assign others' titles):
+-- update public.user_club_roles
+--    set role = 'club_senior_admin'
+--  where user_id = (select id from auth.users where email = 'you@example.com')
+--    and club_id = (select id from public.clubs where slug = 'dookie-united');

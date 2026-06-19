@@ -1,10 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { useClub } from "../components/ClubContext";
 import { useActiveClub } from "./ActiveClub";
 import { useAuth } from "../lib/auth";
 import { usePermissions, toModelRole } from "../lib/permissions";
 import { roleLabel } from "../lib/roles";
 import { supabase } from "../lib/supabase";
+import { MODULE_CATALOG } from "../lib/modules";
+import { COMING_SOON_MODULES } from "./ModulePrePage";
 import {
   COMMITTEE_TITLES,
   loadCommitteeProfile,
@@ -13,50 +15,113 @@ import {
   type CommitteeProfile,
 } from "../lib/committee";
 
+/* ---- tiny dependency-free charts -------------------------------------- */
+
+function Bars({ data }: { data: { label: string; value: number; color: string }[] }) {
+  const max = Math.max(1, ...data.map((d) => d.value));
+  return (
+    <div className="sw-bars">
+      {data.map((d) => (
+        <div key={d.label} className="sw-bar">
+          <span className="sw-bar-val">{d.value}</span>
+          <div className="sw-bar-track">
+            <div className="sw-bar-fill" style={{ height: `${Math.round((d.value / max) * 100)}%`, background: d.color }} />
+          </div>
+          <span className="sw-bar-label">{d.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function Donut({ segments }: { segments: { value: number; color: string; label: string }[] }) {
+  const total = segments.reduce((s, x) => s + x.value, 0) || 1;
+  const r = 42;
+  const C = 2 * Math.PI * r;
+  let acc = 0;
+  return (
+    <div className="sw-donut-wrap">
+      <svg viewBox="0 0 120 120" className="sw-donut" role="img" aria-label="Modules breakdown">
+        <circle cx={60} cy={60} r={r} fill="none" stroke="var(--border)" strokeWidth={14} opacity={0.35} />
+        <g transform="rotate(-90 60 60)">
+          {segments.map((s, i) => {
+            const len = (s.value / total) * C;
+            const node = (
+              <circle
+                key={i}
+                cx={60}
+                cy={60}
+                r={r}
+                fill="none"
+                stroke={s.color}
+                strokeWidth={14}
+                strokeDasharray={`${len} ${C - len}`}
+                strokeDashoffset={-acc}
+                strokeLinecap="butt"
+              />
+            );
+            acc += len;
+            return node;
+          })}
+        </g>
+        <text x={60} y={56} textAnchor="middle" className="sw-donut-num">
+          {segments[0]?.value ?? 0}
+        </text>
+        <text x={60} y={74} textAnchor="middle" className="sw-donut-cap">
+          active
+        </text>
+      </svg>
+      <ul className="sw-donut-legend">
+        {segments.map((s) => (
+          <li key={s.label}>
+            <i style={{ background: s.color }} />
+            {s.label} <strong>{s.value}</strong>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/* ---- quick-action icons (inline, no deps) ----------------------------- */
+
+const ICONS: Record<string, ReactNode> = {
+  news: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 20h9" /><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  ),
+  events: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" />
+    </svg>
+  ),
+  ladder: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 20V10M10 20V4M16 20v-8M22 20H2" />
+    </svg>
+  ),
+  website: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18Z" />
+    </svg>
+  ),
+  message: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2Z" />
+    </svg>
+  ),
+};
+
 /**
- * Admin landing dashboard. Shows a friendly snapshot of the club plus quick
- * shortcuts to the jobs people do most. `go` switches the admin view (same
- * setActive used by the sidebar), so a card behaves like a nav shortcut.
+ * Admin landing dashboard — a personalised, role-aware snapshot of the club
+ * with quick shortcuts to the jobs people do most.
  */
 export function AdminDashboard({ go }: { go: (key: string) => void }) {
   const { club } = useClub();
   const { can } = usePermissions();
   const { clubId, role: activeRole, isActingAs } = useActiveClub();
   const { userId, email, platformRole } = useAuth();
-
-  const [profile, setProfile] = useState<CommitteeProfile>({ displayName: "", committeeTitle: "" });
-  const [editing, setEditing] = useState(false);
-  const [form, setForm] = useState({ name: "", title: "" });
-  const [saveMsg, setSaveMsg] = useState("");
-
-  useEffect(() => {
-    if (!clubId || !userId) return;
-    let alive = true;
-    loadCommitteeProfile(clubId, userId).then((p) => {
-      if (!alive) return;
-      setProfile(p);
-      setForm({ name: p.displayName, title: p.committeeTitle });
-    });
-    return () => {
-      alive = false;
-    };
-  }, [clubId, userId]);
-
-  const firstName = firstNameFrom(profile.displayName, email);
-  const roleFallback = roleLabel(platformRole ?? toModelRole(activeRole));
-  const greetingRole = profile.committeeTitle || (roleFallback !== "—" ? roleFallback : "");
-
-  const saveProfile = async () => {
-    setSaveMsg("Saving…");
-    const err = await saveCommitteeProfile(clubId, form.name, form.title);
-    if (err) {
-      setSaveMsg("Couldn't save — has the committee-roles migration been run?");
-      return;
-    }
-    setProfile({ displayName: form.name.trim(), committeeTitle: form.title.trim() });
-    setSaveMsg("Saved.");
-    setEditing(false);
-  };
 
   const [counts, setCounts] = useState<Record<string, number | null>>({
     news: null,
@@ -65,6 +130,15 @@ export function AdminDashboard({ go }: { go: (key: string) => void }) {
     sponsors: null,
     ladder: null,
   });
+
+  const [profile, setProfile] = useState<CommitteeProfile>({ displayName: "", committeeTitle: "" });
+  const [editing, setEditing] = useState(false);
+  const [form, setForm] = useState({ name: "", title: "" });
+  const [saveMsg, setSaveMsg] = useState("");
+
+  // Only a SportsWeb admin or the club's senior (signup) admin assigns committee
+  // titles. A regular club admin can correct their display name, not their title.
+  const canAssignTitle = can("club.users");
 
   useEffect(() => {
     if (!clubId || !supabase) return;
@@ -97,106 +171,173 @@ export function AdminDashboard({ go }: { go: (key: string) => void }) {
     };
   }, [clubId]);
 
-  const clubName = club.identity.shortName || "your club";
+  useEffect(() => {
+    if (!clubId || !userId) return;
+    let alive = true;
+    loadCommitteeProfile(clubId, userId).then((p) => {
+      if (!alive) return;
+      setProfile(p);
+      setForm({ name: p.displayName, title: p.committeeTitle });
+    });
+    return () => {
+      alive = false;
+    };
+  }, [clubId, userId]);
 
-  const stats: { key: string; label: string }[] = [
-    { key: "news", label: "News posts" },
-    { key: "events", label: "Events" },
-    { key: "teams", label: "Teams" },
-    { key: "sponsors", label: "Sponsors" },
-    { key: "ladder", label: "Ladder rows" },
+  const clubName = club.identity.shortName || "your club";
+  const firstName = firstNameFrom(profile.displayName, email);
+  const roleFallback = roleLabel(platformRole ?? toModelRole(activeRole));
+  const greetingRole = profile.committeeTitle || (roleFallback !== "—" ? roleFallback : "");
+
+  const saveProfile = async () => {
+    setSaveMsg("Saving…");
+    const err = await saveCommitteeProfile(clubId, form.name, canAssignTitle ? form.title : profile.committeeTitle);
+    if (err) {
+      setSaveMsg("Couldn't save — has the committee-roles migration been run?");
+      return;
+    }
+    setProfile({ displayName: form.name.trim(), committeeTitle: (canAssignTitle ? form.title : profile.committeeTitle).trim() });
+    setSaveMsg("Saved.");
+    setEditing(false);
+  };
+
+  const n = (k: string) => counts[k] ?? 0;
+
+  // Modules breakdown (real): active vs locked vs coming-soon.
+  const enabled = new Set(club.enabledModules ?? []);
+  const activeCount = MODULE_CATALOG.filter((m) => enabled.has(m.key)).length;
+  const lockedCount = MODULE_CATALOG.filter((m) => !enabled.has(m.key)).length;
+  const soonCount = COMING_SOON_MODULES.length;
+
+  const accent = "var(--accent)";
+  const bars = [
+    { label: "News", value: n("news"), color: accent },
+    { label: "Events", value: n("events"), color: "#6366f1" },
+    { label: "Teams", value: n("teams"), color: "#0ea5e9" },
+    { label: "Sponsors", value: n("sponsors"), color: "#f59e0b" },
+    { label: "Ladder", value: n("ladder"), color: "#10b981" },
   ];
 
-  const quick: { title: string; sub: string; key: string; show: boolean }[] = [
-    { title: "Write a news post", sub: "Share an update with your members", key: "news", show: can("club.content") },
-    { title: "Add an event", sub: "Put a date on the calendar", key: "events", show: can("club.content") },
-    { title: "Update the ladder", sub: "Add or edit a ladder row", key: "ladder", show: can("club.content") },
-    { title: "Edit your website", sub: "Hero, logo, text, images and video", key: "__site", show: can("club.website") },
-    { title: "Send a message", sub: "Email or SMS your members", key: "__comms", show: can("club.comms") },
+  const quick: { title: string; sub: string; key: string; show: boolean; icon: ReactNode; tone: string }[] = [
+    { title: "Write a news post", sub: "Share an update with your members", key: "news", show: can("club.content"), icon: ICONS.news, tone: "a" },
+    { title: "Add an event", sub: "Put a date on the calendar", key: "events", show: can("club.content"), icon: ICONS.events, tone: "b" },
+    { title: "Update the ladder", sub: "Add or edit a ladder row", key: "ladder", show: can("club.content"), icon: ICONS.ladder, tone: "c" },
+    { title: "Edit your website", sub: "Hero, logo, text, images and video", key: "__site", show: can("club.website"), icon: ICONS.website, tone: "d" },
+    { title: "Send a message", sub: "Email or SMS your members", key: "__comms", show: can("club.comms"), icon: ICONS.message, tone: "e" },
   ];
 
   return (
     <div className="sw-admin-panel sw-dash">
-      <div className="sw-dash-head">
-        <h2>
-          Welcome {firstName}
-          {greetingRole && (
-            <>
-              {" — "}
-              <span className="sw-dash-role">{greetingRole}</span>
-            </>
-          )}
-        </h2>
-        <p className="sw-admin-note">Here's {clubName} at a glance. Jump straight into whatever you need.</p>
-        {!isActingAs && (
-          <div className="sw-dash-rolebar">
-            <button
-              className="sw-dash-roleedit"
-              onClick={() => {
-                setEditing((v) => !v);
-                setSaveMsg("");
-              }}
-            >
-              {editing ? "Close" : profile.committeeTitle ? "Edit your name & role" : "Set your name & committee role"}
-            </button>
-            {editing && (
-              <div className="sw-dash-roleform">
-                <label className="sw-ed-l">
-                  Your name
-                  <input
-                    className="sw-input"
-                    value={form.name}
-                    placeholder="e.g. Carson"
-                    onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                  />
-                </label>
-                <label className="sw-ed-l">
-                  Committee role
-                  <select
-                    className="sw-input"
-                    value={form.title}
-                    onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-                  >
-                    <option value="">— none —</option>
-                    {COMMITTEE_TITLES.map((t) => (
-                      <option key={t} value={t}>
-                        {t}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <div className="sw-ed-foot">
-                  <button className="sw-btn" onClick={saveProfile}>
-                    Save
-                  </button>
-                  <span className="sw-ed-status" aria-live="polite">
-                    {saveMsg}
-                  </span>
-                </div>
-              </div>
+      <div className="sw-dash-hero">
+        <div>
+          <h2 className="sw-dash-greet">
+            Welcome {firstName}
+            {greetingRole && (
+              <>
+                {" — "}
+                <span className="sw-dash-role">{greetingRole}</span>
+              </>
             )}
-          </div>
-        )}
+          </h2>
+          <p className="sw-dash-strap">Here's {clubName} at a glance. Jump straight into whatever you need.</p>
+          {!isActingAs && (
+            <div className="sw-dash-rolebar">
+              <button
+                className="sw-dash-roleedit"
+                onClick={() => {
+                  setEditing((v) => !v);
+                  setSaveMsg("");
+                }}
+              >
+                {editing ? "Close" : canAssignTitle ? "Edit your name & role" : "Edit your name"}
+              </button>
+              {editing && (
+                <div className="sw-dash-roleform">
+                  <label className="sw-ed-l">
+                    Your name
+                    <input
+                      className="sw-input"
+                      value={form.name}
+                      placeholder="e.g. Carson"
+                      onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
+                    />
+                  </label>
+                  {canAssignTitle ? (
+                    <label className="sw-ed-l">
+                      Committee role
+                      <select
+                        className="sw-input"
+                        value={form.title}
+                        onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+                      >
+                        <option value="">— none —</option>
+                        {COMMITTEE_TITLES.map((t) => (
+                          <option key={t} value={t}>
+                            {t}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  ) : (
+                    <p className="sw-ed-hint">
+                      Your committee role is set by a SportsWeb admin or your club's senior admin.
+                    </p>
+                  )}
+                  <div className="sw-ed-foot">
+                    <button className="sw-btn" onClick={saveProfile}>
+                      Save
+                    </button>
+                    <span className="sw-ed-status" aria-live="polite">
+                      {saveMsg}
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
-      <div className="sw-dash-stats">
-        {stats.map((s) => (
-          <button key={s.key} className="sw-dash-stat" onClick={() => go(s.key)}>
-            <span className="sw-dash-stat-num">{counts[s.key] === null ? "—" : counts[s.key]}</span>
-            <span className="sw-dash-stat-label">{s.label}</span>
-          </button>
-        ))}
+      <div className="sw-dash-charts">
+        <section className="sw-dash-panel">
+          <header className="sw-dash-panelhead">
+            <h3>Content on your site</h3>
+            <span className="sw-dash-panelnote">Live counts</span>
+          </header>
+          <Bars data={bars} />
+        </section>
+
+        <section className="sw-dash-panel">
+          <header className="sw-dash-panelhead">
+            <h3>Modules</h3>
+            <button className="sw-dash-panellink" onClick={() => go("__modules")}>
+              View all →
+            </button>
+          </header>
+          <Donut
+            segments={[
+              { label: "Active", value: activeCount, color: "var(--accent)" },
+              { label: "Locked", value: lockedCount, color: "#cbd5e1" },
+              { label: "Coming soon", value: soonCount, color: "#6366f1" },
+            ]}
+          />
+        </section>
       </div>
 
       <h3 className="sw-dash-subhead">Quick actions</h3>
       <div className="sw-dash-grid">
-        {quick.filter((q) => q.show).map((q) => (
-          <button key={q.key} className="sw-dash-card" onClick={() => go(q.key)}>
-            <span className="sw-dash-card-title">{q.title}</span>
-            <span className="sw-dash-card-sub">{q.sub}</span>
-            <span className="sw-dash-card-go" aria-hidden="true">→</span>
-          </button>
-        ))}
+        {quick
+          .filter((q) => q.show)
+          .map((q) => (
+            <button key={q.key} className={`sw-qcard sw-qcard--${q.tone}`} onClick={() => go(q.key)}>
+              <span className="sw-qcard-icon">{q.icon}</span>
+              <span className="sw-qcard-body">
+                <span className="sw-qcard-title">{q.title}</span>
+                <span className="sw-qcard-sub">{q.sub}</span>
+              </span>
+              <span className="sw-qcard-go" aria-hidden="true">→</span>
+            </button>
+          ))}
       </div>
     </div>
   );

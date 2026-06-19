@@ -5,7 +5,7 @@ import { useClub } from "../components/ClubContext";
 import { useActiveClub, ActiveClubProvider } from "./ActiveClub";
 import { ROLE_LABELS } from "../lib/roles";
 import { usePermissions } from "../lib/permissions";
-import { supabase } from "../lib/supabase";
+import { supabase, isPlatformHost } from "../lib/supabase";
 import { RESOURCES } from "./resources";
 import { ResourceManager } from "./ResourceManager";
 import { AdminWebsite } from "./AdminWebsite";
@@ -71,6 +71,12 @@ function AdminInner() {
     "--club-silver": bc.silver,
   } as CSSProperties;
 
+  // "View site" must open the club's *public* site. On a platform host, the bare
+  // root redirects a logged-in admin back here, so we add the club preview param
+  // and open in a new tab — the admin never navigates away.
+  const siteSlug = club.identity.slug ?? "";
+  const siteHref = isPlatformHost() && siteSlug ? `/?club=${siteSlug}` : "/";
+
   // Modules group: the club's switched-on modules, plus the ones we haven't
   // wired into this dashboard yet (shown as "Coming soon").
   const enabledMods: ModulePre[] = (club.enabledModules ?? [])
@@ -127,8 +133,13 @@ function AdminInner() {
     <div className={`sw-admin${operatorConsole ? " sw-brandwrap" : ""}`} style={operatorConsole ? undefined : brandStyle}>
       <aside className="sw-admin-side">
         <div className="sw-admin-brand">
-          <strong>{hasClub ? "Club Admin" : "Platform Admin"}</strong>
-          <span>{hasClub ? clubName : "SportsWeb"}</span>
+          {hasClub && club.identity.logo && (
+            <img className="sw-admin-brandlogo" src={club.identity.logo} alt={`${clubName} logo`} />
+          )}
+          <div className="sw-admin-brandtext">
+            <strong>{hasClub ? "Club Admin" : "Platform Admin"}</strong>
+            <span>{hasClub ? clubName : "SportsWeb"}</span>
+          </div>
         </div>
         <nav className="sw-admin-nav">
           {hasClub && (
@@ -220,7 +231,7 @@ function AdminInner() {
           )}
         </nav>
         <div className="sw-admin-side-foot">
-          <Link to="/" className="sw-link-arrow">View site →</Link>
+          <a href={siteHref} target="_blank" rel="noreferrer" className="sw-link-arrow">View site →</a>
           <button onClick={signOut}>Sign out</button>
         </div>
       </aside>

@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { useClub } from "../components/ClubContext";
 import { useActiveClub } from "./ActiveClub";
-import { supabase } from "../lib/supabase";
+import { supabase, isPlatformHost } from "../lib/supabase";
 import { ImageField } from "./ImageCropper";
 import { SectionHelp } from "./SectionHelp";
 
@@ -55,6 +55,8 @@ export function AdminSiteEditor({ page = "all" }: { page?: SitePage }) {
         : page === "footer"
           ? "Footer & site-wide"
           : "Edit website";
+  const siteSlug = club.identity.slug ?? "";
+  const previewHref = isPlatformHost() && siteSlug ? `/?club=${siteSlug}` : "/";
 
   const [hero, setHero] = useState({
     eyebrow: club.hero.eyebrow ?? "",
@@ -120,8 +122,11 @@ export function AdminSiteEditor({ page = "all" }: { page?: SitePage }) {
 
   return (
     <div className="sw-admin-panel sw-site-editor">
-      <div className="sw-admin-formhead">
+      <div className="sw-admin-formhead sw-site-edithead">
         <h2>{pageTitle}</h2>
+        <a href={previewHref} target="_blank" rel="noreferrer" className="sw-btn sw-btn--ghost sw-preview-btn">
+          Preview site →
+        </a>
       </div>
       <p className="sw-admin-note">
         Edit your homepage and key pages here. Each section opens up so you can work through them one at a time.
