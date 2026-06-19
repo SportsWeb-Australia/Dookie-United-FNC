@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { club as staticClub } from "./content/club.config";
 import { getClubConfig } from "./lib/loadClub";
+import { isPlatformHost, hasPreviewClub } from "./lib/supabase";
 import { ClubContext } from "./components/ClubContext";
-import { AuthProvider } from "./lib/auth";
+import { AuthProvider, useAuth } from "./lib/auth";
 import { EditProvider } from "./lib/edit";
 import { registerServiceWorker } from "./lib/pwa";
 import type { ClubConfig, DesignVariant } from "./content/types";
@@ -33,6 +34,7 @@ import { NotFound } from "./pages/NotFound";
 import { StartTrial } from "./pages/StartTrial";
 import { Guide } from "./pages/Guide";
 import { AdminApp } from "./admin/AdminApp";
+import { Login } from "./admin/Login";
 import { SeoManager } from "./lib/seo";
 
 /** Scroll to top on every route change. */
@@ -44,6 +46,19 @@ function ScrollToTop() {
   return null;
 }
 
+/**
+ * Root of a SportsWeb One platform host. Logged out → the SportsWeb One entry
+ * page (log in / sign up / learn more). Logged in → straight into the admin,
+ * where the user's own club (or the platform console) resolves. Club custom
+ * domains never reach here — their root renders the club's public homepage.
+ */
+function PlatformFront() {
+  const { ready, email } = useAuth();
+  if (!ready) return <div className="sw-admin-loading">Loading…</div>;
+  if (email) return <Navigate to="/admin" replace />;
+  return <Login />;
+}
+
 export default function App() {
   // Static config renders instantly; live Supabase content swaps in when ready.
   const [club, setClub] = useState<ClubConfig>(staticClub);
@@ -52,6 +67,12 @@ export default function App() {
   const isAdmin = location.pathname.startsWith("/admin");
   const isTrial = location.pathname.startsWith("/start");
   const isGuide = location.pathname.startsWith("/guide");
+  // Host-aware front door: on a SportsWeb One platform host, the root path shows
+  // the SportsWeb One entry page — unless a club preview override is active, in
+  // which case we render that club's public site for demos/screenshots.
+  const [platformHost] = useState(() => isPlatformHost());
+  const isPlatformFront =
+    location.pathname === "/" && platformHost && !hasPreviewClub();
 
   useEffect(() => {
     registerServiceWorker();
@@ -99,6 +120,15 @@ export default function App() {
   // Standalone quick-start guide (linked from the welcome email).
   if (isGuide) {
     return <Guide />;
+  }
+
+  // SportsWeb One front door: platform host root, no club chrome.
+  if (isPlatformFront) {
+    return (
+      <AuthProvider>
+        <PlatformFront />
+      </AuthProvider>
+    );
   }
 
   // Admin runs as its own full-screen app, without the public site chrome.

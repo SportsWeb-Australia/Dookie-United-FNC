@@ -77,5 +77,48 @@ export async function resolveClubSlug(): Promise<string> {
   return DEFAULT_CLUB_SLUG;
 }
 
+/**
+ * Hosts that are SportsWeb One *platform* hosts (not a club's own site).
+ * Add new platform aliases here.
+ */
+const PLATFORM_HOSTS = new Set([
+  "sportsweb.com.au",
+  "www.sportsweb.com.au",
+  "app.sportsweb.com.au",
+]);
+
+/**
+ * Is this request hitting a SportsWeb One platform host rather than a club site?
+ *   true  → sportsweb-one-v1.vercel.app, *.vercel.app, app/www/apex sportsweb.com.au, localhost
+ *   false → a club's custom domain (dookieunited.com.au) or {slug}.sportsweb.com.au
+ * Drives host-aware root routing: platform host root = the SportsWeb One entry
+ * page; club-domain root = that club's public homepage.
+ */
+export function isPlatformHost(host?: string): boolean {
+  const h = (host ?? (typeof window !== "undefined" ? window.location.hostname : "")).toLowerCase();
+  if (!h) return false;
+  if (h === "localhost" || h === "127.0.0.1") return true;
+  if (h.endsWith(".vercel.app")) return true;
+  if (PLATFORM_HOSTS.has(h)) return true;
+  return false;
+}
+
+/**
+ * Is a club preview override active for this tab (?club=<slug>, or one saved
+ * earlier this session)? When true, even a platform host shows that club's
+ * public site — so the operator can demo any club from the platform URL.
+ */
+export function hasPreviewClub(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const q = new URLSearchParams(window.location.search).get("club");
+    if (q === "reset") return false;
+    if (q) return true;
+    return !!sessionStorage.getItem("sw_preview_club");
+  } catch {
+    return false;
+  }
+}
+
 export const supabase =
   url && anonKey ? createClient(url, anonKey, { auth: { persistSession: false } }) : null;
