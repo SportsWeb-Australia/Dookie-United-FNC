@@ -11,7 +11,7 @@ export function Register() {
 
   return (
     <>
-      <PageHero eyebrow="Join the Dooks" title="Register & Get Involved" intro={join.blurb} />
+      <PageHero pageKey="register" eyebrow="Join the Dooks" title="Register & Get Involved" intro={join.blurb} />
 
       <section className="sw-section">
         <div className="sw-container">

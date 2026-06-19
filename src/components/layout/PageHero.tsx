@@ -6,6 +6,8 @@ interface Props {
   eyebrow: string;
   title: string;
   intro?: string;
+  /** When set, the club can override this page's eyebrow/title/intro from the admin. */
+  pageKey?: string;
 }
 
 /** Each variant family gets an interior page-header treatment that matches its
@@ -41,8 +43,12 @@ const HERO_FAMILY: Record<DesignVariant, string> = {
   touch: "soft",
 };
 
-export function PageHero({ eyebrow, title, intro }: Props) {
-  const { variant } = useClub();
+export function PageHero({ eyebrow, title, intro, pageKey }: Props) {
+  const { club, variant } = useClub();
+  const c = club.content ?? {};
+  const ev = (pageKey && c[`page.${pageKey}.eyebrow`]) || eyebrow;
+  const tv = (pageKey && c[`page.${pageKey}.title`]) || title;
+  const iv = (pageKey && c[`page.${pageKey}.intro`]) || intro;
   const family = HERO_FAMILY[variant] ?? "";
   return (
     <section className={`sw-pagehero${family ? ` sw-pagehero--${family}` : ""}`}>
@@ -53,9 +59,9 @@ export function PageHero({ eyebrow, title, intro }: Props) {
       </div>
       <div className="sw-container">
         <AccentBars />
-        <span className="sw-breadcrumb">{eyebrow}</span>
-        <h1>{title}</h1>
-        {intro && <p>{intro}</p>}
+        <span className="sw-breadcrumb">{ev}</span>
+        <h1>{tv}</h1>
+        {iv && <p>{iv}</p>}
       </div>
     </section>
   );

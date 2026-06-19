@@ -25,6 +25,8 @@ import { Login } from "./Login";
 const SITE_PAGES: { key: string; label: string }[] = [
   { key: "__page_home", label: "Home" },
   { key: "__page_about", label: "About" },
+  { key: "__page_contact", label: "Contact" },
+  { key: "__page_register", label: "Register" },
   { key: "__page_footer", label: "Footer & site-wide" },
 ];
 
@@ -294,9 +296,12 @@ function AdminInner() {
             );
           })()
         ) : effectiveActive === "__site" && can("club.website") ? (
-          <AdminSiteEditor />
+          <AdminSiteEditor key="__site" />
         ) : effectiveActive.startsWith("__page_") && can("club.website") ? (
-          <AdminSiteEditor page={effectiveActive.slice("__page_".length) as "home" | "about" | "footer"} />
+          <AdminSiteEditor
+            key={effectiveActive}
+            page={effectiveActive.slice("__page_".length) as "home" | "about" | "contact" | "register" | "footer"}
+          />
         ) : effectiveActive === "__website" && can("club.settings") ? (
           <AdminWebsite />
         ) : effectiveActive === "__modules" && hasClub ? (

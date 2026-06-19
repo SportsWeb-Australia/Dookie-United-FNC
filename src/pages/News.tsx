@@ -11,7 +11,7 @@ export function News() {
   const mode = useNewsMode();
   return (
     <>
-      <PageHero
+      <PageHero pageKey="news"
         eyebrow="Latest"
         title="Club News"
         intro="Match reports, announcements and what's happening around the club."

@@ -15,7 +15,7 @@ export function About() {
 
   return (
     <>
-      <PageHero
+      <PageHero pageKey="about"
         eyebrow="The Club"
         title={about.heading}
         intro={`Football & netball in ${identity.location}, competing in the ${identity.league}.`}

@@ -6,7 +6,7 @@ export function Sponsors() {
   const { club } = useClub();
   return (
     <>
-      <PageHero
+      <PageHero pageKey="sponsors"
         eyebrow="Partners"
         title="Our Sponsors"
         intro="Local business backing local sport. Our partners make everything at the club possible."

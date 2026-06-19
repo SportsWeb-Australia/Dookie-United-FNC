@@ -41,20 +41,43 @@ function EdCard({
  * club logo. Images upload to the club-media bucket via the crop tool. No
  * inline editing happens on the public site.
  */
-export type SitePage = "all" | "home" | "about" | "footer";
+export type SitePage =
+  | "all"
+  | "home"
+  | "about"
+  | "footer"
+  | "contact"
+  | "news"
+  | "events"
+  | "teams"
+  | "fixtures"
+  | "sponsors"
+  | "documents"
+  | "register";
+
+const PAGE_LABELS: Record<string, string> = {
+  home: "Home page",
+  about: "About page",
+  footer: "Footer & site-wide",
+  contact: "Contact page",
+  news: "News page",
+  events: "Events page",
+  teams: "Teams page",
+  fixtures: "Fixtures page",
+  sponsors: "Sponsors page",
+  documents: "Documents page",
+  register: "Register page",
+};
+
+// Pages that render a PageHero whose eyebrow/title/intro the club can override.
+const HEADING_PAGES = ["about", "contact", "news", "events", "teams", "fixtures", "sponsors", "documents", "register"];
 
 export function AdminSiteEditor({ page = "all" }: { page?: SitePage }) {
   const { club } = useClub();
   const { clubId } = useActiveClub();
   const show = (p: SitePage) => page === "all" || page === p;
-  const pageTitle =
-    page === "home"
-      ? "Home page"
-      : page === "about"
-        ? "About page"
-        : page === "footer"
-          ? "Footer & site-wide"
-          : "Edit website";
+  const pageTitle = PAGE_LABELS[page] ?? "Edit website";
+  const headingKey = HEADING_PAGES.includes(page) ? page : "";
   const siteSlug = club.identity.slug ?? "";
   const previewHref = isPlatformHost() && siteSlug ? `/?club=${siteSlug}` : "/";
 
@@ -92,6 +115,19 @@ export function AdminSiteEditor({ page = "all" }: { page?: SitePage }) {
   });
 
   const [status, setStatus] = useState<Record<string, string>>({});
+  const content = club.content ?? {};
+  const [heading, setHeading] = useState({
+    eyebrow: (headingKey && content[`page.${headingKey}.eyebrow`]) || "",
+    title: (headingKey && content[`page.${headingKey}.title`]) || "",
+    intro: (headingKey && content[`page.${headingKey}.intro`]) || "",
+  });
+  const [contactInfo, setContactInfo] = useState({
+    email: content["contact.email"] ?? club.contact.email ?? "",
+    phone: content["contact.phone"] ?? club.contact.phone ?? "",
+    instagram: content["contact.instagram"] ?? club.contact.instagram ?? "",
+    facebook: content["contact.facebook"] ?? club.contact.facebook ?? "",
+    address: content["contact.address"] ?? club.contact.addressLine ?? "",
+  });
   const setSt = (card: string, msg: string) => setStatus((s) => ({ ...s, [card]: msg }));
 
   async function saveContent(card: string, entries: Record<string, string>) {
@@ -133,6 +169,64 @@ export function AdminSiteEditor({ page = "all" }: { page?: SitePage }) {
         Images open a framing tool so they always sit nicely. Changes save to your site — reload the public site to see them live.
       </p>
       {show("home") && <SectionHelp section="website" />}
+
+      {headingKey && (
+        <EdCard title={`${PAGE_LABELS[page] ?? "Page"} heading`} subtitle="The banner at the top of this page. Leave a field blank to use the built-in default." defaultOpen>
+          <label className="sw-ed-l">Eyebrow (small line above the title)</label>
+          <input className="sw-input" value={heading.eyebrow} onChange={(e) => setHeading({ ...heading, eyebrow: e.target.value })} />
+          <label className="sw-ed-l">Title</label>
+          <input className="sw-input" value={heading.title} onChange={(e) => setHeading({ ...heading, title: e.target.value })} />
+          <label className="sw-ed-l">Intro</label>
+          <textarea className="sw-input" rows={3} value={heading.intro} onChange={(e) => setHeading({ ...heading, intro: e.target.value })} />
+          <div className="sw-ed-foot">
+            <button
+              className="sw-btn"
+              onClick={() =>
+                saveContent("heading", {
+                  [`page.${headingKey}.eyebrow`]: heading.eyebrow,
+                  [`page.${headingKey}.title`]: heading.title,
+                  [`page.${headingKey}.intro`]: heading.intro,
+                })
+              }
+            >
+              Save heading
+            </button>
+            <span className="sw-ed-status" aria-live="polite">{status.heading}</span>
+          </div>
+        </EdCard>
+      )}
+
+      {page === "contact" && (
+        <EdCard title="Contact details" subtitle="Shown on your Contact page and used across the site." defaultOpen>
+          <label className="sw-ed-l">Email</label>
+          <input className="sw-input" value={contactInfo.email} onChange={(e) => setContactInfo({ ...contactInfo, email: e.target.value })} />
+          <label className="sw-ed-l">Phone</label>
+          <input className="sw-input" value={contactInfo.phone} onChange={(e) => setContactInfo({ ...contactInfo, phone: e.target.value })} />
+          <label className="sw-ed-l">Postal / ground address</label>
+          <input className="sw-input" value={contactInfo.address} onChange={(e) => setContactInfo({ ...contactInfo, address: e.target.value })} />
+          <label className="sw-ed-l">Instagram link</label>
+          <input className="sw-input" placeholder="https://instagram.com/…" value={contactInfo.instagram} onChange={(e) => setContactInfo({ ...contactInfo, instagram: e.target.value })} />
+          <label className="sw-ed-l">Facebook link</label>
+          <input className="sw-input" placeholder="https://facebook.com/…" value={contactInfo.facebook} onChange={(e) => setContactInfo({ ...contactInfo, facebook: e.target.value })} />
+          <div className="sw-ed-foot">
+            <button
+              className="sw-btn"
+              onClick={() =>
+                saveContent("contact", {
+                  "contact.email": contactInfo.email,
+                  "contact.phone": contactInfo.phone,
+                  "contact.address": contactInfo.address,
+                  "contact.instagram": contactInfo.instagram,
+                  "contact.facebook": contactInfo.facebook,
+                })
+              }
+            >
+              Save contact details
+            </button>
+            <span className="sw-ed-status" aria-live="polite">{status.contact}</span>
+          </div>
+        </EdCard>
+      )}
 
       {show("home") && (
         <EdCard title="Homepage hero" subtitle="The big banner at the very top of your homepage" defaultOpen>

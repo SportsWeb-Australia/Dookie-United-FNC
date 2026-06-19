@@ -4,7 +4,7 @@ import { UpcomingEvents } from "../components/blocks/UpcomingEvents";
 export function Events() {
   return (
     <>
-      <PageHero
+      <PageHero pageKey="events"
         eyebrow="What's On"
         title="Events Calendar"
         intro="Social nights, fundraisers and the dates that matter across the season."

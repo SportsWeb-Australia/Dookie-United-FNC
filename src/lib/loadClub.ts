@@ -348,6 +348,12 @@ async function buildClubConfig(clubRow: Record<string, any>): Promise<ClubConfig
       if (map["hero.image"]) cfg.hero = { ...cfg.hero, backgroundImage: map["hero.image"] };
       if (map["hero.video"]) cfg.hero = { ...cfg.hero, video: map["hero.video"] };
       if (map["branding.logo"]) cfg.identity = { ...cfg.identity, logo: map["branding.logo"] };
+      // Contact-page overrides (edited under Edit website → Contact).
+      if (map["contact.email"]) cfg.contact = { ...cfg.contact, email: map["contact.email"] };
+      if (map["contact.phone"]) cfg.contact = { ...cfg.contact, phone: map["contact.phone"] };
+      if (map["contact.instagram"]) cfg.contact = { ...cfg.contact, instagram: map["contact.instagram"] };
+      if (map["contact.facebook"]) cfg.contact = { ...cfg.contact, facebook: map["contact.facebook"] };
+      if (map["contact.address"]) cfg.contact = { ...cfg.contact, addressLine: map["contact.address"] };
     }
 
     return cfg;

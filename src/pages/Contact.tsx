@@ -8,7 +8,7 @@ export function Contact() {
 
   return (
     <>
-      <PageHero
+      <PageHero pageKey="contact"
         eyebrow="Get in touch"
         title="Contact the Club"
         intro="Questions about playing, volunteering, sponsorship or anything else — we'd love to hear from you."

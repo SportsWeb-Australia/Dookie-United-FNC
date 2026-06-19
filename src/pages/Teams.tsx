@@ -9,7 +9,7 @@ export function Teams() {
   const { club } = useClub();
   return (
     <>
-      <PageHero
+      <PageHero pageKey="teams"
         eyebrow="Football & Netball"
         title="Teams & Programs"
         intro="From Auskick and Net Set Go through to seniors — there's a place at the Dooks for every age and ability."

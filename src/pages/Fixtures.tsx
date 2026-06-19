@@ -6,7 +6,7 @@ export function Fixtures() {
   const { club } = useClub();
   return (
     <>
-      <PageHero
+      <PageHero pageKey="fixtures"
         eyebrow="Match Centre"
         title="Fixtures & Results"
         intro="Upcoming games, recent results and where the Dooks sit on the ladder."

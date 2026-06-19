@@ -6,7 +6,7 @@ export function Documents() {
   const { club } = useClub();
   return (
     <>
-      <PageHero
+      <PageHero pageKey="documents"
         eyebrow="Resources"
         title="Documents & Policies"
         intro="Club policies, welfare information and the forms you need, all in one place."
