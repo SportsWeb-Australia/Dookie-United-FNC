@@ -8,6 +8,7 @@ import { usePermissions } from "../lib/permissions";
 import { supabase, isPlatformHost } from "../lib/supabase";
 import { RESOURCES } from "./resources";
 import { ResourceManager } from "./ResourceManager";
+import { AdminPeople } from "./AdminPeople";
 import { AdminWebsite } from "./AdminWebsite";
 import { AdminSiteEditor } from "./AdminSiteEditor";
 import { AdminDashboard } from "./AdminDashboard";
@@ -193,6 +194,14 @@ function AdminInner() {
               </button>
             </>
           )}
+          {hasClub && can("club.users") && (
+            <>
+              <div className="sw-admin-navgroup">Club</div>
+              <button data-active={active === "__people"} onClick={() => setActive("__people")}>
+                People & committee
+              </button>
+            </>
+          )}
           {hasClub && can("club.comms") && (
             <>
               <div className="sw-admin-navgroup">Communicate</div>
@@ -292,6 +301,8 @@ function AdminInner() {
           <AdminWebsite />
         ) : effectiveActive === "__modules" && hasClub ? (
           <AdminModules />
+        ) : effectiveActive === "__people" && can("club.users") ? (
+          <AdminPeople />
         ) : effectiveActive === "__comms" && can("club.comms") ? (
           <Communications />
         ) : effectiveActive === "__super_clubs" && can("platform.clubs") ? (

@@ -3120,3 +3120,22 @@
 .sw-module-card--soon .sw-module-badge { background: #6366f1; }
 .sw-module-card--locked .sw-module-badge { background: #94a3b8; }
 .sw-module-state.off { background: #fef2f2; color: #b91c1c; }
+
+/* ===================== People & committee ===================== */
+.sw-people { display: grid; gap: 1rem; }
+.sw-people-row {
+  display: grid; gap: 1rem; padding: 1.15rem 1.25rem;
+  border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface);
+}
+@media (min-width: 760px) { .sw-people-row { grid-template-columns: 1fr 1.4fr; align-items: center; } }
+.sw-people-id { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
+.sw-people-id strong { font-size: 1.02rem; }
+.sw-people-id span { color: var(--text-soft); font-size: 0.85rem; display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
+.sw-people-rolechip {
+  font-family: var(--font-mono, monospace); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.07em;
+  padding: 0.15rem 0.5rem; border-radius: 999px; background: var(--surface-2); color: var(--text-soft); border: 1px solid var(--border);
+}
+.sw-people-fields { display: grid; gap: 0.75rem; grid-template-columns: 1fr; }
+@media (min-width: 520px) { .sw-people-fields { grid-template-columns: 1fr 1fr; align-items: end; } }
+.sw-people-fields .sw-ed-l { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.82rem; }
+.sw-people-actions { display: flex; align-items: center; gap: 0.75rem; grid-column: 1 / -1; }
