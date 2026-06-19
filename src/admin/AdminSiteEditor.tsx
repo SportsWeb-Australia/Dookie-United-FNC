@@ -41,9 +41,20 @@ function EdCard({
  * club logo. Images upload to the club-media bucket via the crop tool. No
  * inline editing happens on the public site.
  */
-export function AdminSiteEditor() {
+export type SitePage = "all" | "home" | "about" | "footer";
+
+export function AdminSiteEditor({ page = "all" }: { page?: SitePage }) {
   const { club } = useClub();
   const { clubId } = useActiveClub();
+  const show = (p: SitePage) => page === "all" || page === p;
+  const pageTitle =
+    page === "home"
+      ? "Home page"
+      : page === "about"
+        ? "About page"
+        : page === "footer"
+          ? "Footer & site-wide"
+          : "Edit website";
 
   const [hero, setHero] = useState({
     eyebrow: club.hero.eyebrow ?? "",
@@ -110,15 +121,16 @@ export function AdminSiteEditor() {
   return (
     <div className="sw-admin-panel sw-site-editor">
       <div className="sw-admin-formhead">
-        <h2>Edit website</h2>
+        <h2>{pageTitle}</h2>
       </div>
       <p className="sw-admin-note">
         Edit your homepage and key pages here. Each section opens up so you can work through them one at a time.
         Images open a framing tool so they always sit nicely. Changes save to your site — reload the public site to see them live.
       </p>
-      <SectionHelp section="website" />
+      {show("home") && <SectionHelp section="website" />}
 
-      <EdCard title="Homepage hero" subtitle="The big banner at the very top of your homepage" defaultOpen>
+      {show("home") && (
+        <EdCard title="Homepage hero" subtitle="The big banner at the very top of your homepage" defaultOpen>
         <label className="sw-ed-l">Eyebrow (small line above the title)</label>
         <input className="sw-input" value={hero.eyebrow} onChange={(e) => setHero({ ...hero, eyebrow: e.target.value })} />
         <label className="sw-ed-l">Title</label>
@@ -153,8 +165,10 @@ export function AdminSiteEditor() {
           <span className="sw-ed-status" aria-live="polite">{status.hero}</span>
         </div>
       </EdCard>
+      )}
 
-      <EdCard title="Club logo & branding" subtitle="Your club crest, shown in the header and around the site">
+      {show("home") && (
+        <EdCard title="Club logo & branding" subtitle="Your club crest, shown in the header and around the site">
         <ImageField
           label="Logo"
           hint="Square works best. Recommended 512 × 512, transparent PNG."
@@ -168,8 +182,10 @@ export function AdminSiteEditor() {
         />
         <span className="sw-ed-status" aria-live="polite">{status.brand}</span>
       </EdCard>
+      )}
 
-      <EdCard title="President's welcome" subtitle="The welcome message and portrait on your homepage">
+      {show("home") && (
+        <EdCard title="President's welcome" subtitle="The welcome message and portrait on your homepage">
         <div className="sw-ed-2col">
           <div>
             <label className="sw-ed-l">Name</label>
@@ -204,8 +220,10 @@ export function AdminSiteEditor() {
           <span className="sw-ed-status" aria-live="polite">{status.pres}</span>
         </div>
       </EdCard>
+      )}
 
-      <EdCard title="Join / membership call-to-action" subtitle="The prompt that invites people to join your club">
+      {show("home") && (
+        <EdCard title="Join / membership call-to-action" subtitle="The prompt that invites people to join your club">
         <label className="sw-ed-l">Heading</label>
         <input className="sw-input" value={join.heading} onChange={(e) => setJoin({ ...join, heading: e.target.value })} />
         <label className="sw-ed-l">Blurb</label>
@@ -217,8 +235,10 @@ export function AdminSiteEditor() {
           <span className="sw-ed-status" aria-live="polite">{status.join}</span>
         </div>
       </EdCard>
+      )}
 
-      <EdCard title="About your club" subtitle="The opening of your About page">
+      {show("about") && (
+        <EdCard title="About your club" subtitle="The opening of your About page">
         <label className="sw-ed-l">Opening paragraph</label>
         <textarea className="sw-input" rows={4} value={about.body} onChange={(e) => setAbout({ ...about, body: e.target.value })} />
         <ImageField
@@ -241,8 +261,10 @@ export function AdminSiteEditor() {
           <span className="sw-ed-status" aria-live="polite">{status.about}</span>
         </div>
       </EdCard>
+      )}
 
-      <EdCard title="Footer" subtitle="Acknowledgement of Country and footer logos or flags">
+      {show("footer") && (
+        <EdCard title="Footer" subtitle="Acknowledgement of Country and footer logos or flags">
         <label className="sw-ed-l">Acknowledgement of Country</label>
         <textarea className="sw-input" rows={3} value={footer.acknowledgement} onChange={(e) => setFooter({ acknowledgement: e.target.value })} />
         <div className="sw-ed-foot">
@@ -304,6 +326,7 @@ export function AdminSiteEditor() {
         </div>
         <span className="sw-ed-status" aria-live="polite">{status.footerlogos}</span>
       </EdCard>
+      )}
     </div>
   );
 }

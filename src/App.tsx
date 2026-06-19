@@ -34,7 +34,7 @@ import { NotFound } from "./pages/NotFound";
 import { StartTrial } from "./pages/StartTrial";
 import { Guide } from "./pages/Guide";
 import { AdminApp } from "./admin/AdminApp";
-import { Login } from "./admin/Login";
+import { PlatformLanding } from "./pages/PlatformLanding";
 import { SeoManager } from "./lib/seo";
 
 /** Scroll to top on every route change. */
@@ -56,7 +56,7 @@ function PlatformFront() {
   const { ready, email } = useAuth();
   if (!ready) return <div className="sw-admin-loading">Loading…</div>;
   if (email) return <Navigate to="/admin" replace />;
-  return <Login />;
+  return <PlatformLanding />;
 }
 
 export default function App() {

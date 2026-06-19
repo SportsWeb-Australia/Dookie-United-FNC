@@ -20,6 +20,13 @@ import { SuperIntegrations } from "./SuperIntegrations";
 import { SuperStudio } from "./SuperStudio";
 import { Login } from "./Login";
 
+/** Editable site pages shown under "Edit website" (alongside the content collections). */
+const SITE_PAGES: { key: string; label: string }[] = [
+  { key: "__page_home", label: "Home" },
+  { key: "__page_about", label: "About" },
+  { key: "__page_footer", label: "Footer & site-wide" },
+];
+
 function AdminInner() {
   const { ready, resolving, email, platformRole, isPlatformAdmin, signOut } = useAuth();
   const {
@@ -132,59 +139,47 @@ function AdminInner() {
           {hasClub && (can("club.website") || can("club.content")) && (
             <>
               <div className="sw-admin-navgroup">Your website</div>
-              {can("club.website") ? (
-                <>
-                  <div className="sw-admin-parentrow">
-                    <button
-                      className="sw-admin-parent"
-                      data-active={active === "__site"}
-                      onClick={() => { setActive("__site"); setWebOpen(true); }}
-                    >
-                      Edit website
-                    </button>
-                    {can("club.content") && (
-                      <button
-                        className="sw-admin-caret"
-                        aria-label={webOpen ? "Collapse pages" : "Expand pages"}
-                        aria-expanded={webOpen}
-                        onClick={() => setWebOpen((o) => !o)}
-                      >
-                        {webOpen ? "▾" : "▸"}
+              <div className="sw-admin-parentrow">
+                <button
+                  className="sw-admin-parent"
+                  data-active={active === "__site"}
+                  onClick={() => { setActive("__site"); setWebOpen(true); }}
+                >
+                  Edit website
+                </button>
+                <button
+                  className="sw-admin-caret"
+                  aria-label={webOpen ? "Collapse pages" : "Expand pages"}
+                  aria-expanded={webOpen}
+                  onClick={() => setWebOpen((o) => !o)}
+                >
+                  {webOpen ? "▾" : "▸"}
+                </button>
+              </div>
+              {webOpen && (
+                <div className="sw-admin-subnav">
+                  {can("club.website") &&
+                    SITE_PAGES.map((p) => (
+                      <button key={p.key} data-active={p.key === active} onClick={() => setActive(p.key)}>
+                        {p.label}
                       </button>
-                    )}
-                  </div>
-                  {can("club.content") && webOpen && (
-                    <div className="sw-admin-subnav">
-                      {RESOURCES.map((r) => (
-                        <button key={r.key} data-active={r.key === active} onClick={() => setActive(r.key)}>
-                          {r.label}
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </>
-              ) : (
-                can("club.content") &&
-                RESOURCES.map((r) => (
-                  <button key={r.key} data-active={r.key === active} onClick={() => setActive(r.key)}>
-                    {r.label}
-                  </button>
-                ))
+                    ))}
+                  {can("club.content") &&
+                    RESOURCES.map((r) => (
+                      <button key={r.key} data-active={r.key === active} onClick={() => setActive(r.key)}>
+                        {r.label}
+                      </button>
+                    ))}
+                </div>
               )}
             </>
           )}
-          {hasClub && moduleNav.length > 0 && (
+          {hasClub && (
             <>
               <div className="sw-admin-navgroup">Modules</div>
-              {moduleNav.map(({ def }) => (
-                <button
-                  key={def.key}
-                  data-active={active === `__mod_${def.key}`}
-                  onClick={() => setActive(`__mod_${def.key}`)}
-                >
-                  {def.name}
-                </button>
-              ))}
+              <button data-active={active === "__modules"} onClick={() => setActive("__modules")}>
+                All modules
+              </button>
             </>
           )}
           {hasClub && can("club.comms") && (
@@ -195,19 +190,12 @@ function AdminInner() {
               </button>
             </>
           )}
-          {hasClub && (can("club.settings") || can("club.modules")) && (
+          {hasClub && can("club.settings") && (
             <>
               <div className="sw-admin-navgroup">Setup</div>
-              {can("club.settings") && (
-                <button data-active={active === "__website"} onClick={() => setActive("__website")}>
-                  Website style
-                </button>
-              )}
-              {can("club.modules") && (
-                <button data-active={active === "__modules"} onClick={() => setActive("__modules")}>
-                  Modules
-                </button>
-              )}
+              <button data-active={active === "__website"} onClick={() => setActive("__website")}>
+                Website style
+              </button>
             </>
           )}
           {(can("platform.clubs") || can("platform.integrations")) && (
@@ -287,9 +275,11 @@ function AdminInner() {
           })()
         ) : effectiveActive === "__site" && can("club.website") ? (
           <AdminSiteEditor />
+        ) : effectiveActive.startsWith("__page_") && can("club.website") ? (
+          <AdminSiteEditor page={effectiveActive.slice("__page_".length) as "home" | "about" | "footer"} />
         ) : effectiveActive === "__website" && can("club.settings") ? (
           <AdminWebsite />
-        ) : effectiveActive === "__modules" && can("club.modules") ? (
+        ) : effectiveActive === "__modules" && hasClub ? (
           <AdminModules />
         ) : effectiveActive === "__comms" && can("club.comms") ? (
           <Communications />
