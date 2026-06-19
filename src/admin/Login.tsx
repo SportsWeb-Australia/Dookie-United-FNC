@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { useAuth } from "../lib/auth";
 
+/**
+ * SportsWeb One platform entry page. SportsWeb-branded (not club-branded) —
+ * the front door for every club. Log in resolves the account and lands them in
+ * their own branded club admin. Sign up and Learn more go to the marketing
+ * site, where a club chooses a plan and activates.
+ */
+const MARKETING_URL = "https://sportsweb.com.au";
+const SIGNUP_URL = "https://sportsweb.com.au/#pricing";
+
 export function Login() {
   const { signIn } = useAuth();
   const [email, setEmail] = useState("");
@@ -17,15 +26,20 @@ export function Login() {
   };
 
   return (
-    <div className="sw-admin-login sw-brandwrap">
-      <div className="sw-admin-login-card">
+    <div className="sw-entry sw-brandwrap">
+      <div className="sw-entry-card">
         <div className="sw-login-brand">
           <span className="sw-login-mark">S1</span>
-          <span className="sw-login-word">SportsWeb</span>
+          <span className="sw-login-word">
+            SportsWeb <span className="sw-login-one">One</span>
+          </span>
         </div>
-        <h1>Club admin</h1>
-        <p>Sign in to manage your club.</p>
+
+        <h1>Welcome back</h1>
+        <p>Log in to manage your club. New here? Choose a plan to get started.</p>
+
         {error && <p className="sw-admin-error">{error}</p>}
+
         <label className="sw-admin-field">
           <span>Email</span>
           <input
@@ -47,9 +61,17 @@ export function Login() {
           />
         </label>
         <button className="sw-btn" onClick={submit} disabled={busy}>
-          {busy ? "Signing in…" : "Sign in"}
+          {busy ? "Logging in…" : "Log in"}
         </button>
-        <p className="sw-login-sub">SportsWeb One · club management platform</p>
+
+        <div className="sw-entry-divider"><span>New to SportsWeb One?</span></div>
+
+        <div className="sw-entry-actions">
+          <a className="sw-btn sw-btn--ghost" href={SIGNUP_URL}>Sign up &amp; choose a plan</a>
+          <a className="sw-entry-link" href={MARKETING_URL}>Learn more about SportsWeb One →</a>
+        </div>
+
+        <p className="sw-login-sub">SportsWeb One · the operating system for community sport</p>
       </div>
     </div>
   );
