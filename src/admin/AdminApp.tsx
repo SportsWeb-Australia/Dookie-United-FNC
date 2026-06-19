@@ -17,6 +17,7 @@ import { getModule } from "../lib/modules";
 import { AdminModules } from "./AdminModules";
 import { Communications } from "./Communications";
 import { SuperClubs } from "./SuperClubs";
+import { AdminImport } from "./AdminImport";
 import { SuperIntegrations } from "./SuperIntegrations";
 import { SuperStudio } from "./SuperStudio";
 import { Login } from "./Login";
@@ -125,7 +126,7 @@ function AdminInner() {
 
   const resource = RESOURCES.find((r) => r.key === active) ?? RESOURCES[0];
   const isSuperView =
-    active === "__super_clubs" || active === "__super_integrations" || active === "__super_studio";
+    active === "__super_clubs" || active === "__super_integrations" || active === "__super_studio" || active === "__super_import";
   // A platform operator with no club of their own lands on the platform views.
   const effectiveActive = !hasClub && !isSuperView ? "__super_clubs" : active;
   // The dedicated operator console (platform admin, no club) wears SportsWeb colours;
@@ -186,6 +187,15 @@ function AdminInner() {
                     ))}
                 </div>
               )}
+              {can("club.settings") && (
+                <button
+                  className="sw-admin-stylebtn"
+                  data-active={active === "__website"}
+                  onClick={() => setActive("__website")}
+                >
+                  Website style
+                </button>
+              )}
             </>
           )}
           {hasClub && (
@@ -212,14 +222,6 @@ function AdminInner() {
               </button>
             </>
           )}
-          {hasClub && can("club.settings") && (
-            <>
-              <div className="sw-admin-navgroup">Setup</div>
-              <button data-active={active === "__website"} onClick={() => setActive("__website")}>
-                Website style
-              </button>
-            </>
-          )}
           {(can("platform.clubs") || can("platform.integrations")) && (
             <>
               <div className="sw-admin-navgroup">Platform · SportsWeb</div>
@@ -236,6 +238,11 @@ function AdminInner() {
               {can("platform.clubs") && (
                 <button data-active={active === "__super_studio"} onClick={() => setActive("__super_studio")}>
                   Template Studio
+                </button>
+              )}
+              {can("platform.clubs") && (
+                <button data-active={active === "__super_import"} onClick={() => setActive("__super_import")}>
+                  Import a club
                 </button>
               )}
             </>
@@ -316,6 +323,8 @@ function AdminInner() {
           <SuperIntegrations />
         ) : effectiveActive === "__super_studio" && can("platform.clubs") ? (
           <SuperStudio />
+        ) : effectiveActive === "__super_import" && can("platform.clubs") ? (
+          <AdminImport />
         ) : hasClub && can("club.content") ? (
           <ResourceManager resource={resource} />
         ) : (

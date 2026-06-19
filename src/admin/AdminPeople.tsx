@@ -59,7 +59,7 @@ export function AdminPeople() {
       ) : people.length === 0 ? (
         <p className="sw-muted">No people found, or you don&apos;t have permission to manage them.</p>
       ) : (
-        <div className="sw-people">
+        <div className="sw-people-admin">
           {people.map((p) => {
             const d = drafts[p.userId] ?? { name: "", title: "" };
             return (

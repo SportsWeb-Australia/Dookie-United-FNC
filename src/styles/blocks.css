@@ -1532,8 +1532,10 @@
 
 /* Modules — index grid */
 .sw-module-grid { display: grid; gap: 1.25rem; grid-template-columns: 1fr; }
-@media (min-width: 620px) { .sw-module-grid { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 980px) { .sw-module-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 560px) { .sw-module-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 820px) { .sw-module-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1100px) { .sw-module-grid { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 1400px) { .sw-module-grid { grid-template-columns: repeat(5, 1fr); } }
 .sw-module-card {
   display: flex; flex-direction: column; gap: 0.5rem;
   border: 1px solid var(--border); border-radius: var(--radius-lg);
@@ -1619,9 +1621,11 @@
   content: ""; position: absolute; left: 0.6rem; top: 50%; width: 0.4rem; height: 1px;
   background: rgba(255, 255, 255, 0.25);
 }
-.sw-admin-styles { display: grid; gap: 0.75rem; grid-template-columns: 1fr; }
+.sw-admin-styles { display: grid; gap: 0.85rem; grid-template-columns: 1fr; }
 @media (min-width: 560px) { .sw-admin-styles { grid-template-columns: repeat(2, 1fr); } }
-@media (min-width: 900px) { .sw-admin-styles { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 820px) { .sw-admin-styles { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1100px) { .sw-admin-styles { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 1400px) { .sw-admin-styles { grid-template-columns: repeat(5, 1fr); } }
 .sw-admin-style {
   display: flex; flex-direction: column; gap: 0.25rem; text-align: left;
   padding: 1rem 1.1rem; border: 1px solid #e4e4e7; border-radius: 10px;
@@ -2640,10 +2644,12 @@
 /* admin news-mode picker reuses the style-picker grid */
 .sw-admin-newsmode {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 0.75rem;
-  margin-top: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.1rem;
+  margin-top: 0.85rem;
+  margin-bottom: 1rem;
 }
+.sw-admin-newsmode .sw-admin-style { min-height: 110px; padding: 1.15rem 1.25rem; gap: 0.4rem; }
 
 /* ===== Trial signup (/start) — SportsWeb-branded, standalone ===== */
 .sw-trial{min-height:100vh;display:flex;align-items:center;justify-content:center;
@@ -3122,7 +3128,7 @@
 .sw-module-state.off { background: #fef2f2; color: #b91c1c; }
 
 /* ===================== People & committee ===================== */
-.sw-people { display: grid; gap: 1rem; }
+.sw-people-admin { display: grid; gap: 1rem; grid-template-columns: 1fr; }
 .sw-people-row {
   display: grid; gap: 1rem; padding: 1.15rem 1.25rem;
   border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface);
@@ -3139,3 +3145,57 @@
 @media (min-width: 520px) { .sw-people-fields { grid-template-columns: 1fr 1fr; align-items: end; } }
 .sw-people-fields .sw-ed-l { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.82rem; }
 .sw-people-actions { display: flex; align-items: center; gap: 0.75rem; grid-column: 1 / -1; }
+
+/* ── Import a club ─────────────────────────────────────────── */
+.sw-import-target {
+  font-size: 13px;
+  color: var(--text-soft, #555);
+  margin: 4px 0 12px;
+}
+.sw-import-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.sw-import-bar .sw-input { flex: 1; }
+.sw-import-bar .sw-btn { white-space: nowrap; }
+.sw-import-empty,
+.sw-import-error {
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 14px;
+}
+.sw-import-empty {
+  background: var(--surface-2, #f4f5f7);
+  color: var(--text-soft, #555);
+}
+.sw-import-error {
+  background: #fdecec;
+  color: #a12424;
+  margin-bottom: 12px;
+}
+.sw-import-preview {
+  border-top: 1px solid var(--line, #e6e8ec);
+  padding-top: 12px;
+}
+.sw-import-row {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.sw-import-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.sw-import-check input { width: 16px; height: 16px; }
+@media (max-width: 640px) {
+  .sw-import-row { grid-template-columns: 1fr; gap: 4px; }
+}
+
+.sw-admin-stylebtn { margin-top: 0.35rem; }
