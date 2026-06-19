@@ -322,7 +322,7 @@ export function AdminDashboard({ go }: { go: (key: string) => void }) {
         <header className="sw-dash-panelhead">
           <h3>{kpi.heading}</h3>
           {!metrics.zohoConnected && (
-            <span className="sw-kpi-note">Live from SportsWeb · finance &amp; registrations light up once Zoho is connected</span>
+            <span className="sw-kpi-note">Live from SportsWeb · P&amp;L vs budget lights up once Zoho is connected</span>
           )}
         </header>
         <div className="sw-kpi-grid">
