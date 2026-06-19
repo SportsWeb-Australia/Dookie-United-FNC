@@ -4,6 +4,7 @@ import { uploadToStorage } from "../lib/upload";
 import { RichText } from "./RichText";
 import { useAuth } from "../lib/auth";
 import { slugify, type Field, type ResourceDef } from "./resources";
+import { SectionHelp } from "./SectionHelp";
 
 type Row = Record<string, unknown> & { id?: string };
 
@@ -236,6 +237,7 @@ export function ResourceManager({ resource }: { resource: ResourceDef }) {
           </button>
         </div>
       </div>
+      <SectionHelp section={resource.key} />
       {error && <p className="sw-admin-error">{error}</p>}
       {importMsg && <p className="sw-admin-note">{importMsg}</p>}
       {rows.length === 0 ? (

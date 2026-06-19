@@ -3,6 +3,7 @@ import { useClub } from "../components/ClubContext";
 import { useAuth } from "../lib/auth";
 import { supabase } from "../lib/supabase";
 import { ImageField } from "./ImageCropper";
+import { SectionHelp } from "./SectionHelp";
 
 /**
  * Website editor — lives in the admin panel (Club Admin level and up).
@@ -85,6 +86,7 @@ export function AdminSiteEditor() {
         Edit your homepage and key pages here. Images open a framing tool so they always sit nicely.
         Changes save to your site — reload the public site to see them live.
       </p>
+      <SectionHelp section="website" />
 
       {/* HERO */}
       <section className="sw-ed-card">

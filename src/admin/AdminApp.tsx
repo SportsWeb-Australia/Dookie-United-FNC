@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../lib/auth";
+import { useClub } from "../components/ClubContext";
 import { ROLE_LABELS } from "../lib/roles";
 import { usePermissions } from "../lib/permissions";
 import { supabase } from "../lib/supabase";
@@ -8,6 +9,9 @@ import { RESOURCES } from "./resources";
 import { ResourceManager } from "./ResourceManager";
 import { AdminWebsite } from "./AdminWebsite";
 import { AdminSiteEditor } from "./AdminSiteEditor";
+import { AdminDashboard } from "./AdminDashboard";
+import { ModulePrePage, COMING_SOON_MODULES, type ModulePre } from "./ModulePrePage";
+import { getModule } from "../lib/modules";
 import { AdminModules } from "./AdminModules";
 import { Communications } from "./Communications";
 import { SuperClubs } from "./SuperClubs";
@@ -17,8 +21,21 @@ import { Login } from "./Login";
 
 function AdminInner() {
   const { ready, resolving, email, membership, platformRole, isPlatformAdmin, signOut } = useAuth();
+  const { club } = useClub();
   const { can } = usePermissions();
-  const [active, setActive] = useState(RESOURCES[0].key);
+  const [active, setActive] = useState("__dashboard");
+
+  // Modules group: the club's switched-on modules, plus the ones we haven't
+  // wired into this dashboard yet (shown as "Coming soon").
+  const enabledMods: ModulePre[] = (club.enabledModules ?? [])
+    .map((k) => getModule(k))
+    .filter((m): m is NonNullable<typeof m> => Boolean(m));
+  const enabledKeys = new Set(enabledMods.map((m) => m.key));
+  const soonMods: ModulePre[] = COMING_SOON_MODULES.filter((m) => !enabledKeys.has(m.key));
+  const moduleNav: { def: ModulePre; status: "open" | "soon" }[] = [
+    ...enabledMods.map((def) => ({ def, status: (def.appUrl ? "open" : "soon") as "open" | "soon" })),
+    ...soonMods.map((def) => ({ def, status: "soon" as const })),
+  ];
 
   if (!supabase) {
     return (
@@ -68,21 +85,39 @@ function AdminInner() {
           <span>{membership?.clubName ?? "SportsWeb"}</span>
         </div>
         <nav className="sw-admin-nav">
-          {membership && can("club.content") && (
-            <>
-              {RESOURCES.map((r) => (
-                <button key={r.key} data-active={r.key === active} onClick={() => setActive(r.key)}>
-                  {r.label}
-                </button>
-              ))}
-            </>
+          {membership && (
+            <button data-active={active === "__dashboard"} onClick={() => setActive("__dashboard")}>
+              Dashboard
+            </button>
           )}
-          {membership && can("club.website") && (
+          {membership && (can("club.website") || can("club.content")) && (
             <>
               <div className="sw-admin-navgroup">Your website</div>
-              <button data-active={active === "__site"} onClick={() => setActive("__site")}>
-                Edit website
-              </button>
+              {can("club.website") && (
+                <button data-active={active === "__site"} onClick={() => setActive("__site")}>
+                  Edit website
+                </button>
+              )}
+              {can("club.content") &&
+                RESOURCES.map((r) => (
+                  <button key={r.key} data-active={r.key === active} onClick={() => setActive(r.key)}>
+                    {r.label}
+                  </button>
+                ))}
+            </>
+          )}
+          {membership && moduleNav.length > 0 && (
+            <>
+              <div className="sw-admin-navgroup">Modules</div>
+              {moduleNav.map(({ def }) => (
+                <button
+                  key={def.key}
+                  data-active={active === `__mod_${def.key}`}
+                  onClick={() => setActive(`__mod_${def.key}`)}
+                >
+                  {def.name}
+                </button>
+              ))}
             </>
           )}
           {membership && can("club.comms") && (
@@ -141,7 +176,7 @@ function AdminInner() {
             {platformRole
               ? ` · ${ROLE_LABELS[platformRole]}`
               : membership?.role === "super_admin"
-                ? " · Club Senior Admin"
+                ? " · Exec Admin"
                 : membership?.role === "club_admin"
                   ? " · Club Admin"
                   : membership?.role
@@ -149,7 +184,19 @@ function AdminInner() {
                     : ""}
           </span>
         </div>
-        {effectiveActive === "__site" && can("club.website") ? (
+        {effectiveActive === "__dashboard" && membership ? (
+          <AdminDashboard go={setActive} />
+        ) : effectiveActive.startsWith("__mod_") && membership ? (
+          (() => {
+            const key = effectiveActive.slice("__mod_".length);
+            const item = moduleNav.find((m) => m.def.key === key);
+            return item ? (
+              <ModulePrePage mod={item.def} status={item.status} />
+            ) : (
+              <div className="sw-admin-loading">That module isn't available.</div>
+            );
+          })()
+        ) : effectiveActive === "__site" && can("club.website") ? (
           <AdminSiteEditor />
         ) : effectiveActive === "__website" && can("club.settings") ? (
           <AdminWebsite />

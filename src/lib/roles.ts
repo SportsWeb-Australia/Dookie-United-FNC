@@ -11,7 +11,7 @@ export const CLUB_ROLES: ClubRole[] = ["club_senior_admin", "club_admin"];
 export const ROLE_LABELS: Record<AnyRole, string> = {
   superadmin: "Superadmin",
   sportsweb_admin: "SportsWeb Admin",
-  club_senior_admin: "Club Senior Admin",
+  club_senior_admin: "Exec Admin",
   club_admin: "Club Admin",
 };
 
