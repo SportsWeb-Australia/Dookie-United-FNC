@@ -108,3 +108,44 @@ export async function cancelClubInvite(id: string): Promise<string | null> {
     return e instanceof Error ? e.message : "Could not cancel.";
   }
 }
+
+export interface ClubMember {
+  personId: string;
+  fullName: string;
+  firstName: string | null;
+  lastName: string | null;
+  email: string | null;
+  mobile: string | null;
+  status: string | null;
+  dateOfBirth: string | null;
+  isMinor: boolean;
+  roles: string[];
+  teams: string[];
+  paymentStatus: string | null;
+  createdAt: string | null;
+}
+
+export async function listClubMembers(clubId: string): Promise<ClubMember[]> {
+  if (!supabase || !clubId) return [];
+  try {
+    const { data, error } = await supabase.rpc("list_club_members", { p_club: clubId });
+    if (error || !data) return [];
+    return (data as Record<string, any>[]).map((r) => ({
+      personId: r.person_id,
+      fullName: r.full_name ?? "",
+      firstName: r.first_name ?? null,
+      lastName: r.last_name ?? null,
+      email: r.email ?? null,
+      mobile: r.mobile ?? null,
+      status: r.status ?? null,
+      dateOfBirth: r.date_of_birth ?? null,
+      isMinor: Boolean(r.is_minor),
+      roles: Array.isArray(r.roles) ? r.roles : [],
+      teams: Array.isArray(r.teams) ? r.teams : [],
+      paymentStatus: r.current_payment_status ?? null,
+      createdAt: r.created_at ?? null,
+    }));
+  } catch {
+    return [];
+  }
+}

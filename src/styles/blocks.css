@@ -3598,3 +3598,39 @@
   color: var(--accent, #2563eb);
   border-color: var(--accent, #2563eb);
 }
+
+/* ── Members screen ── */
+.sw-mem-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem; margin: 0 0 1.4rem; }
+@media (min-width: 720px) { .sw-mem-stats { grid-template-columns: repeat(4, 1fr); } }
+.sw-mem-stat { background: #fff; border: 1px solid var(--border, #e6e8ec); border-radius: 14px; padding: 1rem 1.1rem; display: flex; flex-direction: column; gap: 0.15rem; }
+.sw-mem-stat strong { font-family: var(--font-display, inherit); font-size: 1.6rem; line-height: 1; color: var(--club-accent, #2563eb); }
+.sw-mem-stat span { font-size: 0.8rem; color: var(--text-soft, #64748b); }
+
+.sw-mem-controls { display: flex; flex-direction: column; gap: 0.8rem; margin: 0 0 1.2rem; }
+.sw-mem-search { width: 100%; padding: 0.7rem 0.95rem; border: 1px solid var(--border, #cbd5e1); border-radius: 10px; font: inherit; }
+.sw-mem-roles { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.sw-mem-roles button { border: 1px solid var(--border, #cbd5e1); background: #fff; color: var(--text, #1e293b); border-radius: 999px; padding: 0.35rem 0.8rem; font-size: 0.82rem; font-weight: 600; cursor: pointer; }
+.sw-mem-roles button[data-on="true"] { background: var(--club-accent, #2563eb); border-color: var(--club-accent, #2563eb); color: #fff; }
+
+.sw-mem-list { display: flex; flex-direction: column; gap: 0.7rem; }
+.sw-mem-card { display: flex; flex-direction: column; gap: 0.7rem; padding: 1.1rem 1.2rem; background: #fff; border: 1px solid var(--border, #e6e8ec); border-radius: 14px; }
+@media (min-width: 760px) { .sw-mem-card { flex-direction: row; align-items: center; justify-content: space-between; } }
+.sw-mem-main { display: flex; flex-direction: column; gap: 0.45rem; min-width: 0; }
+.sw-mem-name { font-family: var(--font-display, inherit); font-size: 1.1rem; display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem; }
+.sw-mem-minor { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; color: #0369a1; background: #e0f2fe; padding: 0.15rem 0.5rem; border-radius: 999px; }
+.sw-mem-inactive { font-size: 0.65rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #92400e; background: #fef3c7; padding: 0.15rem 0.5rem; border-radius: 999px; }
+.sw-mem-badges { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+.sw-mem-badge { font-size: 0.74rem; font-weight: 600; color: var(--club-accent, #2563eb); background: color-mix(in srgb, var(--club-accent, #2563eb) 10%, #fff); border: 1px solid color-mix(in srgb, var(--club-accent, #2563eb) 22%, #fff); padding: 0.2rem 0.55rem; border-radius: 999px; }
+.sw-mem-badge--none { color: var(--text-soft, #94a3b8); background: #f1f5f9; border-color: #e2e8f0; }
+.sw-mem-teams { font-size: 0.82rem; color: var(--text-soft, #64748b); }
+.sw-mem-side { display: flex; flex-direction: column; gap: 0.4rem; align-items: flex-start; }
+@media (min-width: 760px) { .sw-mem-side { align-items: flex-end; text-align: right; flex: none; } }
+.sw-mem-contact { display: flex; flex-direction: column; gap: 0.1rem; font-size: 0.85rem; }
+.sw-mem-contact a { color: var(--accent, #2563eb); text-decoration: none; }
+.sw-mem-muted { color: var(--text-soft, #94a3b8); }
+.sw-mem-pay { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; padding: 0.2rem 0.55rem; border-radius: 999px; }
+.sw-mem-pay--ok { color: #166534; background: #dcfce7; }
+.sw-mem-pay--warn { color: #92400e; background: #fef3c7; }
+.sw-mem-pay--bad { color: #991b1b; background: #fee2e2; }
+.sw-mem-pay--muted { color: #475569; background: #f1f5f9; }
+.sw-mem-empty { padding: 2rem 1.2rem; text-align: center; color: var(--text-soft, #64748b); background: #fff; border: 1px dashed var(--border, #cbd5e1); border-radius: 14px; }
