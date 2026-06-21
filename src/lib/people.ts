@@ -155,6 +155,7 @@ export async function listClubMembers(clubId: string): Promise<ClubMember[]> {
 export interface MemberRole {
   id: string; role: string; sport: string | null; committee_title: string | null;
   status: string; start_date: string | null; end_date: string | null;
+  team_id: string | null; season_id: string | null;
   team_name: string | null; season_name: string | null;
 }
 export interface MemberRelationship {
@@ -318,5 +319,27 @@ export async function listClubSeasons(clubId: string): Promise<ClubSeason[]> {
     }));
   } catch {
     return [];
+  }
+}
+
+export async function updatePersonRole(
+  roleId: string,
+  r: { role: string; sport?: string | null; teamId?: string | null; seasonId?: string | null; committeeTitle?: string | null; startDate?: string | null; status?: string | null },
+): Promise<string | null> {
+  if (!supabase) return "Not connected.";
+  try {
+    const { error } = await supabase.rpc("update_person_role", {
+      p_role_id: roleId,
+      p_role: r.role,
+      p_sport: r.sport ?? null,
+      p_team_id: r.teamId ?? null,
+      p_season_id: r.seasonId ?? null,
+      p_committee_title: r.committeeTitle ?? null,
+      p_start_date: r.startDate ?? null,
+      p_status: r.status ?? null,
+    });
+    return error ? error.message : null;
+  } catch (e) {
+    return e instanceof Error ? e.message : "Could not update role.";
   }
 }

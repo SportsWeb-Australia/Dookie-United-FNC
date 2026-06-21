@@ -3699,22 +3699,34 @@
 .sw-mem-teamcount[data-on="true"] { background: var(--club-accent, #2563eb); border-color: var(--club-accent, #2563eb); color: #fff; }
 .sw-mem-teamcount[data-on="true"] strong { color: #fff; }
 
-/* manilla folder */
+/* folder (club colours) */
 .sw-folder { position: relative; margin-top: 1.4rem; }
 .sw-folder-tab {
-  display: inline-block; background: linear-gradient(180deg, #ecd9a8, #e4cb90);
-  color: #6b4f1d; font-family: var(--font-display, inherit); font-weight: 700;
+  display: inline-block;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--club-accent, #2563eb) 26%, #fff), color-mix(in srgb, var(--club-accent, #2563eb) 40%, #fff));
+  color: color-mix(in srgb, var(--club-accent, #2563eb) 72%, #0b1324);
+  font-family: var(--font-display, inherit); font-weight: 700;
   font-size: 0.82rem; letter-spacing: 0.05em; text-transform: uppercase;
   padding: 0.5rem 1.5rem 0.7rem; border-radius: 12px 16px 0 0;
-  border: 1px solid #d4b878; border-bottom: none; margin-left: 0.4rem;
+  border: 1px solid color-mix(in srgb, var(--club-accent, #2563eb) 38%, #fff); border-bottom: none; margin-left: 0.4rem;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 .sw-folder-body {
-  background: linear-gradient(180deg, #f4ead2, #efe1bf);
-  border: 1px solid #d4b878; border-radius: 2px 16px 16px 16px;
+  position: relative;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--club-accent, #2563eb) 7%, #fff), color-mix(in srgb, var(--club-accent, #2563eb) 13%, #fff));
+  border: 1px solid color-mix(in srgb, var(--club-accent, #2563eb) 28%, #fff);
+  border-radius: 2px 16px 16px 16px;
   padding: 1.3rem 1.3rem 1.5rem;
-  box-shadow: 0 16px 34px -24px rgba(90, 68, 24, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  box-shadow: 0 16px 34px -24px rgba(15, 23, 42, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
+.sw-folder--member .sw-folder-body { padding: 1.6rem 1.6rem 1.8rem; }
+.sw-folder--member .sw-md-head { padding-right: 70px; }
+.sw-folder-logo {
+  position: absolute; top: 1.1rem; right: 1.2rem; width: 54px; height: 54px;
+  object-fit: contain; opacity: 0.92; z-index: 1; pointer-events: none;
+  filter: drop-shadow(0 2px 6px rgba(15, 23, 42, 0.18));
+}
+.sw-md-rolehint { grid-column: 1 / -1; margin: 0; font-size: 0.8rem; color: var(--text-soft, #94a3b8); }
 
 /* role add form on the profile */
 .sw-md-roleadd { margin-bottom: 1rem; }
