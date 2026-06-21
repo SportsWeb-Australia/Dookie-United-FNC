@@ -3538,8 +3538,9 @@
   border-radius: 14px; background: var(--club-accent, #2563eb); color: #fff;
 }
 .sw-ws-hero-ic svg { width: 26px; height: 26px; }
+.sw-ws-hero-copy { flex: 1; min-width: 0; }
 .sw-ws-hero-copy h2 { margin: 0 0 0.4rem; text-align: left; font-size: 1.6rem; line-height: 1.05; }
-.sw-ws-hero-copy p { margin: 0; color: var(--text-soft, #475467); font-size: 0.95rem; line-height: 1.55; max-width: 60ch; }
+.sw-ws-hero-copy p { margin: 0; color: var(--text-soft, #475467); font-size: 0.95rem; line-height: 1.55; max-width: none; }
 
 /* ── Module logo badge ── */
 .sw-module-badge--logo { background: #fff; padding: 0; overflow: hidden; }
