@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { Metrics } from "../lib/roleKpis";
 import {
   buildHealth,
@@ -8,6 +8,35 @@ import {
   type DataState,
   type Status,
 } from "../lib/presidentCentre";
+
+/** Collapsible dashboard section with a header bar + chevron. */
+export function Collapsible({
+  title,
+  badge,
+  defaultOpen = true,
+  children,
+}: {
+  title: string;
+  badge?: ReactNode;
+  defaultOpen?: boolean;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <section className="sw-collapse">
+      <button className="sw-collapse-head" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+        <span className="sw-collapse-title">
+          {title}
+          {badge}
+        </span>
+        <span className="sw-collapse-chev" aria-hidden="true">
+          {open ? "▾" : "▸"}
+        </span>
+      </button>
+      {open && <div className="sw-collapse-body">{children}</div>}
+    </section>
+  );
+}
 
 const STATE_LABEL: Record<DataState, string> = { live: "Live", mock: "Sample", setup: "Set up", manual: "Manual" };
 
@@ -46,14 +75,13 @@ type CentreProps = { metrics: Metrics; local: CentreLocal; go: (key: string) => 
 export function HealthScore({ metrics, local, go }: CentreProps) {
   const health = buildHealth(metrics, local);
   return (
-    <section className="sw-cc-block">
+    <Collapsible title="Club health score">
       <div className="sw-cc-health">
         <div className={`sw-cc-score sw-cc-score--${health.status}`}>
           <span className="sw-cc-score-num">{health.overall ?? "—"}</span>
           <span className="sw-cc-score-cap">Club health</span>
         </div>
         <div className="sw-cc-health-copy">
-          <h3>Club health score</h3>
           <p>
             An at-a-glance read on the whole club. Areas marked <em>Set up</em> or <em>Sample</em> light up with real
             numbers as you connect modules and Zoho.
@@ -81,7 +109,7 @@ export function HealthScore({ metrics, local, go }: CentreProps) {
           </div>
         ))}
       </div>
-    </section>
+    </Collapsible>
   );
 }
 
@@ -89,8 +117,7 @@ export function HealthScore({ metrics, local, go }: CentreProps) {
 export function RedFlags({ metrics, local, go }: CentreProps) {
   const flags = buildRedFlags(metrics, local);
   return (
-    <section className="sw-cc-block">
-      <h3 className="sw-cc-h">Red flag alerts</h3>
+    <Collapsible title="Red flag alerts">
       <div className="sw-cc-flags">
         {flags.map((f) => (
           <div key={f.id} className={`sw-cc-flag sw-cc-flag--${f.severity}`}>
@@ -110,7 +137,7 @@ export function RedFlags({ metrics, local, go }: CentreProps) {
           </div>
         ))}
       </div>
-    </section>
+    </Collapsible>
   );
 }
 
@@ -125,8 +152,7 @@ const BUCKETS: { key: "urgent" | "week" | "month" | "season"; label: string }[] 
 export function TodoCentre({ metrics, local, go }: CentreProps) {
   const todos = buildTodos(metrics, local);
   return (
-    <section className="sw-cc-block">
-      <h3 className="sw-cc-h">President to-do centre</h3>
+    <Collapsible title="President to-do centre">
       <div className="sw-cc-todos">
         {BUCKETS.map((b) => {
           const items = todos.filter((t) => t.bucket === b.key);
@@ -152,7 +178,7 @@ export function TodoCentre({ metrics, local, go }: CentreProps) {
           );
         })}
       </div>
-    </section>
+    </Collapsible>
   );
 }
 
@@ -243,10 +269,7 @@ export function SampleCharts() {
   const finMax = Math.max(...SAMPLE_FIN.flatMap((d) => [d.inc, d.exp]));
   const memMax = Math.max(...SAMPLE_MEM.map((d) => d.v));
   return (
-    <section className="sw-cc-block">
-      <h3 className="sw-cc-h">
-        Trends <span className="sw-sample-badge">Sample data</span>
-      </h3>
+    <Collapsible title="Trends" badge={<span className="sw-sample-badge">Sample data</span>}>
       <p className="sw-cc-sample-note">
         These graphs show example figures so you can see the shape of things at a glance. They fill with your club's real
         numbers once Club Finance and your modules are connected.
@@ -290,6 +313,6 @@ export function SampleCharts() {
           </div>
         </div>
       </div>
-    </section>
+    </Collapsible>
   );
 }

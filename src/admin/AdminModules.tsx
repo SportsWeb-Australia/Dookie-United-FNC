@@ -211,27 +211,22 @@ export function AdminModules() {
             </button>
           );
         })}
-        {COMING_SOON_MODULES.map((m) => {
-          const addable = m.key === "team_lineups";
-          return (
-            <button
-              key={m.key}
-              type="button"
-              className={`sw-module-card ${addable ? "sw-module-card--locked" : "sw-module-card--soon"}`}
-              onClick={() => setActiveKey(m.key)}
-            >
-              <div className="sw-module-top">
-                <span className="sw-module-badge">{m.badge}</span>
-                <span className={`sw-module-state ${addable ? "off" : "soon"}`}>
-                  {addable ? "🔒 Locked" : "Coming soon"}
-                </span>
-              </div>
-              <h3>{m.name}</h3>
-              <p>{m.tagline}</p>
-              <span className="sw-module-plan">{addable ? "Add module to plan" : m.plan}</span>
-            </button>
-          );
-        })}
+        {COMING_SOON_MODULES.map((m) => (
+          <button
+            key={m.key}
+            type="button"
+            className="sw-module-card sw-module-card--locked"
+            onClick={() => setActiveKey(m.key)}
+          >
+            <div className="sw-module-top">
+              <span className="sw-module-badge">{m.badge}</span>
+              <span className="sw-module-state off">🔒 Locked</span>
+            </div>
+            <h3>{m.name}</h3>
+            <p>{m.tagline}</p>
+            <span className="sw-module-plan">Add module to plan</span>
+          </button>
+        ))}
       </div>
     </div>
   );

@@ -15,7 +15,7 @@ import {
   type CommitteeProfile,
 } from "../lib/committee";
 import { getDashboardMetrics, buildKpis, personaFromTitle, type Metrics } from "../lib/roleKpis";
-import { HealthScore, RedFlags, TodoCentre, CommsSummary, SportsWebFooter, SampleCharts } from "./PresidentCentre";
+import { HealthScore, RedFlags, TodoCentre, SampleCharts, Collapsible } from "./PresidentCentre";
 
 /* ---- tiny dependency-free charts -------------------------------------- */
 
@@ -269,10 +269,7 @@ export function AdminDashboard({ go }: { go: (key: string) => void }) {
   };
 
   const kpiBlock = (
-    <section className="sw-kpi">
-      <header className="sw-dash-panelhead">
-        <h3>{kpi.heading}</h3>
-      </header>
+    <Collapsible title={kpi.heading}>
       <div className="sw-kpi-grid">
         {kpi.cards.map((c, i) => {
           const clickable = !!c.go;
@@ -300,7 +297,7 @@ export function AdminDashboard({ go }: { go: (key: string) => void }) {
           );
         })}
       </div>
-    </section>
+    </Collapsible>
   );
 
   return (
@@ -327,7 +324,6 @@ export function AdminDashboard({ go }: { go: (key: string) => void }) {
           {kpiBlock}
           <RedFlags metrics={metrics} local={presLocal} go={go} />
           <TodoCentre metrics={metrics} local={presLocal} go={go} />
-          <CommsSummary memberCount={metrics.members?.active ?? 0} go={go} />
         </>
       ) : (
         <>
@@ -361,8 +357,6 @@ export function AdminDashboard({ go }: { go: (key: string) => void }) {
           </div>
         </>
       )}
-
-      <SportsWebFooter activeModules={activeNames} activeCount={activeCount} lockedCount={lockedCount} go={go} />
     </div>
   );
 }

@@ -1029,7 +1029,7 @@
 .sw-admin-side-foot button { color: color-mix(in srgb, var(--text-invert) 70%, transparent); text-align: left; }
 .sw-admin-main { padding: 1.5rem; }
 .sw-admin-userbar { font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-soft); margin-bottom: 1.25rem; }
-.sw-admin-panel { max-width: 760px; }
+.sw-admin-panel { max-width: 1200px; }
 .sw-admin-formhead { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1.25rem; }
 .sw-admin-formhead h2 { font-size: 1.6rem; }
 .sw-admin-error {
@@ -1531,7 +1531,7 @@
 .sw-map iframe { width: 100%; height: 100%; border: 0; display: block; }
 
 /* Modules — index grid */
-.sw-module-grid { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.sw-module-grid { display: grid; gap: 1.25rem; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
 .sw-module-card h3 { font-size: var(--fs-h3); overflow-wrap: break-word; hyphens: auto; }
 .sw-module-card {
   display: flex; flex-direction: column; gap: 0.5rem;
@@ -3280,9 +3280,9 @@
 .sw-cc-health-copy em { font-style: normal; font-weight: 700; color: var(--text, #1e293b); }
 
 /* Area cards */
-.sw-cc-areas { display: grid; gap: 0.85rem; grid-template-columns: repeat(2, 1fr); }
-@media (min-width: 680px) { .sw-cc-areas { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 1000px) { .sw-cc-areas { grid-template-columns: repeat(4, 1fr); } }
+.sw-cc-areas { display: grid; gap: 1rem; grid-template-columns: repeat(1, 1fr); }
+@media (min-width: 620px) { .sw-cc-areas { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1000px) { .sw-cc-areas { grid-template-columns: repeat(3, 1fr); } }
 .sw-cc-area {
   display: flex; flex-direction: column; gap: 0.45rem;
   padding: 1rem 1.05rem; border-radius: 12px;
@@ -3331,7 +3331,7 @@
 .sw-cc-flag-btn:disabled { color: var(--text-soft, #98a2b3); cursor: default; }
 
 /* To-do centre */
-.sw-cc-todos { display: grid; gap: 0.85rem; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.sw-cc-todos { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); align-items: start; }
 .sw-cc-todocol { display: flex; flex-direction: column; gap: 0.5rem; }
 .sw-cc-todohead {
   display: flex; align-items: center; justify-content: space-between;
@@ -3467,3 +3467,53 @@
 .sw-acc-mgr > div { display: flex; flex-direction: column; }
 .sw-acc-mgr strong { font-size: 0.95rem; }
 .sw-acc-actions { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+
+/* ── Dashboard rhythm + collapsible sections ── */
+.sw-dash { display: flex; flex-direction: column; gap: 2.5rem; }
+.sw-dash > .sw-dash-head, .sw-dash > .sw-dash-hero { margin-bottom: 0; }
+
+.sw-collapse { border: 1px solid var(--border, #e6e8ec); border-radius: 16px; background: var(--surface, #fff); overflow: hidden; }
+.sw-collapse-head {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  background: transparent; border: none; cursor: pointer; padding: 1.25rem 1.5rem; text-align: left;
+}
+.sw-collapse-head:hover { background: var(--surface-soft, #f8fafc); }
+.sw-collapse-title { display: flex; align-items: center; gap: 0.6rem; font-family: var(--font-display, inherit); font-size: 1.15rem; letter-spacing: 0.01em; color: var(--text, #1e293b); }
+.sw-collapse-chev { color: var(--text-soft, #94a3b8); font-size: 0.9rem; }
+.sw-collapse-body { padding: 0 1.5rem 1.6rem; }
+.sw-collapse-body > *:first-child { margin-top: 0.2rem; }
+
+/* roomier inner cards */
+.sw-cc-area { padding: 1.35rem 1.4rem; }
+.sw-cc-area-reason { margin: 0.35rem 0 0; }
+.sw-kpi-card { padding: 1.35rem 1.4rem; }
+.sw-chart-card { padding: 1.4rem 1.5rem; }
+.sw-cc-todocol { gap: 0.6rem; }
+.sw-cc-todo { padding: 0.9rem 1rem; }
+
+/* in-app back button */
+.sw-admin-back {
+  display: inline-flex; align-items: center; gap: 0.4rem; margin-bottom: 1.1rem;
+  background: var(--surface, #fff); border: 1px solid var(--border, #e6e8ec); border-radius: 999px;
+  padding: 0.45rem 0.95rem; font-size: 0.85rem; font-weight: 600; color: var(--text, #1e293b); cursor: pointer;
+}
+.sw-admin-back:hover { border-color: var(--accent, #2563eb); color: var(--accent, #2563eb); }
+
+/* ── Module cards: bigger, more visual ── */
+.sw-module-card {
+  padding: 1.5rem 1.6rem; border-radius: 16px; display: flex; flex-direction: column; gap: 0.65rem;
+  transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.sw-module-card:hover { transform: translateY(-3px); box-shadow: 0 14px 30px -18px rgba(15, 23, 42, 0.35); }
+.sw-module-top { margin-bottom: 0.35rem; }
+.sw-module-badge {
+  width: 46px; height: 46px; border-radius: 13px; display: inline-flex; align-items: center; justify-content: center;
+  color: #fff; font-weight: 800; font-size: 0.95rem; letter-spacing: 0.04em;
+}
+.sw-module-state { font-size: 0.66rem; font-weight: 800; letter-spacing: 0.07em; padding: 0.3rem 0.6rem; border-radius: 999px; text-transform: uppercase; }
+.sw-module-card h3 { font-size: 1.15rem; margin: 0; line-height: 1.1; }
+.sw-module-card p { color: var(--text-soft, #475467); margin: 0; line-height: 1.5; flex: 1; }
+.sw-module-plan { font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-soft, #98a2b3); font-weight: 700; margin-top: 0.3rem; }
+
+/* account page: a touch more room on wide screens */
+@media (min-width: 1080px) { .sw-acc-grid { gap: 1.25rem; } }
