@@ -1,0 +1,243 @@
+/* SportsWeb One — base styles. LOCKED / GLOBAL. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+
+img,
+picture,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: 0;
+  background: none;
+  color: inherit;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: var(--heading-weight, 800);
+  line-height: var(--heading-leading, 0.98);
+  letter-spacing: var(--heading-tracking, 0.01em);
+  text-transform: var(--heading-transform, uppercase);
+}
+
+/* ---------- Layout primitives ---------- */
+.sw-container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: clamp(1.1rem, 4vw, 2.25rem);
+}
+
+.sw-section {
+  padding-block: var(--section-pad, clamp(3rem, 6vw, 5.5rem));
+}
+
+.sw-section--alt {
+  background: var(--bg-alt);
+}
+
+.sw-section--invert {
+  background: var(--bg-invert);
+  color: var(--text-invert);
+}
+
+.sw-eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--fs-eyebrow);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent-on-bg);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.sw-eyebrow::before {
+  content: "";
+  width: 1.4rem;
+  height: 2px;
+  background: var(--accent);
+  display: inline-block;
+}
+
+.sw-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+}
+
+.sw-section-head h2 {
+  font-size: var(--fs-h2);
+  margin-top: 0.6rem;
+}
+
+.sw-lead {
+  font-size: var(--fs-lead);
+  color: var(--text-soft);
+  max-width: 60ch;
+}
+
+/* ---------- Buttons ---------- */
+.sw-btn {
+  --btn-bg: var(--accent);
+  --btn-fg: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 1.05rem;
+  padding: 0.85rem 1.5rem;
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  border-radius: var(--radius);
+  transition: transform var(--dur) var(--ease), background-color var(--dur) var(--ease);
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.sw-btn:hover {
+  transform: translateY(-2px);
+  background: var(--accent-deep);
+}
+
+.sw-btn--ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--text);
+  border: 2px solid var(--border);
+}
+
+.sw-btn--ghost:hover {
+  --btn-bg: transparent;
+  border-color: var(--accent);
+  color: var(--accent-on-bg);
+}
+
+.sw-btn--on-dark {
+  --btn-fg: #ffffff;
+}
+
+.sw-btn--ghost.sw-btn--on-dark {
+  --btn-fg: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.sw-link-arrow {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-on-bg);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: gap var(--dur) var(--ease);
+}
+
+.sw-link-arrow:hover {
+  gap: 0.8rem;
+}
+
+/* ---------- Placeholder flag (shows during build, hidden in prod) ---------- */
+.sw-flag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  background: var(--accent-soft);
+  border: 1px dashed var(--accent);
+  border-radius: 3px;
+  padding: 0.1rem 0.4rem;
+  vertical-align: middle;
+}
+
+[data-variant="broadcast"] .sw-flag {
+  color: #fff;
+  background: color-mix(in srgb, var(--accent) 24%, transparent);
+}
+
+/* ---------- Accessibility ---------- */
+:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.sw-skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--accent);
+  color: #fff;
+  padding: 0.7rem 1rem;
+  z-index: 200;
+}
+
+.sw-skip:focus {
+  left: 1rem;
+  top: 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
