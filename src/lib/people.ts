@@ -121,6 +121,7 @@ export interface ClubMember {
   isMinor: boolean;
   roles: string[];
   teams: string[];
+  sports: string[];
   paymentStatus: string | null;
   createdAt: string | null;
 }
@@ -142,6 +143,7 @@ export async function listClubMembers(clubId: string): Promise<ClubMember[]> {
       isMinor: Boolean(r.is_minor),
       roles: Array.isArray(r.roles) ? r.roles : [],
       teams: Array.isArray(r.teams) ? r.teams : [],
+      sports: Array.isArray(r.sports) ? r.sports : [],
       paymentStatus: r.current_payment_status ?? null,
       createdAt: r.created_at ?? null,
     }));
@@ -230,5 +232,91 @@ export async function uploadMemberAvatar(
     return { url: `${data.publicUrl}?v=${Date.now()}` };
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Upload failed." };
+  }
+}
+
+export interface ClubTeam { id: string; name: string; sport: string | null; ageGroup: string | null; gender: string | null; }
+export interface ClubSeason { id: string; name: string; sport: string | null; isCurrent: boolean; }
+
+export async function addClubMember(
+  clubId: string,
+  profile: Record<string, any>,
+): Promise<{ id?: string; error?: string }> {
+  if (!supabase) return { error: "Not connected." };
+  try {
+    const { data, error } = await supabase.rpc("add_club_member", { p_club: clubId, p_profile: profile });
+    if (error) return { error: error.message };
+    return { id: data as string };
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Could not add member." };
+  }
+}
+
+export async function addPersonRole(
+  clubId: string,
+  personId: string,
+  r: { role: string; sport?: string | null; teamId?: string | null; seasonId?: string | null; committeeTitle?: string | null; startDate?: string | null },
+): Promise<string | null> {
+  if (!supabase) return "Not connected.";
+  try {
+    const { error } = await supabase.rpc("add_person_role", {
+      p_club: clubId,
+      p_person: personId,
+      p_role: r.role,
+      p_sport: r.sport ?? null,
+      p_team_id: r.teamId ?? null,
+      p_season_id: r.seasonId ?? null,
+      p_committee_title: r.committeeTitle ?? null,
+      p_start_date: r.startDate ?? null,
+    });
+    return error ? error.message : null;
+  } catch (e) {
+    return e instanceof Error ? e.message : "Could not add role.";
+  }
+}
+
+export async function endPersonRole(roleId: string, endDate?: string | null): Promise<string | null> {
+  if (!supabase) return "Not connected.";
+  try {
+    const { error } = await supabase.rpc("end_person_role", { p_role_id: roleId, p_end_date: endDate ?? null });
+    return error ? error.message : null;
+  } catch (e) {
+    return e instanceof Error ? e.message : "Could not update role.";
+  }
+}
+
+export async function deletePersonRole(roleId: string): Promise<string | null> {
+  if (!supabase) return "Not connected.";
+  try {
+    const { error } = await supabase.rpc("delete_person_role", { p_role_id: roleId });
+    return error ? error.message : null;
+  } catch (e) {
+    return e instanceof Error ? e.message : "Could not remove role.";
+  }
+}
+
+export async function listClubTeams(clubId: string): Promise<ClubTeam[]> {
+  if (!supabase || !clubId) return [];
+  try {
+    const { data, error } = await supabase.rpc("list_club_teams", { p_club: clubId });
+    if (error || !data) return [];
+    return (data as Record<string, any>[]).map((t) => ({
+      id: t.id, name: t.name, sport: t.sport ?? null, ageGroup: t.age_group ?? null, gender: t.gender ?? null,
+    }));
+  } catch {
+    return [];
+  }
+}
+
+export async function listClubSeasons(clubId: string): Promise<ClubSeason[]> {
+  if (!supabase || !clubId) return [];
+  try {
+    const { data, error } = await supabase.rpc("list_club_seasons", { p_club: clubId });
+    if (error || !data) return [];
+    return (data as Record<string, any>[]).map((s) => ({
+      id: s.id, name: s.name, sport: s.sport ?? null, isCurrent: Boolean(s.is_current),
+    }));
+  } catch {
+    return [];
   }
 }

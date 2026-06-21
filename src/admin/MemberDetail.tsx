@@ -4,8 +4,21 @@ import {
   getMemberDetail,
   updateMemberProfile,
   uploadMemberAvatar,
+  addPersonRole,
+  endPersonRole,
+  deletePersonRole,
+  listClubTeams,
+  listClubSeasons,
   type MemberDetail as Detail,
+  type ClubTeam,
+  type ClubSeason,
 } from "../lib/people";
+
+const ROLE_OPTIONS = [
+  "player", "past_player", "parent", "guardian", "coach", "assistant_coach",
+  "team_manager", "volunteer", "committee", "sponsor_contact", "official",
+  "trainer", "life_member", "administrator",
+];
 
 function humanRole(role: string): string {
   const s = role.replace(/_/g, " ").trim();
@@ -31,6 +44,8 @@ const EDITABLE = [
   "address", "suburb", "state", "postcode", "emergency_name", "emergency_phone", "notes",
 ] as const;
 
+const EMPTY_ROLE = { role: "player", sport: "", team_id: "", season_id: "", committee_title: "", start_date: "" };
+
 export function MemberDetail({ personId, onBack }: { personId: string; onBack: () => void }) {
   const { clubId } = useActiveClub();
   const [detail, setDetail] = useState<Detail | null>(null);
@@ -43,6 +58,12 @@ export function MemberDetail({ personId, onBack }: { personId: string; onBack: (
   const [msg, setMsg] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
 
+  const [teams, setTeams] = useState<ClubTeam[]>([]);
+  const [seasons, setSeasons] = useState<ClubSeason[]>([]);
+  const [addingRole, setAddingRole] = useState(false);
+  const [roleForm, setRoleForm] = useState({ ...EMPTY_ROLE });
+  const [roleBusy, setRoleBusy] = useState(false);
+
   const load = () => {
     if (!clubId || !personId) return;
     setLoading(true);
@@ -52,6 +73,12 @@ export function MemberDetail({ personId, onBack }: { personId: string; onBack: (
     });
   };
   useEffect(load, [clubId, personId]);
+
+  useEffect(() => {
+    if (!clubId) return;
+    listClubTeams(clubId).then(setTeams);
+    listClubSeasons(clubId).then(setSeasons);
+  }, [clubId]);
 
   const p = detail?.profile ?? null;
   const sensitive = detail?.can_view_sensitive ?? false;
@@ -102,6 +129,40 @@ export function MemberDetail({ personId, onBack }: { personId: string; onBack: (
     if (res.error) { setMsg(res.error); setUploading(false); return; }
     await updateMemberProfile(clubId, personId, { avatar_url: res.url });
     setUploading(false);
+    load();
+  }
+
+  async function saveRole() {
+    if (!clubId) return;
+    setRoleBusy(true);
+    setMsg(null);
+    const err = await addPersonRole(clubId, personId, {
+      role: roleForm.role,
+      sport: roleForm.sport || null,
+      teamId: roleForm.team_id || null,
+      seasonId: roleForm.season_id || null,
+      committeeTitle: roleForm.committee_title || null,
+      startDate: roleForm.start_date || null,
+    });
+    setRoleBusy(false);
+    if (err) { setMsg(err); return; }
+    setRoleForm({ ...EMPTY_ROLE });
+    setAddingRole(false);
+    load();
+  }
+
+  async function onEndRole(id: string) {
+    setRoleBusy(true);
+    const err = await endPersonRole(id);
+    setRoleBusy(false);
+    if (err) { setMsg(err); return; }
+    load();
+  }
+  async function onRemoveRole(id: string) {
+    setRoleBusy(true);
+    const err = await deletePersonRole(id);
+    setRoleBusy(false);
+    if (err) { setMsg(err); return; }
     load();
   }
 
@@ -191,26 +252,79 @@ export function MemberDetail({ personId, onBack }: { personId: string; onBack: (
 
           {/* ROLES & TEAMS */}
           {tab === "roles" && (
-            detail!.roles.length === 0 ? (
-              <p className="sw-admin-note">No roles recorded yet.</p>
-            ) : (
-              <div className="sw-md-list">
-                {detail!.roles.map((r) => (
-                  <div className="sw-md-rolecard" key={r.id} data-ended={r.status !== "active"}>
-                    <div className="sw-md-roletop">
-                      <strong>{humanRole(r.role)}{r.committee_title ? ` — ${r.committee_title}` : ""}</strong>
-                      <span className={`sw-md-rolestate sw-md-rolestate--${r.status === "active" ? "on" : "off"}`}>{humanRole(r.status)}</span>
+            <>
+              {canEdit && (
+                <div className="sw-md-roleadd">
+                  {!addingRole ? (
+                    <button className="sw-btn sw-btn--sm" onClick={() => { setAddingRole(true); setMsg(null); }}>+ Add role</button>
+                  ) : (
+                    <div className="sw-md-roleform">
+                      <label><span>Role</span>
+                        <select value={roleForm.role} onChange={(e) => setRoleForm({ ...roleForm, role: e.target.value })}>
+                          {ROLE_OPTIONS.map((r) => <option key={r} value={r}>{humanRole(r)}</option>)}
+                        </select>
+                      </label>
+                      <label><span>Sport</span>
+                        <select value={roleForm.sport} onChange={(e) => setRoleForm({ ...roleForm, sport: e.target.value })}>
+                          <option value="">Any / all</option>
+                          <option value="football">Football</option>
+                          <option value="netball">Netball</option>
+                        </select>
+                      </label>
+                      <label><span>Team</span>
+                        <select value={roleForm.team_id} onChange={(e) => setRoleForm({ ...roleForm, team_id: e.target.value })}>
+                          <option value="">No team</option>
+                          {teams.map((t) => <option key={t.id} value={t.id}>{t.name}</option>)}
+                        </select>
+                      </label>
+                      <label><span>Season</span>
+                        <select value={roleForm.season_id} onChange={(e) => setRoleForm({ ...roleForm, season_id: e.target.value })}>
+                          <option value="">No season</option>
+                          {seasons.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+                        </select>
+                      </label>
+                      {roleForm.role === "committee" && (
+                        <label><span>Committee title</span><input value={roleForm.committee_title} onChange={(e) => setRoleForm({ ...roleForm, committee_title: e.target.value })} placeholder="e.g. Treasurer" /></label>
+                      )}
+                      <label><span>Start date</span><input type="date" value={roleForm.start_date} onChange={(e) => setRoleForm({ ...roleForm, start_date: e.target.value })} /></label>
+                      <div className="sw-md-roleformactions">
+                        <button className="sw-btn sw-btn--sm" onClick={saveRole} disabled={roleBusy}>{roleBusy ? "Adding…" : "Add role"}</button>
+                        <button className="sw-btn sw-btn--sm sw-btn--ghost" onClick={() => { setAddingRole(false); setRoleForm({ ...EMPTY_ROLE }); }} disabled={roleBusy}>Cancel</button>
+                      </div>
                     </div>
-                    <div className="sw-md-rolemeta">
-                      {[r.team_name, r.season_name, r.sport ? humanRole(r.sport) : null].filter(Boolean).join(" · ") || "Club-wide"}
-                      {(r.start_date || r.end_date) && (
-                        <span> · {fmtDate(r.start_date)}{r.end_date ? ` → ${fmtDate(r.end_date)}` : ""}</span>
+                  )}
+                </div>
+              )}
+
+              {detail!.roles.length === 0 ? (
+                <p className="sw-admin-note">No roles recorded yet.</p>
+              ) : (
+                <div className="sw-md-list">
+                  {detail!.roles.map((r) => (
+                    <div className="sw-md-rolecard" key={r.id} data-ended={r.status !== "active"}>
+                      <div className="sw-md-roletop">
+                        <strong>{humanRole(r.role)}{r.committee_title ? ` — ${r.committee_title}` : ""}</strong>
+                        <span className={`sw-md-rolestate sw-md-rolestate--${r.status === "active" ? "on" : "off"}`}>{humanRole(r.status)}</span>
+                      </div>
+                      <div className="sw-md-rolemeta">
+                        {[r.team_name, r.season_name, r.sport ? humanRole(r.sport) : null].filter(Boolean).join(" · ") || "Club-wide"}
+                        {(r.start_date || r.end_date) && (
+                          <span> · {fmtDate(r.start_date)}{r.end_date ? ` → ${fmtDate(r.end_date)}` : ""}</span>
+                        )}
+                      </div>
+                      {canEdit && (
+                        <div className="sw-md-roleactions">
+                          {r.status === "active" && (
+                            <button className="sw-linklike" onClick={() => onEndRole(r.id)} disabled={roleBusy}>End</button>
+                          )}
+                          <button className="sw-linklike sw-linklike--danger" onClick={() => onRemoveRole(r.id)} disabled={roleBusy}>Remove</button>
+                        </div>
                       )}
                     </div>
-                  </div>
-                ))}
-              </div>
-            )
+                  ))}
+                </div>
+              )}
+            </>
           )}
 
           {/* FAMILY */}
@@ -280,9 +394,9 @@ export function MemberDetail({ personId, onBack }: { personId: string; onBack: (
             <div className="sw-md-restricted">
               <span className="sw-mem-inactive">Restricted</span>
               <p>
-                Injury and concussion records will live here. Access is limited to medical / high-performance staff
-                and the member&apos;s coaches — we&apos;ll switch this on once the health module and its access rules
-                are confirmed.
+                Injury and concussion records will live here. Access is limited to medical / high-performance staff,
+                senior admins, and the member&apos;s active-season coach — we&apos;ll switch this on with the health
+                module.
               </p>
             </div>
           )}
