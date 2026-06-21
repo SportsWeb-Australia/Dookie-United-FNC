@@ -71,7 +71,7 @@ export const MODULE_CATALOG: ModuleDef[] = [
   },
   {
     key: "books",
-    name: "Club Books",
+    name: "Club Finance",
     badge: "BK",
     tagline: "Invoices, payments and a clean set of books.",
     summary:

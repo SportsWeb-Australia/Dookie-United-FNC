@@ -90,24 +90,4 @@ export const COMING_SOON_MODULES: ModulePre[] = [
     ],
     plan: "SportsWeb module",
   },
-  {
-    key: "records",
-    name: "SportsWeb Records",
-    badge: "DB",
-    tagline: "Your club's people, members and history in one searchable place.",
-    summary:
-      "A simple club database — members, players, families and history — that every committee role can draw on without the spreadsheets.",
-    overview: [
-      "One record per person: contact details, roles and history.",
-      "Find members, families and past players in seconds.",
-      "Feeds registrations, volunteers and comms so you enter details once.",
-      "Export lists for your league, grants or end-of-season reports.",
-    ],
-    quickstart: [
-      { title: "Import your list", body: "Bring in members from a spreadsheet or your registration export." },
-      { title: "Tidy the records", body: "Merge duplicates and tag people by role or team." },
-      { title: "Put it to work", body: "Use it across comms, volunteers and registrations." },
-    ],
-    plan: "SportsWeb module",
-  },
 ];

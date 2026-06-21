@@ -136,7 +136,13 @@ function AdminInner() {
   return (
     <div className={`sw-admin${operatorConsole ? " sw-brandwrap" : ""}`} style={operatorConsole ? undefined : brandStyle}>
       <aside className="sw-admin-side">
-        <div className="sw-admin-brand">
+        <div
+          className={`sw-admin-brand${hasClub ? " sw-admin-brand--link" : ""}`}
+          onClick={hasClub ? () => setActive("__dashboard") : undefined}
+          role={hasClub ? "button" : undefined}
+          tabIndex={hasClub ? 0 : undefined}
+          title={hasClub ? "Back to dashboard" : undefined}
+        >
           {hasClub && club.identity.logo && (
             <img className="sw-admin-brandlogo" src={club.identity.logo} alt={`${clubName} logo`} />
           )}
@@ -216,7 +222,7 @@ function AdminInner() {
           )}
           {hasClub && can("club.comms") && (
             <>
-              <div className="sw-admin-navgroup">Communicate</div>
+              <div className="sw-admin-navgroup">Communications</div>
               <button data-active={active === "__comms"} onClick={() => setActive("__comms")}>
                 Send a message
               </button>

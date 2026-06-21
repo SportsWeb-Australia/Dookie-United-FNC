@@ -36,7 +36,7 @@ export function Login() {
         </div>
 
         <h1>Welcome back</h1>
-        <p>Log in to manage your club. New here? Choose a plan to get started.</p>
+        <p>Log in to manage your club.</p>
 
         {error && <p className="sw-admin-error">{error}</p>}
 

@@ -353,15 +353,36 @@ export function AdminDashboard({ go }: { go: (key: string) => void }) {
         </div>
       </section>
 
-      <div className="sw-dash-charts">
-        <section className="sw-dash-panel">
-          <header className="sw-dash-panelhead">
-            <h3>Content on your site</h3>
-            <span className="sw-dash-panelnote">Live counts</span>
-          </header>
-          <Bars data={bars} />
-        </section>
+      {persona === "general" && (
+        <div className="sw-dash-charts">
+          <section className="sw-dash-panel">
+            <header className="sw-dash-panelhead">
+              <h3>Content on your site</h3>
+              <span className="sw-dash-panelnote">Live counts</span>
+            </header>
+            <Bars data={bars} />
+          </section>
+        </div>
+      )}
 
+      <h3 className="sw-dash-subhead">Quick actions</h3>
+      <div className="sw-dash-grid">
+        {quick
+          .filter((q) => q.show)
+          .filter((q) => !(persona === "president" && (q.key === "news" || q.key === "ladder")))
+          .map((q) => (
+            <button key={q.key} className={`sw-qcard sw-qcard--${q.tone}`} onClick={() => go(q.key)}>
+              <span className="sw-qcard-icon">{q.icon}</span>
+              <span className="sw-qcard-body">
+                <span className="sw-qcard-title">{q.title}</span>
+                <span className="sw-qcard-sub">{q.sub}</span>
+              </span>
+              <span className="sw-qcard-go" aria-hidden="true">→</span>
+            </button>
+          ))}
+      </div>
+
+      <div className="sw-dash-charts sw-dash-modules">
         <section className="sw-dash-panel">
           <header className="sw-dash-panelhead">
             <h3>Modules</h3>
@@ -377,22 +398,6 @@ export function AdminDashboard({ go }: { go: (key: string) => void }) {
             ]}
           />
         </section>
-      </div>
-
-      <h3 className="sw-dash-subhead">Quick actions</h3>
-      <div className="sw-dash-grid">
-        {quick
-          .filter((q) => q.show)
-          .map((q) => (
-            <button key={q.key} className={`sw-qcard sw-qcard--${q.tone}`} onClick={() => go(q.key)}>
-              <span className="sw-qcard-icon">{q.icon}</span>
-              <span className="sw-qcard-body">
-                <span className="sw-qcard-title">{q.title}</span>
-                <span className="sw-qcard-sub">{q.sub}</span>
-              </span>
-              <span className="sw-qcard-go" aria-hidden="true">→</span>
-            </button>
-          ))}
       </div>
     </div>
   );
