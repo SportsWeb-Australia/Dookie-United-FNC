@@ -15,7 +15,7 @@ import {
   type CommitteeProfile,
 } from "../lib/committee";
 import { getDashboardMetrics, buildKpis, personaFromTitle, type Metrics } from "../lib/roleKpis";
-import { PresidentCentre } from "./PresidentCentre";
+import { HealthScore, RedFlags, TodoCentre, CommsSummary, SportsWebFooter } from "./PresidentCentre";
 
 /* ---- tiny dependency-free charts -------------------------------------- */
 
@@ -247,6 +247,62 @@ export function AdminDashboard({ go }: { go: (key: string) => void }) {
     { title: "Send a message", sub: "Email or SMS your members", key: "__comms", show: can("club.comms"), icon: ICONS.message, tone: "e" },
   ];
 
+  const activeNames = MODULE_CATALOG.filter((m) => enabled.has(m.key)).map((m) => m.name);
+  const presLocal = { events: n("events"), sponsors: n("sponsors"), teams: n("teams"), news: n("news") };
+
+  const svg = (inner: ReactNode): ReactNode => (
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+      {inner}
+    </svg>
+  );
+  const iconFor = (label: string): ReactNode => {
+    const l = label.toLowerCase();
+    if (l.includes("member") || l.includes("new ")) return svg(<><circle cx="12" cy="8" r="4" /><path d="M4 20c0-4 4-6 8-6s8 2 8 6" /></>);
+    if (l.includes("budget") || l.includes("position")) return svg(<path d="M12 2v20M17 6H9a3 3 0 000 6h6a3 3 0 010 6H7" />);
+    if (l.includes("registration")) return svg(<><rect x="6" y="3" width="12" height="18" rx="2" /><path d="M9 8h6M9 12h6M9 16h4" /></>);
+    if (l.includes("volunteer")) return svg(<><circle cx="9" cy="8" r="3" /><path d="M3 20c0-3 3-5 6-5s6 2 6 5" /><circle cx="17" cy="9" r="2" /></>);
+    if (l.includes("compliance") || l.includes("risk")) return svg(<path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6z" />);
+    if (l.includes("event")) return svg(<><rect x="4" y="5" width="16" height="16" rx="2" /><path d="M4 9h16M9 3v4M15 3v4" /></>);
+    if (l.includes("sponsor")) return svg(<><path d="M3 12l9-9 9 9-9 9z" /><circle cx="9" cy="9" r="1.5" /></>);
+    if (l.includes("task")) return svg(<><rect x="4" y="4" width="16" height="16" rx="2" /><path d="M8 12l3 3 5-5" /></>);
+    return svg(<circle cx="12" cy="12" r="8" />);
+  };
+
+  const kpiBlock = (
+    <section className="sw-kpi">
+      <header className="sw-dash-panelhead">
+        <h3>{kpi.heading}</h3>
+      </header>
+      <div className="sw-kpi-grid">
+        {kpi.cards.map((c, i) => {
+          const clickable = !!c.go;
+          return (
+            <div
+              key={i}
+              className={`sw-kpi-card sw-kpi-${c.tone ?? "plain"}${clickable ? " sw-kpi-clickable" : ""}`}
+              onClick={clickable ? () => go(c.go!) : undefined}
+              role={clickable ? "button" : undefined}
+              tabIndex={clickable ? 0 : undefined}
+            >
+              <span className="sw-kpi-ic">{iconFor(c.label)}</span>
+              <span className="sw-kpi-val">{c.value === null ? "—" : c.value}</span>
+              <span className="sw-kpi-label">{c.label}</span>
+              {c.value === null ? (
+                c.source === "zoho" ? (
+                  <span className="sw-kpi-connect">Connect Zoho</span>
+                ) : (
+                  <span className="sw-kpi-hint">Not set up yet</span>
+                )
+              ) : c.hint ? (
+                <span className="sw-kpi-hint">{c.hint}</span>
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+
   return (
     <div className="sw-admin-panel sw-dash">
       <div className="sw-dash-hero">
@@ -261,153 +317,51 @@ export function AdminDashboard({ go }: { go: (key: string) => void }) {
             )}
           </h2>
           <p className="sw-dash-strap">Here's {clubName} at a glance. Jump straight into whatever you need.</p>
-          {!isActingAs && (
-            <div className="sw-dash-rolebar">
-              <button
-                className="sw-dash-roleedit"
-                onClick={() => {
-                  setEditing((v) => !v);
-                  setSaveMsg("");
-                }}
-              >
-                {editing ? "Close" : canAssignTitle ? "Edit your name & role" : "Edit your name"}
-              </button>
-              {editing && (
-                <div className="sw-dash-roleform">
-                  <label className="sw-ed-l">
-                    Your name
-                    <input
-                      className="sw-input"
-                      value={form.name}
-                      placeholder="e.g. Carson"
-                      onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                    />
-                  </label>
-                  {canAssignTitle ? (
-                    <label className="sw-ed-l">
-                      Committee role
-                      <select
-                        className="sw-input"
-                        value={form.title}
-                        onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-                      >
-                        <option value="">— none —</option>
-                        {COMMITTEE_TITLES.map((t) => (
-                          <option key={t} value={t}>
-                            {t}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  ) : (
-                    <p className="sw-ed-hint">
-                      Your committee role is set by a SportsWeb admin or your club's senior admin.
-                    </p>
-                  )}
-                  <div className="sw-ed-foot">
-                    <button className="sw-btn" onClick={saveProfile}>
-                      Save
-                    </button>
-                    <span className="sw-ed-status" aria-live="polite">
-                      {saveMsg}
-                    </span>
-                  </div>
-                </div>
-              )}
+        </div>
+      </div>
+
+      {persona === "president" ? (
+        <>
+          <HealthScore metrics={metrics} local={presLocal} go={go} />
+          {kpiBlock}
+          <RedFlags metrics={metrics} local={presLocal} go={go} />
+          <TodoCentre metrics={metrics} local={presLocal} go={go} />
+          <CommsSummary memberCount={metrics.members?.active ?? 0} go={go} />
+        </>
+      ) : (
+        <>
+          {kpiBlock}
+          {persona === "general" && (
+            <div className="sw-dash-charts">
+              <section className="sw-dash-panel">
+                <header className="sw-dash-panelhead">
+                  <h3>Content on your site</h3>
+                  <span className="sw-dash-panelnote">Live counts</span>
+                </header>
+                <Bars data={bars} />
+              </section>
             </div>
           )}
-        </div>
-      </div>
 
-      <section className="sw-kpi">
-        <header className="sw-dash-panelhead">
-          <h3>{kpi.heading}</h3>
-          {!metrics.zohoConnected && (
-            <span className="sw-kpi-note">Live from SportsWeb · P&amp;L vs budget lights up once Zoho is connected</span>
-          )}
-        </header>
-        <div className="sw-kpi-grid">
-          {kpi.cards.map((c, i) => {
-            const clickable = !!c.go;
-            return (
-              <div
-                key={i}
-                className={`sw-kpi-card sw-kpi-${c.tone ?? "plain"}${clickable ? " sw-kpi-clickable" : ""}`}
-                onClick={clickable ? () => go(c.go!) : undefined}
-                role={clickable ? "button" : undefined}
-                tabIndex={clickable ? 0 : undefined}
-              >
-                <span className="sw-kpi-val">{c.value === null ? "—" : c.value}</span>
-                <span className="sw-kpi-label">{c.label}</span>
-                {c.value === null ? (
-                  c.source === "zoho" ? (
-                    <span className="sw-kpi-connect">Connect Zoho</span>
-                  ) : (
-                    <span className="sw-kpi-hint">Not set up yet</span>
-                  )
-                ) : c.hint ? (
-                  <span className="sw-kpi-hint">{c.hint}</span>
-                ) : null}
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
-      {persona === "president" && (
-        <PresidentCentre
-          metrics={metrics}
-          local={{ events: n("events"), sponsors: n("sponsors"), teams: n("teams"), news: n("news") }}
-          go={go}
-        />
+          <h3 className="sw-dash-subhead">Quick actions</h3>
+          <div className="sw-dash-grid">
+            {quick
+              .filter((q) => q.show)
+              .map((q) => (
+                <button key={q.key} className={`sw-qcard sw-qcard--${q.tone}`} onClick={() => go(q.key)}>
+                  <span className="sw-qcard-icon">{q.icon}</span>
+                  <span className="sw-qcard-body">
+                    <span className="sw-qcard-title">{q.title}</span>
+                    <span className="sw-qcard-sub">{q.sub}</span>
+                  </span>
+                  <span className="sw-qcard-go" aria-hidden="true">→</span>
+                </button>
+              ))}
+          </div>
+        </>
       )}
 
-      {persona === "general" && (
-        <div className="sw-dash-charts">
-          <section className="sw-dash-panel">
-            <header className="sw-dash-panelhead">
-              <h3>Content on your site</h3>
-              <span className="sw-dash-panelnote">Live counts</span>
-            </header>
-            <Bars data={bars} />
-          </section>
-        </div>
-      )}
-
-      <h3 className="sw-dash-subhead">Quick actions</h3>
-      <div className="sw-dash-grid">
-        {quick
-          .filter((q) => q.show)
-          .filter((q) => !(persona === "president" && (q.key === "news" || q.key === "ladder")))
-          .map((q) => (
-            <button key={q.key} className={`sw-qcard sw-qcard--${q.tone}`} onClick={() => go(q.key)}>
-              <span className="sw-qcard-icon">{q.icon}</span>
-              <span className="sw-qcard-body">
-                <span className="sw-qcard-title">{q.title}</span>
-                <span className="sw-qcard-sub">{q.sub}</span>
-              </span>
-              <span className="sw-qcard-go" aria-hidden="true">→</span>
-            </button>
-          ))}
-      </div>
-
-      <div className="sw-dash-charts sw-dash-modules">
-        <section className="sw-dash-panel">
-          <header className="sw-dash-panelhead">
-            <h3>Modules</h3>
-            <button className="sw-dash-panellink" onClick={() => go("__modules")}>
-              View all →
-            </button>
-          </header>
-          <Donut
-            segments={[
-              { label: "Active", value: activeCount, color: "var(--accent)" },
-              { label: "Locked", value: lockedCount, color: "#cbd5e1" },
-              { label: "Coming soon", value: soonCount, color: "#6366f1" },
-            ]}
-          />
-        </section>
-      </div>
+      <SportsWebFooter activeModules={activeNames} activeCount={activeCount} lockedCount={lockedCount} go={go} />
     </div>
   );
 }
