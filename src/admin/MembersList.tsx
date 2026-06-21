@@ -16,12 +16,13 @@ function payTone(status: string | null): string {
   return "muted";
 }
 
-export function MembersList() {
+export function MembersList({ onOpen }: { onOpen: (personId: string) => void }) {
   const { clubId } = useActiveClub();
   const [members, setMembers] = useState<ClubMember[]>([]);
   const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [role, setRole] = useState<string>("all");
+  const [team, setTeam] = useState<string>("all");
 
   useEffect(() => {
     if (!clubId) return;
@@ -38,10 +39,17 @@ export function MembersList() {
     return Array.from(set).sort();
   }, [members]);
 
+  const allTeams = useMemo(() => {
+    const set = new Set<string>();
+    members.forEach((m) => m.teams.forEach((t) => set.add(t)));
+    return Array.from(set).sort();
+  }, [members]);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
     return members.filter((m) => {
       if (role !== "all" && !m.roles.includes(role)) return false;
+      if (team !== "all" && !m.teams.includes(team)) return false;
       if (!q) return true;
       return (
         m.fullName.toLowerCase().includes(q) ||
@@ -49,7 +57,7 @@ export function MembersList() {
         (m.mobile ?? "").toLowerCase().includes(q)
       );
     });
-  }, [members, query, role]);
+  }, [members, query, role, team]);
 
   const stats = useMemo(() => {
     const players = members.filter((m) => m.roles.includes("player")).length;
@@ -89,6 +97,14 @@ export function MembersList() {
             <button key={r} data-on={role === r} onClick={() => setRole(r)}>{humanRole(r)}</button>
           ))}
         </div>
+        {allTeams.length > 0 && (
+          <select className="sw-mem-teamfilter" value={team} onChange={(e) => setTeam(e.target.value)}>
+            <option value="all">All teams</option>
+            {allTeams.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
+        )}
       </div>
 
       {loading ? (
@@ -104,7 +120,14 @@ export function MembersList() {
       ) : (
         <div className="sw-mem-list">
           {filtered.map((m) => (
-            <div className="sw-mem-card" key={m.personId}>
+            <div
+              className="sw-mem-card sw-mem-card--click"
+              key={m.personId}
+              role="button"
+              tabIndex={0}
+              onClick={() => onOpen(m.personId)}
+              onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(m.personId); } }}
+            >
               <div className="sw-mem-main">
                 <div className="sw-mem-name">
                   {m.fullName || "—"}
@@ -128,7 +151,7 @@ export function MembersList() {
               </div>
               <div className="sw-mem-side">
                 <div className="sw-mem-contact">
-                  {m.email && <a href={`mailto:${m.email}`}>{m.email}</a>}
+                  {m.email && <a href={`mailto:${m.email}`} onClick={(e) => e.stopPropagation()}>{m.email}</a>}
                   {m.mobile && <span>{m.mobile}</span>}
                   {!m.email && !m.mobile && <span className="sw-mem-muted">No contact</span>}
                 </div>

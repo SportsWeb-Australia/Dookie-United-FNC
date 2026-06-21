@@ -10,6 +10,7 @@ import { RESOURCES } from "./resources";
 import { ResourceManager } from "./ResourceManager";
 import { AdminPeople } from "./AdminPeople";
 import { MembersList } from "./MembersList";
+import { MemberDetail } from "./MemberDetail";
 import { AdminWebsite } from "./AdminWebsite";
 import { AdminSiteEditor } from "./AdminSiteEditor";
 import { AdminDashboard } from "./AdminDashboard";
@@ -54,7 +55,7 @@ function AdminInner() {
   const [active, setActive] = useState("__dashboard");
   const [webOpen, setWebOpen] = useState(true);
   const [officeOpen, setOfficeOpen] = useState(false);
-  const [modulesOpen, setModulesOpen] = useState(true);
+  const [modulesOpen, setModulesOpen] = useState(false);
   const [persona, setPersona] = useState<string>("general");
   const hasClub = !!clubId;
 
@@ -446,7 +447,12 @@ function AdminInner() {
         ) : effectiveActive === "__modules" && hasClub ? (
           <AdminModules />
         ) : effectiveActive === "__members" && can("club.users") ? (
-          <MembersList />
+          <MembersList onOpen={(id) => setActive(`__member_${id}`)} />
+        ) : effectiveActive.startsWith("__member_") && can("club.users") ? (
+          (() => {
+            const id = effectiveActive.slice("__member_".length);
+            return <MemberDetail personId={id} onBack={() => setActive("__members")} />;
+          })()
         ) : effectiveActive === "__people" && can("club.users") ? (
           <AdminPeople />
         ) : effectiveActive === "__comms" && can("club.comms") ? (
