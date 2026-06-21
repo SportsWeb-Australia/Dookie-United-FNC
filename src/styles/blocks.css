@@ -3524,13 +3524,7 @@
   background: #fff;
   border-color: color-mix(in srgb, var(--club-accent, #2563eb) 16%, #e6e8ec);
 }
-.sw-collapse-head {
-  border-left: 4px solid var(--club-accent, #2563eb);
-  background: color-mix(in srgb, var(--club-accent, #2563eb) 4%, #fff);
-}
-.sw-collapse-head:hover { background: color-mix(in srgb, var(--club-accent, #2563eb) 8%, #fff); }
-.sw-collapse-title { color: var(--club-ink, #1e293b); }
-/* slightly tint the inner area/kpi cards so they sit on the section, not float */
+/* (collapse header styling is consolidated in the club-colour band block below) */
 .sw-cc-area, .sw-kpi-card, .sw-chart-card { background: #fff; }
 
 /* ── Workspace sub-page hero (elevated, left-aligned) ── */
@@ -3569,3 +3563,37 @@
   padding: 0.85rem 1.1rem; border: 1px dashed var(--border, #cbd5e1); border-radius: 12px; background: var(--surface, #fff);
 }
 .sw-people-invite .sw-people-id span { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4rem; }
+
+/* ── Collapsible: full club-colour header band + prominent +/- ── */
+.sw-collapse { border-color: color-mix(in srgb, var(--club-accent, #2563eb) 22%, #e6e8ec); }
+.sw-collapse-head {
+  background: var(--club-accent, #2563eb);
+  border-left: none;
+  padding: 1.3rem 1.7rem;
+}
+.sw-collapse-head:hover { background: color-mix(in srgb, var(--club-accent, #2563eb) 90%, #000); }
+.sw-collapse-title { color: #fff; font-size: 1.3rem; flex: 1; }
+.sw-collapse-title .sw-sample-badge { color: #92400e; }
+.sw-collapse-chev {
+  display: inline-flex; align-items: center; justify-content: center; flex: none;
+  width: 34px; height: 34px; border-radius: 50%;
+  background: #fff; color: var(--club-accent, #2563eb);
+  font-size: 1.55rem; font-weight: 800; line-height: 1;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.2);
+}
+/* generous space between the header band and the content below */
+.sw-collapse-body { padding: 2rem 1.7rem 1.9rem; }
+.sw-collapse-body > *:first-child { margin-top: 0; }
+.sw-cc-health { margin-top: 0; }
+
+/* better vertical rhythm platform-wide */
+.sw-admin-formhead { margin-bottom: 1.25rem; }
+.sw-admin-panel > .sw-admin-note:first-of-type { margin-bottom: 1.5rem; }
+
+/* ghost button: keep text readable on hover */
+.sw-btn--ghost { background: #fff; border: 1px solid var(--border, #cbd5e1); color: var(--text, #1e293b); }
+.sw-btn--ghost:hover {
+  background: color-mix(in srgb, var(--accent, #2563eb) 10%, #fff);
+  color: var(--accent, #2563eb);
+  border-color: var(--accent, #2563eb);
+}

@@ -30,7 +30,7 @@ export function Collapsible({
           {badge}
         </span>
         <span className="sw-collapse-chev" aria-hidden="true">
-          {open ? "▾" : "▸"}
+          {open ? "−" : "+"}
         </span>
       </button>
       {open && <div className="sw-collapse-body">{children}</div>}

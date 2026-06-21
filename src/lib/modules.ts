@@ -50,6 +50,25 @@ export const MODULE_CATALOG: ModuleDef[] = [
     plan: "SportsWeb add-on",
   },
   {
+    key: "ticketing",
+    name: "Ticket One",
+    badge: "T1",
+    tagline: "Sell tickets and run events end to end.",
+    summary:
+      "Create events, sell tickets, scan entry at the gate and reconcile takings — all from one place, branded to your club.",
+    overview: [
+      "Paid and free tickets with QR / PIN entry scanning at the gate.",
+      "Tickets emailed on purchase, with save-as-PDF for buyers.",
+      "Attendance and break-even reporting with simple charts.",
+    ],
+    quickstart: [
+      { title: "Create an event", body: "Set the date, venue and ticket types." },
+      { title: "Share the link", body: "Put tickets on your site and socials." },
+      { title: "Scan at the gate", body: "Use the gate-code scanner on the day." },
+    ],
+    plan: "SportsWeb add-on",
+  },
+  {
     key: "learn",
     name: "Club Learn",
     badge: "LN",

@@ -53,6 +53,7 @@ function AdminInner() {
   const [active, setActive] = useState("__dashboard");
   const [webOpen, setWebOpen] = useState(true);
   const [officeOpen, setOfficeOpen] = useState(false);
+  const [modulesOpen, setModulesOpen] = useState(true);
   const [persona, setPersona] = useState<string>("general");
   const hasClub = !!clubId;
 
@@ -231,9 +232,36 @@ function AdminInner() {
           {hasClub && (
             <>
               <div className="sw-admin-navgroup">Modules</div>
-              <button data-active={active === "__modules"} onClick={() => setActive("__modules")}>
-                All modules
-              </button>
+              <div className="sw-admin-parentrow">
+                <button
+                  className="sw-admin-parent"
+                  data-active={active === "__modules"}
+                  onClick={() => { setActive("__modules"); setModulesOpen(true); }}
+                >
+                  All modules
+                </button>
+                <button
+                  className="sw-admin-caret"
+                  aria-label={modulesOpen ? "Collapse modules" : "Expand modules"}
+                  aria-expanded={modulesOpen}
+                  onClick={() => setModulesOpen((o) => !o)}
+                >
+                  {modulesOpen ? "▾" : "▸"}
+                </button>
+              </div>
+              {modulesOpen && enabledMods.length > 0 && (
+                <div className="sw-admin-subnav">
+                  {enabledMods.map((m) => (
+                    <button
+                      key={m.key}
+                      data-active={active === `__mod_${m.key}`}
+                      onClick={() => setActive(`__mod_${m.key}`)}
+                    >
+                      {m.name}
+                    </button>
+                  ))}
+                </div>
+              )}
             </>
           )}
           {hasClub && can("club.users") && (
