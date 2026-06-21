@@ -21,6 +21,9 @@ import { AdminImport } from "./AdminImport";
 import { SuperIntegrations } from "./SuperIntegrations";
 import { SuperStudio } from "./SuperStudio";
 import { Login } from "./Login";
+import { ZohoWorkspace } from "./ZohoWorkspace";
+import { loadCommitteeProfile } from "../lib/committee";
+import { personaFromTitle } from "../lib/roleKpis";
 
 /** Editable site pages shown under "Edit website" (alongside the content collections). */
 const SITE_PAGES: { key: string; label: string }[] = [
@@ -32,7 +35,7 @@ const SITE_PAGES: { key: string; label: string }[] = [
 ];
 
 function AdminInner() {
-  const { ready, resolving, email, platformRole, isPlatformAdmin, signOut } = useAuth();
+  const { ready, resolving, email, platformRole, isPlatformAdmin, signOut, userId } = useAuth();
   const {
     clubId,
     clubName,
@@ -48,6 +51,8 @@ function AdminInner() {
   const { can } = usePermissions();
   const [active, setActive] = useState("__dashboard");
   const [webOpen, setWebOpen] = useState(true);
+  const [officeOpen, setOfficeOpen] = useState(false);
+  const [persona, setPersona] = useState<string>("general");
   const hasClub = !!clubId;
 
   // When the active club changes (login, switch, or superadmin "open"), land on
@@ -55,6 +60,22 @@ function AdminInner() {
   useEffect(() => {
     if (clubId) setActive("__dashboard");
   }, [clubId]);
+
+  // Resolve the committee persona (President / Secretary / …) so the sidebar can
+  // gate role-specific items like Vault.
+  useEffect(() => {
+    if (!clubId || !userId) {
+      setPersona("general");
+      return;
+    }
+    let alive = true;
+    loadCommitteeProfile(clubId, userId).then((p) => {
+      if (alive) setPersona(personaFromTitle(p.committeeTitle));
+    });
+    return () => {
+      alive = false;
+    };
+  }, [clubId, userId]);
 
   // The club switcher lists the user's clubs; when acting-as a club they don't
   // belong to, include it as the current option so the dropdown still shows it.
@@ -157,6 +178,69 @@ function AdminInner() {
               Dashboard
             </button>
           )}
+          {hasClub && (
+            <>
+              <div className="sw-admin-navgroup">Workspace</div>
+              <button data-active={active === "__ws_email"} onClick={() => setActive("__ws_email")}>Email</button>
+              <button data-active={active === "__ws_workdrive"} onClick={() => setActive("__ws_workdrive")}>WorkDrive</button>
+              <button data-active={active === "__ws_intranet"} onClick={() => setActive("__ws_intranet")}>Intranet</button>
+              <div className="sw-admin-parentrow">
+                <button
+                  className="sw-admin-parent"
+                  data-active={active === "__ws_office"}
+                  onClick={() => { setActive("__ws_office"); setOfficeOpen(true); }}
+                >
+                  Office
+                </button>
+                <button
+                  className="sw-admin-caret"
+                  aria-label={officeOpen ? "Collapse office" : "Expand office"}
+                  aria-expanded={officeOpen}
+                  onClick={() => setOfficeOpen((o) => !o)}
+                >
+                  {officeOpen ? "▾" : "▸"}
+                </button>
+              </div>
+              {officeOpen && (
+                <div className="sw-admin-subnav">
+                  <button data-active={active === "__ws_writer"} onClick={() => setActive("__ws_writer")}>Writer</button>
+                  <button data-active={active === "__ws_sheets"} onClick={() => setActive("__ws_sheets")}>Sheets</button>
+                  <button data-active={active === "__ws_show"} onClick={() => setActive("__ws_show")}>Show</button>
+                </div>
+              )}
+              <button data-active={active === "__ws_meeting"} onClick={() => setActive("__ws_meeting")}>Meeting</button>
+              <button data-active={active === "__ws_calendar"} onClick={() => setActive("__ws_calendar")}>Calendar</button>
+              {(persona === "president" || persona === "secretary" || isPlatformAdmin) && (
+                <button data-active={active === "__ws_vault"} onClick={() => setActive("__ws_vault")}>Vault</button>
+              )}
+              <button data-active={active === "__ws_todo"} onClick={() => setActive("__ws_todo")}>To-Do</button>
+              <button data-active={active === "__ws_committee"} onClick={() => setActive("__ws_committee")}>Committee Room</button>
+            </>
+          )}
+          {hasClub && (
+            <>
+              <div className="sw-admin-navgroup">Modules</div>
+              <button data-active={active === "__modules"} onClick={() => setActive("__modules")}>
+                All modules
+              </button>
+            </>
+          )}
+          {hasClub && can("club.users") && (
+            <>
+              <div className="sw-admin-navgroup">Club</div>
+              <button data-active={active === "__people"} onClick={() => setActive("__people")}>
+                People & committee
+              </button>
+            </>
+          )}
+          {hasClub && can("club.comms") && (
+            <>
+              <div className="sw-admin-navgroup">Communications</div>
+              <button data-active={active === "__comms"} onClick={() => setActive("__comms")}>
+                Send a message
+              </button>
+            </>
+          )}
           {hasClub && (can("club.website") || can("club.content")) && (
             <>
               <div className="sw-admin-navgroup">Your website</div>
@@ -202,30 +286,6 @@ function AdminInner() {
                   Website style
                 </button>
               )}
-            </>
-          )}
-          {hasClub && (
-            <>
-              <div className="sw-admin-navgroup">Modules</div>
-              <button data-active={active === "__modules"} onClick={() => setActive("__modules")}>
-                All modules
-              </button>
-            </>
-          )}
-          {hasClub && can("club.users") && (
-            <>
-              <div className="sw-admin-navgroup">Club</div>
-              <button data-active={active === "__people"} onClick={() => setActive("__people")}>
-                People & committee
-              </button>
-            </>
-          )}
-          {hasClub && can("club.comms") && (
-            <>
-              <div className="sw-admin-navgroup">Communications</div>
-              <button data-active={active === "__comms"} onClick={() => setActive("__comms")}>
-                Send a message
-              </button>
             </>
           )}
           {(can("platform.clubs") || can("platform.integrations")) && (
@@ -298,6 +358,8 @@ function AdminInner() {
         </div>
         {effectiveActive === "__dashboard" && hasClub ? (
           <AdminDashboard go={setActive} />
+        ) : effectiveActive.startsWith("__ws_") && hasClub ? (
+          <ZohoWorkspace appKey={effectiveActive.slice("__ws_".length)} />
         ) : effectiveActive.startsWith("__mod_") && hasClub ? (
           (() => {
             const key = effectiveActive.slice("__mod_".length);

@@ -3386,3 +3386,35 @@
 .sw-swf-support p { margin: 0 0 0.7rem; font-size: 0.85rem; color: var(--text-soft, #475467); line-height: 1.45; }
 .sw-swf-support p:last-child { margin-bottom: 0; }
 .sw-swf-support strong { color: var(--text, #1e293b); }
+
+/* Zoho workspace screens */
+.sw-ws .sw-admin-note { max-width: 640px; font-size: 0.95rem; line-height: 1.55; }
+.sw-ws-connect {
+  margin-top: 1.4rem; max-width: 560px; padding: 1.3rem 1.4rem; border-radius: 14px;
+  border: 1px dashed var(--border, #cbd5e1); background: var(--surface-soft, #f8fafc);
+}
+.sw-ws-badge {
+  display: inline-block; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+  color: #92400e; background: #fef3c7; padding: 0.25rem 0.6rem; border-radius: 999px; margin-bottom: 0.7rem;
+}
+.sw-ws-connect p { margin: 0 0 1rem; font-size: 0.92rem; line-height: 1.55; color: var(--text-soft, #475467); }
+
+/* Sample trend charts */
+.sw-sample-badge { font-size: 0.62rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; color: #92400e; background: #fef3c7; padding: 0.2rem 0.5rem; border-radius: 999px; margin-left: 0.5rem; vertical-align: middle; }
+.sw-cc-sample-note { font-size: 0.85rem; color: var(--text-soft, #64748b); margin: 0 0 1rem; max-width: 640px; line-height: 1.5; }
+.sw-chart-grid { display: grid; gap: 1rem; grid-template-columns: 1fr; }
+@media (min-width: 820px) { .sw-chart-grid { grid-template-columns: 1fr 1fr; } }
+.sw-chart-card { padding: 1.1rem 1.2rem; border-radius: 12px; border: 1px solid var(--border, #e6e8ec); background: var(--surface, #fff); }
+.sw-chart-card header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 0.9rem; }
+.sw-chart-card header span:first-child { font-weight: 700; font-size: 0.95rem; }
+.sw-chart-unit { font-size: 0.72rem; color: var(--text-soft, #98a2b3); }
+.sw-bars { display: flex; align-items: flex-end; gap: 0.5rem; height: 140px; }
+.sw-bars-col { flex: 1; display: flex; flex-direction: column; align-items: center; height: 100%; justify-content: flex-end; }
+.sw-bars-pair { display: flex; align-items: flex-end; gap: 3px; height: 100%; width: 100%; justify-content: center; }
+.sw-bar { width: 14px; border-radius: 4px 4px 0 0; min-height: 3px; }
+.sw-bar--inc { background: #16a34a; } .sw-bar--exp { background: #f59e0b; } .sw-bar--mem { background: var(--accent, #2563eb); width: 18px; }
+.sw-bars-lbl { font-size: 0.68rem; color: var(--text-soft, #98a2b3); margin-top: 0.4rem; }
+.sw-chart-legend { display: flex; gap: 1rem; margin-top: 0.7rem; }
+.sw-lg { font-size: 0.74rem; color: var(--text-soft, #64748b); display: inline-flex; align-items: center; }
+.sw-lg::before { content: ""; width: 9px; height: 9px; border-radius: 2px; margin-right: 0.35rem; display: inline-block; }
+.sw-lg--inc::before { background: #16a34a; } .sw-lg--exp::before { background: #f59e0b; }

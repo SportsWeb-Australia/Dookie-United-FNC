@@ -15,7 +15,7 @@ import {
   type CommitteeProfile,
 } from "../lib/committee";
 import { getDashboardMetrics, buildKpis, personaFromTitle, type Metrics } from "../lib/roleKpis";
-import { HealthScore, RedFlags, TodoCentre, CommsSummary, SportsWebFooter } from "./PresidentCentre";
+import { HealthScore, RedFlags, TodoCentre, CommsSummary, SportsWebFooter, SampleCharts } from "./PresidentCentre";
 
 /* ---- tiny dependency-free charts -------------------------------------- */
 
@@ -324,6 +324,7 @@ export function AdminDashboard({ go }: { go: (key: string) => void }) {
         <>
           <HealthScore metrics={metrics} local={presLocal} go={go} />
           {kpiBlock}
+          <SampleCharts />
           <RedFlags metrics={metrics} local={presLocal} go={go} />
           <TodoCentre metrics={metrics} local={presLocal} go={go} />
           <CommsSummary memberCount={metrics.members?.active ?? 0} go={go} />
