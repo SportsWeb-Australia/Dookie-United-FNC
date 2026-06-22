@@ -3,6 +3,7 @@ import { useActiveClub } from "./ActiveClub";
 import { useClub } from "../components/ClubContext";
 import { MODULE_CATALOG } from "../lib/modules";
 import { getSportswebMetrics, type Metrics } from "../lib/roleKpis";
+import { MfaSettings } from "./MfaSettings";
 
 /** Illustrative standalone pricing ($/month) for the jobs SportsWeb One covers. */
 const SAVINGS = [
@@ -121,6 +122,12 @@ export function SportsWebAccount() {
               <span className="sw-acc-soft">No modules active yet.</span>
             )}
           </div>
+        </section>
+
+        {/* Security */}
+        <section className="sw-acc-card">
+          <span className="sw-acc-cap">Security</span>
+          <MfaSettings />
         </section>
 
         {/* Support team */}

@@ -13,6 +13,7 @@ import { MembersList } from "./MembersList";
 import { MemberDetail } from "./MemberDetail";
 import { TeamsSeasons } from "./TeamsSeasons";
 import { Reports } from "./Reports";
+import { MfaGate } from "./MfaGate";
 import { AdminWebsite } from "./AdminWebsite";
 import { AdminSiteEditor } from "./AdminSiteEditor";
 import { AdminDashboard } from "./AdminDashboard";
@@ -64,6 +65,9 @@ function AdminInner() {
   const toggleGroup = (k: string) => setOpenGroups((g) => ({ ...g, [k]: !g[k] }));
   const [persona, setPersona] = useState<string>("general");
   const hasClub = !!clubId;
+  // 2FA is required for accounts that can administer a club or the platform.
+  const mfaRequired =
+    isPlatformAdmin || activeRole === "club_senior_admin" || activeRole === "club_admin";
 
   // Back always returns to the dashboard home.
   const goBack = () => setActive("__dashboard");
@@ -181,6 +185,7 @@ function AdminInner() {
   const operatorConsole = isPlatformAdmin && !hasClub;
 
   return (
+    <MfaGate required={mfaRequired} email={email} onSignOut={signOut}>
     <div className={`sw-admin${operatorConsole ? " sw-brandwrap" : ""}`} style={operatorConsole ? undefined : brandStyle}>
       <header className="sw-admin-topbar">
         <button
@@ -563,6 +568,7 @@ function AdminInner() {
         )}
       </main>
     </div>
+    </MfaGate>
   );
 }
 
