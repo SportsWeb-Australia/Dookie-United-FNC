@@ -173,13 +173,15 @@ function AdminInner() {
   if (resolving || !clubReady) return <div className="sw-admin-loading">Loading…</div>;
 
   if (!hasClub && !isPlatformAdmin && !isOperator) {
+    const isBuilder = platformRole === "sportsweb_admin";
     return (
       <div className="sw-admin-login">
         <div className="sw-admin-login-card">
-          <h1>No club access</h1>
+          <h1>{isBuilder ? "No club assigned yet" : "No club access"}</h1>
           <p>
-            You're signed in as {email}, but this account isn't linked to a club yet. Ask an
-            administrator to add you to <code>club_users</code>.
+            {isBuilder
+              ? `You're signed in as ${email}. Your manager will assign you a club to build — once they do, it'll appear here and you can get started.`
+              : `You're signed in as ${email}, but this account isn't linked to a club yet. Ask your club administrator to add you.`}
           </p>
           <button className="sw-btn sw-btn--ghost" onClick={signOut}>Sign out</button>
         </div>

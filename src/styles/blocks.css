@@ -2070,6 +2070,7 @@
    Super admin (platform)
    ============================================================ */
 .sw-super-table-wrap {
+  margin-top: 1.75rem;
   overflow-x: auto;
   background: #fff;
   border: 1px solid var(--border);

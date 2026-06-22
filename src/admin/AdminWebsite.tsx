@@ -63,6 +63,8 @@ export function AdminWebsite() {
   const [mode, setMode] = useState<NewsMode>(getNewsMode(club.content));
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [styleSaving, setStyleSaving] = useState(false);
+  const [styleSaved, setStyleSaved] = useState(false);
 
   // Only offer styles relevant to this club's sport(s). Generic styles (no sport
   // tag) always show; the current style always shows so it never disappears.
@@ -89,14 +91,26 @@ export function AdminWebsite() {
     if (!error) setSaved(true);
   };
 
+  const chooseStyle = async (v: DesignVariant) => {
+    setVariant(v); // apply live immediately
+    setStyleSaved(false);
+    if (!clubId || !supabase) return;
+    setStyleSaving(true);
+    const { error } = await supabase
+      .from("club_content")
+      .upsert({ club_id: clubId, content_key: "site.variant", value: v }, { onConflict: "club_id,content_key" });
+    setStyleSaving(false);
+    if (!error) setStyleSaved(true);
+  };
+
   return (
     <div className="sw-admin-panel">
       <div className="sw-admin-formhead">
         <h2>Website style</h2>
       </div>
       <p className="sw-admin-note">
-        Pick a look for the {club.identity.shortName} website. The preview applies live across the
-        site — saving it as your permanent style is coming soon. Only styles suited to your
+        Pick a look for the {club.identity.shortName} website. It applies live across the site and
+        saves as your club&apos;s style straight away. Only styles suited to your
         club&apos;s sport{(club.identity.sports ?? []).length === 1 ? "" : "s"} are shown
         {(club.identity.sports ?? []).length > 0 ? ` (${club.identity.sports.join(" & ")})` : ""}.
       </p>
@@ -113,13 +127,18 @@ export function AdminWebsite() {
             type="button"
             className="sw-admin-style"
             data-active={s.id === variant}
-            onClick={() => setVariant(s.id)}
+            onClick={() => chooseStyle(s.id)}
           >
             <strong>{s.label}</strong>
             <span>{s.note}</span>
           </button>
         ))}
       </div>
+      {(styleSaving || styleSaved) && (
+        <p className="sw-admin-note" style={{ marginTop: "0.6rem" }}>
+          {styleSaving ? "Saving\u2026" : "Saved \u2014 this is now your club's style."}
+        </p>
+      )}
 
       <div className="sw-admin-formhead" style={{ marginTop: "2.5rem" }}>
         <h2>News &amp; social</h2>
