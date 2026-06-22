@@ -80,11 +80,22 @@ export async function getClubConfig(): Promise<ClubConfig> {
 export async function getClubConfigById(clubId: string): Promise<ClubConfig> {
   if (!supabase || !clubId) return staticClub;
   try {
-    const { data: clubRow } = await supabase
-      .from("clubs")
-      .select("*")
-      .eq("id", clubId)
-      .maybeSingle();
+    let clubRow: Record<string, any> | null = null;
+    const direct = await supabase.from("clubs").select("*").eq("id", clubId).maybeSingle();
+    clubRow = direct.data ?? null;
+
+    // RLS fallback. A platform admin who "opens" a club they don't belong to may
+    // not be able to read that club's row directly (the clubs SELECT policy is
+    // membership-scoped). Without this, the read returns no row and we'd fall
+    // back to staticClub — which is Dookie — so EVERY foreign club would open as
+    // Dookie. admin_get_club is a platform-admin-gated SECURITY DEFINER RPC that
+    // returns the full row. If the RPC isn't deployed yet, this is a safe no-op
+    // (errors are swallowed) and behaviour is unchanged.
+    if (!clubRow) {
+      const { data: rpcRow } = await supabase.rpc("admin_get_club", { p_club: clubId });
+      clubRow = Array.isArray(rpcRow) ? (rpcRow[0] ?? null) : (rpcRow ?? null);
+    }
+
     if (!clubRow) return staticClub;
     return await buildClubConfig(clubRow);
   } catch {
