@@ -84,7 +84,7 @@ async function resolvePlatformRole(): Promise<PlatformRole | null> {
   if (!supabase) return null;
   const { data, error } = await supabase.rpc("my_platform_role");
   if (error || !data) return null;
-  return data === "superadmin" || data === "sportsweb_admin" ? (data as PlatformRole) : null;
+  return data === "superadmin" || data === "sportsweb_manager" || data === "sportsweb_admin" ? (data as PlatformRole) : null;
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -142,7 +142,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const isSuperadmin = platformRole === "superadmin";
-  const isPlatformAdmin = platformRole !== null;
+  // Platform admin = Super Admin or SportsWeb Manager. The SportsWeb Admin (builder)
+  // is a platform role but NOT a platform admin: it only reaches assigned clubs.
+  const isPlatformAdmin = platformRole === "superadmin" || platformRole === "sportsweb_manager";
 
   return (
     <Ctx.Provider

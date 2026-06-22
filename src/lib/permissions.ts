@@ -30,8 +30,10 @@ const ALL: Permission[] = [
 export const ROLE_PERMISSIONS: Record<AnyRole, Permission[]> = {
   // Owner — everything.
   superadmin: ALL,
-  // SportsWeb staff — all clubs and support, but never code/secrets or platform roles.
-  sportsweb_admin: ["platform.clubs", "club.content", "club.comms", "club.modules", "club.settings", "club.website", "club.billing", "club.users"],
+  // SportsWeb Manager — all clubs and support, but never database/platform settings or platform roles.
+  sportsweb_manager: ["platform.clubs", "club.content", "club.comms", "club.modules", "club.settings", "club.website", "club.billing", "club.users"],
+  // SportsWeb Admin (builder) — builds only the clubs handed to them; RLS scopes the data to those clubs.
+  sportsweb_admin: ["club.content", "club.website", "club.modules", "club.settings"],
   // Senior club role — full control of their own club.
   club_senior_admin: ["club.content", "club.comms", "club.modules", "club.settings", "club.website", "club.billing", "club.users"],
   // Operational club role — content, messaging and website editing.
@@ -42,6 +44,7 @@ export const ROLE_PERMISSIONS: Record<AnyRole, Permission[]> = {
 export function toModelRole(role: string | null | undefined): AnyRole | null {
   switch (role) {
     case "superadmin":
+    case "sportsweb_manager":
     case "sportsweb_admin":
     case "club_senior_admin":
     case "club_admin":
