@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useClub } from "../components/ClubContext";
 import { useActiveClub } from "./ActiveClub";
+import { usePermissions } from "../lib/permissions";
 import { supabase } from "../lib/supabase";
 import { getNewsMode, NEWS_MODE_OPTIONS, type NewsMode } from "../lib/newsMode";
 import type { DesignVariant } from "../content/types";
 
-const STYLES: { id: DesignVariant; label: string; note: string }[] = [
+const STYLES: { id: DesignVariant; label: string; note: string; sports?: string[] }[] = [
   { id: "heritage", label: "Heritage", note: "Clean, light, classic club feel." },
   { id: "broadcast", label: "Broadcast", note: "Dark and bold, TV-style." },
   { id: "arena", label: "Arena", note: "Sharp, flat, high-impact." },
@@ -21,27 +22,60 @@ const STYLES: { id: DesignVariant; label: string; note: string }[] = [
   { id: "sponsorforward", label: "Sponsor-forward", note: "Partners front and centre." },
   { id: "portal", label: "Portal", note: "Sidebar nav + dashboard." },
   { id: "poster", label: "Poster", note: "Brutalist — huge type, colour blocks." },
-  { id: "fieldcourt", label: "Fieldcourt (AFL/Netball)", note: "Dual-code club — football + netball split." },
-  { id: "masters", label: "Masters (AFL Masters)", note: "Warm, social, events-first, photo-led." },
-  { id: "pitch", label: "Pitch (Soccer)", note: "Sleek, dark, horizontal fixture rail." },
-  { id: "scorecard", label: "Scorecard (Cricket)", note: "Scoreboard strip + fixtures | ladder split." },
-  { id: "hardcourt", label: "Hardcourt (Basketball)", note: "Dark stat bento, broadcast energy." },
-  { id: "fastbreak", label: "Fastbreak (Lacrosse)", note: "Energetic zig-zag feature rows." },
-  { id: "leaguefooty", label: "Leaguefooty (AFL)", note: "Guernsey hero, grade strip, match + ladder." },
-  { id: "courtside", label: "Courtside (Netball)", note: "Airy, bib-style grade chips incl. Mixed." },
-  { id: "juniors", label: "Juniors (Junior Football)", note: "Friendly, family-focused, parent info panel." },
-  { id: "rugbyunion", label: "Rugby Union", note: "Traditional, centred crest, honours ribbon." },
-  { id: "rugbyleague", label: "Rugby League", note: "Dark clash banner, form guide, ladder." },
-  { id: "oztag", label: "Oztag", note: "Social comp — register-a-team, divisions, nights." },
-  { id: "touch", label: "Touch Footy", note: "Summery social — come-and-try steps + draw." },
+  { id: "fieldcourt", label: "Fieldcourt (AFL/Netball)", note: "Dual-code club — football + netball split.", sports: ["afl", "netball"] },
+  { id: "masters", label: "Masters (AFL Masters)", note: "Warm, social, events-first, photo-led.", sports: ["afl"] },
+  { id: "pitch", label: "Pitch (Soccer)", note: "Sleek, dark, horizontal fixture rail.", sports: ["soccer"] },
+  { id: "scorecard", label: "Scorecard (Cricket)", note: "Scoreboard strip + fixtures | ladder split.", sports: ["cricket"] },
+  { id: "hardcourt", label: "Hardcourt (Basketball)", note: "Dark stat bento, broadcast energy.", sports: ["basketball"] },
+  { id: "fastbreak", label: "Fastbreak (Lacrosse)", note: "Energetic zig-zag feature rows.", sports: ["lacrosse"] },
+  { id: "leaguefooty", label: "Leaguefooty (AFL)", note: "Guernsey hero, grade strip, match + ladder.", sports: ["afl"] },
+  { id: "courtside", label: "Courtside (Netball)", note: "Airy, bib-style grade chips incl. Mixed.", sports: ["netball"] },
+  { id: "juniors", label: "Juniors (Junior Football)", note: "Friendly, family-focused, parent info panel.", sports: ["afl"] },
+  { id: "rugbyunion", label: "Rugby Union", note: "Traditional, centred crest, honours ribbon.", sports: ["rugbyunion"] },
+  { id: "rugbyleague", label: "Rugby League", note: "Dark clash banner, form guide, ladder.", sports: ["rugbyleague"] },
+  { id: "oztag", label: "Oztag", note: "Social comp — register-a-team, divisions, nights.", sports: ["oztag"] },
+  { id: "touch", label: "Touch Footy", note: "Summery social — come-and-try steps + draw.", sports: ["touch"] },
 ];
+
+// Map a club's free-text sport (e.g. "Football", "AFL") to a canonical family.
+// In this AFL/footy platform, "football"/"footy" means Australian Rules.
+function sportFamily(s: string): string {
+  const k = s.toLowerCase().trim();
+  if (/(afl|aussie|australian rules|footy|^football$|aussie rules)/.test(k)) return "afl";
+  if (k.includes("netball")) return "netball";
+  if (k.includes("soccer")) return "soccer";
+  if (k.includes("cricket")) return "cricket";
+  if (k.includes("basket")) return "basketball";
+  if (k.includes("lacrosse")) return "lacrosse";
+  if (k.includes("union")) return "rugbyunion";
+  if (k.includes("league")) return "rugbyleague";
+  if (k.includes("oztag")) return "oztag";
+  if (k.includes("touch")) return "touch";
+  return k;
+}
 
 export function AdminWebsite() {
   const { club, variant, setVariant } = useClub();
   const { clubId } = useActiveClub();
+  const { can } = usePermissions();
+  const isPlatform = can("platform.clubs");
+  const [showAll, setShowAll] = useState(false);
   const [mode, setMode] = useState<NewsMode>(getNewsMode(club.content));
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+
+  // Only offer styles relevant to this club's sport(s). Generic styles (no sport
+  // tag) always show; the current style always shows so it never disappears.
+  const clubFamilies = useMemo(
+    () => new Set((club.identity.sports ?? []).map(sportFamily)),
+    [club.identity.sports],
+  );
+  const visibleStyles = useMemo(() => {
+    if (isPlatform && showAll) return STYLES;
+    return STYLES.filter(
+      (s) => !s.sports || s.id === variant || s.sports.some((sp) => clubFamilies.has(sp)),
+    );
+  }, [clubFamilies, variant, isPlatform, showAll]);
 
   const chooseMode = async (m: NewsMode) => {
     setMode(m);
@@ -62,10 +96,18 @@ export function AdminWebsite() {
       </div>
       <p className="sw-admin-note">
         Pick a look for the {club.identity.shortName} website. The preview applies live across the
-        site — saving it as your permanent style is coming soon.
+        site — saving it as your permanent style is coming soon. Only styles suited to your
+        club&apos;s sport{(club.identity.sports ?? []).length === 1 ? "" : "s"} are shown
+        {(club.identity.sports ?? []).length > 0 ? ` (${club.identity.sports.join(" & ")})` : ""}.
       </p>
+      {isPlatform && (
+        <label className="sw-admin-showall">
+          <input type="checkbox" checked={showAll} onChange={(e) => setShowAll(e.target.checked)} />
+          <span>Show all styles (platform admin)</span>
+        </label>
+      )}
       <div className="sw-admin-styles">
-        {STYLES.map((s) => (
+        {visibleStyles.map((s) => (
           <button
             key={s.id}
             type="button"

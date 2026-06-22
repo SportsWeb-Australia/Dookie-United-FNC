@@ -21,6 +21,13 @@ const CHANNELS: { key: Channel; label: string; needs: "email" | "mobile" | null;
 
 const SMS_LIMIT = 160;
 
+// "ticket_confirmation" -> "Ticket confirmation"; leaves nice labels alone.
+function prettyAudience(a: string | null): string {
+  if (!a) return "—";
+  const s = a.replace(/_/g, " ").trim();
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
 export function Communications() {
   const { clubId } = useActiveClub();
 
@@ -248,37 +255,66 @@ export function Communications() {
         </aside>
       </div>
 
-      <section className="sw-comms-history">
-        <h3>Recent sends</h3>
+      <section className="sw-sends">
+        <div className="sw-sends-head">
+          <h3>Recent sends</h3>
+          {history.length > 0 && (
+            <span className="sw-sends-count">
+              {history.length} message{history.length === 1 ? "" : "s"}
+            </span>
+          )}
+        </div>
         {history.length === 0 ? (
-          <p className="sw-muted">Nothing sent yet.</p>
+          <p className="sw-sends-empty">Nothing sent yet. Your sends will appear here.</p>
         ) : (
-          <table className="sw-admin-table">
-            <thead>
-              <tr>
-                <th>When</th>
-                <th>Channels</th>
-                <th>Audience</th>
-                <th>To</th>
-                <th>Message</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {history.map((m) => (
-                <tr key={m.id}>
-                  <td>{new Date(m.created_at).toLocaleString("en-AU", { dateStyle: "medium", timeStyle: "short" })}</td>
-                  <td>{(m.channels ?? []).join(", ")}</td>
-                  <td>{m.audience ?? "—"}</td>
-                  <td>{m.recipient_count}</td>
-                  <td className="sw-comms-msgcell">{m.subject ? `${m.subject} — ` : ""}{m.body}</td>
-                  <td>
-                    <span className={`sw-pill ${m.status === "sent" ? "ok" : "err"}`}>{m.status}</span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="sw-sends-card">
+            <div className="sw-sends-scroll">
+              <table className="sw-sends-table">
+                <thead>
+                  <tr>
+                    <th>When</th>
+                    <th>Channels</th>
+                    <th>Audience</th>
+                    <th className="sw-sends-num">To</th>
+                    <th>Message</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {history.map((m) => (
+                    <tr key={m.id}>
+                      <td className="sw-sends-when">
+                        {new Date(m.created_at).toLocaleString("en-AU", { dateStyle: "medium", timeStyle: "short" })}
+                      </td>
+                      <td>
+                        <span className="sw-sends-chips">
+                          {(m.channels ?? []).map((c) => (
+                            <span key={c} className="sw-sends-chip">{c}</span>
+                          ))}
+                        </span>
+                      </td>
+                      <td>{prettyAudience(m.audience)}</td>
+                      <td className="sw-sends-num">{m.recipient_count}</td>
+                      <td className="sw-sends-msg">
+                        {m.subject ? <strong>{m.subject}</strong> : null}
+                        {m.subject ? " — " : ""}
+                        {m.body}
+                      </td>
+                      <td>
+                        <span
+                          className={`sw-sends-status sw-sends-status--${
+                            m.status === "sent" ? "ok" : m.status === "failed" ? "err" : "muted"
+                          }`}
+                        >
+                          {m.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         )}
       </section>
 

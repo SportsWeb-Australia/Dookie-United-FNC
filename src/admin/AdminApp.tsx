@@ -12,6 +12,7 @@ import { AdminPeople } from "./AdminPeople";
 import { MembersList } from "./MembersList";
 import { MemberDetail } from "./MemberDetail";
 import { TeamsSeasons } from "./TeamsSeasons";
+import { Reports } from "./Reports";
 import { AdminWebsite } from "./AdminWebsite";
 import { AdminSiteEditor } from "./AdminSiteEditor";
 import { AdminDashboard } from "./AdminDashboard";
@@ -327,6 +328,9 @@ function AdminInner() {
               <button data-active={active === "__teams_seasons"} onClick={() => setActive("__teams_seasons")}>
                 Teams &amp; seasons
               </button>
+              <button data-active={active === "__member_reports"} onClick={() => setActive("__member_reports")}>
+                Member reports
+              </button>
               </div>
             </>
           )}
@@ -339,6 +343,9 @@ function AdminInner() {
               <div className="sw-admin-groupitems" data-open={groupOpen("comms")}>
               <button data-active={active === "__comms"} onClick={() => setActive("__comms")}>
                 Send a message
+              </button>
+              <button data-active={active === "__comms_reports"} onClick={() => setActive("__comms_reports")}>
+                Communication reports
               </button>
               </div>
             </>
@@ -530,8 +537,12 @@ function AdminInner() {
           <AdminPeople />
         ) : effectiveActive === "__teams_seasons" && can("club.users") ? (
           <TeamsSeasons />
+        ) : effectiveActive === "__member_reports" && can("club.users") ? (
+          <Reports section="members" />
         ) : effectiveActive === "__comms" && can("club.comms") ? (
           <Communications />
+        ) : effectiveActive === "__comms_reports" && can("club.comms") ? (
+          <Reports section="communications" />
         ) : effectiveActive === "__super_clubs" && can("platform.clubs") ? (
           <SuperClubs />
         ) : effectiveActive === "__super_integrations" && can("platform.integrations") ? (

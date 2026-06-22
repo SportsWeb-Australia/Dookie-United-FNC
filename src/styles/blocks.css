@@ -3891,3 +3891,71 @@
 .sw-ts-badge--draft { background: #fde9c8; color: #92600a; }
 .sw-ts-rowbtns { display: flex; gap: 0.4rem; flex: 0 0 auto; }
 .sw-ts-del { color: #b23a2c; }
+
+/* ---- Member segment chips: count badge ---- */
+.sw-mem-roles button strong {
+  font-weight: 800;
+  margin-left: 0.3rem;
+  opacity: 0.65;
+  font-variant-numeric: tabular-nums;
+}
+.sw-mem-roles button[data-on="true"] strong { opacity: 0.85; }
+
+/* ---- Recent sends / send history table ---- */
+.sw-sends { margin-top: 1.75rem; }
+.sw-sends-head { display: flex; align-items: baseline; justify-content: space-between; gap: 0.75rem; margin-bottom: 0.85rem; }
+.sw-sends-head h3 { margin: 0; }
+.sw-sends-count { font-family: var(--font-mono); font-size: 0.78rem; color: var(--text-soft, #64748b); text-transform: uppercase; letter-spacing: 0.05em; }
+.sw-sends-empty { color: var(--text-soft, #64748b); padding: 1.25rem; background: #fff; border: 1px dashed var(--border, #e2e8f0); border-radius: 14px; }
+.sw-sends-card {
+  background: #fff;
+  border: 1px solid var(--border, #e6e8ec);
+  border-radius: 16px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 8px 24px -18px rgba(15, 23, 42, 0.25);
+  overflow: hidden;
+}
+.sw-sends-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.sw-sends-table { width: 100%; border-collapse: collapse; min-width: 640px; font-size: 0.9rem; }
+.sw-sends-table thead th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 0.7rem; letter-spacing: 0.07em; text-transform: uppercase;
+  color: var(--text-soft, #64748b);
+  padding: 0.85rem 1rem;
+  background: color-mix(in srgb, var(--club-accent, #2563eb) 6%, #fff);
+  border-bottom: 1px solid var(--border, #e6e8ec);
+  white-space: nowrap;
+}
+.sw-sends-table tbody td { padding: 0.85rem 1rem; border-bottom: 1px solid var(--border, #f1f5f9); vertical-align: middle; }
+.sw-sends-table tbody tr:last-child td { border-bottom: none; }
+.sw-sends-table tbody tr:hover { background: color-mix(in srgb, var(--club-accent, #2563eb) 4%, #fff); }
+.sw-sends-when { white-space: nowrap; color: var(--text-soft, #475569); font-variant-numeric: tabular-nums; }
+.sw-sends-num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+.sw-sends-msg { max-width: 340px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text, #1e293b); }
+.sw-sends-chips { display: inline-flex; flex-wrap: wrap; gap: 0.3rem; }
+.sw-sends-chip {
+  font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em;
+  padding: 0.16rem 0.5rem; border-radius: 999px;
+  background: color-mix(in srgb, var(--club-accent, #2563eb) 12%, #fff);
+  color: color-mix(in srgb, var(--club-accent, #2563eb) 70%, #1e293b);
+}
+.sw-sends-status {
+  display: inline-block; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 0.2rem 0.6rem; border-radius: 999px; white-space: nowrap;
+}
+.sw-sends-status--ok { background: #dcfce7; color: #166534; }
+.sw-sends-status--err { background: #fee2e2; color: #b91c1c; }
+.sw-sends-status--muted { background: #f1f5f9; color: #475569; }
+
+/* ---- Reports: simple bar breakdowns ---- */
+.sw-rep-block { margin-top: 1.6rem; }
+.sw-rep-h { margin: 0 0 0.8rem; font-size: 1.05rem; }
+.sw-rep-bars { display: flex; flex-direction: column; gap: 0.7rem; }
+.sw-rep-bar { display: flex; flex-direction: column; gap: 0.3rem; }
+.sw-rep-bar-top { display: flex; align-items: baseline; justify-content: space-between; font-size: 0.9rem; }
+.sw-rep-bar-top strong { font-variant-numeric: tabular-nums; }
+.sw-rep-bar-track { height: 10px; border-radius: 999px; background: color-mix(in srgb, var(--club-accent, #2563eb) 10%, #eef2f7); overflow: hidden; }
+.sw-rep-bar-fill { height: 100%; border-radius: 999px; background: var(--club-accent, #2563eb); min-width: 2px; transition: width 0.3s ease; }
+
+/* ---- Website style: platform-admin show-all toggle ---- */
+.sw-admin-showall { display: inline-flex; align-items: center; gap: 0.5rem; margin: 0 0 1rem; font-size: 0.88rem; color: var(--text-soft, #475569); }

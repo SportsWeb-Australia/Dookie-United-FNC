@@ -17,6 +17,10 @@ function payTone(status: string | null): string {
 
 const EMPTY_ADD = { full_name: "", email: "", mobile: "", date_of_birth: "", member_since: "", status: "active" };
 
+// Canonical filter segments — always shown so they're discoverable even before
+// anyone holds that role. "sponsor" is a placeholder for the upcoming sponsor module.
+const ROLE_SEGMENTS = ["player", "guardian", "coach", "volunteer", "committee", "sponsor"];
+
 export function MembersList({ onOpen }: { onOpen: (personId: string) => void }) {
   const { clubId } = useActiveClub();
   const [members, setMembers] = useState<ClubMember[]>([]);
@@ -44,6 +48,13 @@ export function MembersList({ onOpen }: { onOpen: (personId: string) => void }) 
     members.forEach((m) => m.roles.forEach((r) => set.add(r)));
     return Array.from(set).sort();
   }, [members]);
+
+  // Canonical segments first, then any other roles that exist in the data.
+  const roleSegments = useMemo(() => {
+    const extra = allRoles.filter((r) => !ROLE_SEGMENTS.includes(r));
+    return [...ROLE_SEGMENTS, ...extra];
+  }, [allRoles]);
+  const roleCount = (r: string) => members.filter((m) => m.roles.includes(r)).length;
 
   const allTeams = useMemo(() => {
     const set = new Set<string>();
@@ -162,9 +173,16 @@ export function MembersList({ onOpen }: { onOpen: (personId: string) => void }) 
               onChange={(e) => setQuery(e.target.value)}
             />
             <div className="sw-mem-roles">
-              <button data-on={role === "all"} onClick={() => setRole("all")}>All</button>
-              {allRoles.map((r) => (
-                <button key={r} data-on={role === r} onClick={() => setRole(r)}>{humanRole(r)}</button>
+              <button data-on={role === "all"} onClick={() => setRole("all")}>All <strong>{members.length}</strong></button>
+              {roleSegments.map((r) => (
+                <button
+                  key={r}
+                  data-on={role === r}
+                  onClick={() => setRole(r)}
+                  title={r === "sponsor" ? "Sponsors arrive with the upcoming sponsor module" : undefined}
+                >
+                  {humanRole(r)} <strong>{roleCount(r)}</strong>
+                </button>
               ))}
             </div>
             {allTeams.length > 0 && (

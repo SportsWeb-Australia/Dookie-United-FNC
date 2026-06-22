@@ -137,7 +137,7 @@ export function AdminPeople() {
         </div>
         <div className="sw-people-actions">
           <button className="sw-btn" onClick={submitInvite} disabled={adding}>
-            Add member
+            Add committee member
           </button>
           <span className="sw-ed-status" aria-live="polite">
             {addMsg}
