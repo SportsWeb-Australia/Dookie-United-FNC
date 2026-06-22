@@ -49,6 +49,8 @@ export interface BrandColours {
   accent: string;
   /** Secondary / metallic (Dookie silver). */
   silver: string;
+  /** Optional third club colour (Dookie: white). Falls back to paper when unset. */
+  tertiary?: string;
 }
 
 export interface LinkRef {

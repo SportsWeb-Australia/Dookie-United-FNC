@@ -3773,14 +3773,15 @@
      desktop folder-tab "merge into the sheet" look breaks once it has to scroll. */
   .sw-md-tabs { flex-wrap: wrap; gap: 0.4rem; row-gap: 0.4rem; align-items: stretch; margin: 0 0 0.9rem; }
   .sw-md-tabs button {
-    border: 1px solid color-mix(in srgb, var(--club-accent, #2563eb) 28%, #fff);
+    border: 1px solid var(--club-secondary, #15181d);
     border-radius: 999px;
-    background: color-mix(in srgb, var(--club-accent, #2563eb) 10%, #fff);
+    background: var(--club-secondary, #15181d);
+    color: var(--club-tertiary, #fff);
     padding: 0.5rem 0.95rem; margin-bottom: 0; font-size: 0.85rem;
   }
   .sw-md-tabs button[data-on="true"] {
-    background: var(--club-accent, #2563eb); color: #fff;
-    border-color: var(--club-accent, #2563eb); padding-top: 0.5rem;
+    background: var(--club-primary, var(--club-accent, #2563eb)); color: #fff;
+    border-color: var(--club-primary, var(--club-accent, #2563eb)); padding-top: 0.5rem;
   }
 }
 .sw-md-tabpanel {

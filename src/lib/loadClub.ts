@@ -121,6 +121,7 @@ async function buildClubConfig(clubRow: Record<string, any>): Promise<ClubConfig
       colours: deriveColours(
         clubRow.primary_colour ?? null,
         clubRow.secondary_colour ?? null,
+        clubRow.tertiary_colour ?? null,
         staticClub.identity.colours
       ),
     };
@@ -406,6 +407,7 @@ function sat({ r, g, b }: Rgb): number {
 function deriveColours(
   primary: string | null,
   secondary: string | null,
+  tertiary: string | null,
   fallback: BrandColours
 ): BrandColours {
   const parsed = [primary, secondary]
@@ -413,7 +415,9 @@ function deriveColours(
     .map((hex) => ({ hex, rgb: hexToRgb(hex) }))
     .filter((c): c is { hex: string; rgb: Rgb } => c.rgb !== null);
 
-  if (!parsed.length) return fallback;
+  const tertiaryHex = tertiary && hexToRgb(tertiary) ? tertiary : undefined;
+
+  if (!parsed.length) return { ...fallback, tertiary: tertiaryHex ?? fallback.tertiary };
 
   const darkest = [...parsed].sort((a, b) => lum(a.rgb) - lum(b.rgb))[0];
   const ink = lum(darkest.rgb) < 0.25 ? darkest.hex : fallback.ink;
@@ -424,5 +428,5 @@ function deriveColours(
   )[0];
   const accent = accentPick ? accentPick.hex : fallback.accent;
 
-  return { ink, paper: fallback.paper, accent, silver: fallback.silver };
+  return { ink, paper: fallback.paper, accent, silver: fallback.silver, tertiary: tertiaryHex };
 }

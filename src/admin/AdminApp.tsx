@@ -115,6 +115,11 @@ function AdminInner() {
     "--club-paper": bc.paper,
     "--club-accent": bc.accent,
     "--club-silver": bc.silver,
+    // Semantic aliases — how clubs think about their palette.
+    // Dookie: primary = turquoise (accent), secondary = black (ink), tertiary = white (paper).
+    "--club-primary": bc.accent,
+    "--club-secondary": bc.ink,
+    "--club-tertiary": bc.tertiary ?? bc.paper,
   } as CSSProperties;
 
   // "View site" must open the club's *public* site. On a platform host, the bare
@@ -328,7 +333,7 @@ function AdminInner() {
               <button data-active={active === "__teams_seasons"} onClick={() => setActive("__teams_seasons")}>
                 Teams &amp; seasons
               </button>
-              <button data-active={active === "__member_reports"} onClick={() => setActive("__member_reports")}>
+              <button data-active={active === "__reports_members"} onClick={() => setActive("__reports_members")}>
                 Member reports
               </button>
               </div>
@@ -537,7 +542,7 @@ function AdminInner() {
           <AdminPeople />
         ) : effectiveActive === "__teams_seasons" && can("club.users") ? (
           <TeamsSeasons />
-        ) : effectiveActive === "__member_reports" && can("club.users") ? (
+        ) : effectiveActive === "__reports_members" && can("club.users") ? (
           <Reports section="members" />
         ) : effectiveActive === "__comms" && can("club.comms") ? (
           <Communications />
