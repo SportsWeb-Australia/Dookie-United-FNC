@@ -12,6 +12,9 @@ import {
 
 type Phase = "idle" | "enrolling" | "codes";
 
+/** Group the setup key into 4-char blocks so it's easy to type by hand. */
+const formatSecret = (s: string) => s.replace(/(.{4})/g, "$1 ").trim();
+
 function QrView({ qr }: { qr: string }) {
   if (!qr) return null;
   if (qr.trim().startsWith("<svg")) {
@@ -47,7 +50,7 @@ function CodesView({ codes }: { codes: string[] }) {
   );
 }
 
-export function MfaSettings() {
+export function MfaSettings({ enforced = false }: { enforced?: boolean }) {
   const [status, setStatus] = useState<MfaStatus | null>(null);
   const [remaining, setRemaining] = useState(0);
   const [phase, setPhase] = useState<Phase>("idle");
@@ -56,6 +59,18 @@ export function MfaSettings() {
   const [codes, setCodes] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const copyKey = () => {
+    if (!enroll) return;
+    navigator.clipboard
+      ?.writeText(enroll.secret)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      })
+      .catch(() => undefined);
+  };
 
   async function refresh() {
     const s = await getMfaStatus();
@@ -179,26 +194,65 @@ export function MfaSettings() {
       {/* Enrolment in progress */}
       {phase === "enrolling" && enroll && (
         <div className="sw-mfa-panel">
-          <strong>1. Scan this with your authenticator app</strong>
-          <QrView qr={enroll.qrCode} />
-          {enroll.secret && (
-            <p className="sw-mfa-secret">
-              Can&apos;t scan? Enter this key manually: <code>{enroll.secret}</code>
-            </p>
-          )}
-          <strong>2. Enter the 6-digit code it shows</strong>
-          <div className="sw-mfa-verify">
-            <input
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              placeholder="123456"
-              value={code}
-              onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-            />
-            <button className="sw-btn" disabled={busy || code.length < 6} onClick={confirmSetup}>
-              {busy ? "Verifying…" : "Verify & turn on"}
-            </button>
+          <div className="sw-mfa-step">
+            <span className="sw-mfa-stepnum">1</span>
+            <div>
+              <strong>Open an authenticator app on your phone</strong>
+              <p className="sw-mem-muted">
+                Use Google Authenticator, Microsoft Authenticator, Authy or 1Password. Your phone
+                camera or a chat app <em>won&apos;t</em> work for this — it has to be an authenticator app.
+              </p>
+            </div>
           </div>
+
+          <div className="sw-mfa-step">
+            <span className="sw-mfa-stepnum">2</span>
+            <div className="sw-mfa-add">
+              <strong>Add SportsWeb One to it</strong>
+
+              {/* Easiest on a phone: one tap opens the authenticator pre-filled */}
+              <a className="sw-btn sw-mfa-open" href={enroll.uri}>
+                Open in my authenticator app
+              </a>
+              <p className="sw-mem-muted sw-mfa-or">
+                Nothing opened? Add it by hand — in your authenticator app choose
+                <strong> Add account → Enter a setup key</strong>, then paste this key:
+              </p>
+
+              <div className="sw-mfa-key">
+                <code>{formatSecret(enroll.secret)}</code>
+                <button className="sw-btn sw-btn--ghost sw-btn--sm" onClick={copyKey}>
+                  {copied ? "Copied ✓" : "Copy key"}
+                </button>
+              </div>
+
+              {/* QR is only useful from a *second* device, so it's tucked away */}
+              <details className="sw-mfa-qrwrap">
+                <summary>On a computer instead? Scan this QR with your phone</summary>
+                <QrView qr={enroll.qrCode} />
+              </details>
+            </div>
+          </div>
+
+          <div className="sw-mfa-step">
+            <span className="sw-mfa-stepnum">3</span>
+            <div className="sw-mfa-add">
+              <strong>Type the 6-digit code your app now shows</strong>
+              <div className="sw-mfa-verify">
+                <input
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  placeholder="123456"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                />
+                <button className="sw-btn" disabled={busy || code.length < 6} onClick={confirmSetup}>
+                  {busy ? "Verifying…" : "Verify & turn on"}
+                </button>
+              </div>
+            </div>
+          </div>
+
           <button className="sw-btn sw-btn--ghost sw-btn--sm" onClick={() => { setPhase("idle"); setEnroll(null); }}>
             Cancel
           </button>
@@ -215,10 +269,18 @@ export function MfaSettings() {
               <button className="sw-btn sw-btn--ghost" disabled={busy} onClick={regenerate}>
                 Regenerate backup codes
               </button>
-              <button className="sw-btn sw-btn--ghost sw-ts-del" disabled={busy} onClick={turnOff}>
-                Turn off 2FA
-              </button>
+              {!enforced && (
+                <button className="sw-btn sw-btn--ghost sw-ts-del" disabled={busy} onClick={turnOff}>
+                  Turn off 2FA
+                </button>
+              )}
             </div>
+            {enforced && (
+              <p className="sw-mem-muted">
+                Two-factor is required on admin accounts by your platform's security policy, so it
+                can't be switched off here.
+              </p>
+            )}
           </div>
         ) : (
           <div className="sw-mfa-off">
