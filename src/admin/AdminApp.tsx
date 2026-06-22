@@ -25,6 +25,7 @@ import { SuperClubs } from "./SuperClubs";
 import { AdminImport } from "./AdminImport";
 import { SuperIntegrations } from "./SuperIntegrations";
 import { SuperStudio } from "./SuperStudio";
+import { LaunchTracker } from "./LaunchTracker";
 import { Login } from "./Login";
 import { ZohoWorkspace, WS_ICON } from "./ZohoWorkspace";
 import { SportsWebAccount } from "./SportsWebAccount";
@@ -65,9 +66,19 @@ function AdminInner() {
   const toggleGroup = (k: string) => setOpenGroups((g) => ({ ...g, [k]: !g[k] }));
   const [persona, setPersona] = useState<string>("general");
   const hasClub = !!clubId;
-  // 2FA is required for accounts that can administer a club or the platform.
+  // Scoped launch operator: SportsWeb staff, not a platform admin, no club.
+  const [isOperator, setIsOperator] = useState(false);
+  useEffect(() => {
+    if (!userId || !supabase) { setIsOperator(false); return; }
+    let alive = true;
+    supabase.from("launch_operators").select("user_id").eq("user_id", userId).limit(1)
+      .then(({ data }) => { if (alive) setIsOperator(!!(data && data.length)); });
+    return () => { alive = false; };
+  }, [userId]);
+  // 2FA is required for accounts that can administer a club or the platform, and
+  // for launch operators (they reach club data through the launch system).
   const mfaRequired =
-    isPlatformAdmin || activeRole === "club_senior_admin" || activeRole === "club_admin";
+    isPlatformAdmin || isOperator || activeRole === "club_senior_admin" || activeRole === "club_admin";
 
   // Back always returns to the dashboard home.
   const goBack = () => setActive("__dashboard");
@@ -160,7 +171,7 @@ function AdminInner() {
   if (!email) return <Login />;
   if (resolving || !clubReady) return <div className="sw-admin-loading">Loading…</div>;
 
-  if (!hasClub && !isPlatformAdmin) {
+  if (!hasClub && !isPlatformAdmin && !isOperator) {
     return (
       <div className="sw-admin-login">
         <div className="sw-admin-login-card">
@@ -177,12 +188,15 @@ function AdminInner() {
 
   const resource = RESOURCES.find((r) => r.key === active) ?? RESOURCES[0];
   const isSuperView =
-    active === "__super_clubs" || active === "__super_integrations" || active === "__super_studio" || active === "__super_import";
+    active === "__super_clubs" || active === "__super_integrations" || active === "__super_studio" || active === "__super_import" || active === "__super_launches";
+  // A scoped launch operator only ever sees the Launches screen.
+  const operatorOnly = isOperator && !isPlatformAdmin && !hasClub;
   // A platform operator with no club of their own lands on the platform views.
-  const effectiveActive = !hasClub && !isSuperView ? "__super_clubs" : active;
-  // The dedicated operator console (platform admin, no club) wears SportsWeb colours;
-  // a club admin keeps their own club colours.
-  const operatorConsole = isPlatformAdmin && !hasClub;
+  const effectiveActive = operatorOnly
+    ? "__super_launches"
+    : !hasClub && !isSuperView ? "__super_clubs" : active;
+  // The SportsWeb-branded console: platform admins and launch operators with no club.
+  const operatorConsole = (isPlatformAdmin || isOperator) && !hasClub;
 
   return (
     <MfaGate required={mfaRequired} email={email} onSignOut={signOut}>
@@ -233,6 +247,11 @@ function AdminInner() {
           </div>
         </div>
         <nav className="sw-admin-nav">
+          {operatorOnly && (
+            <button data-active={effectiveActive === "__super_launches"} onClick={() => setActive("__super_launches")}>
+              Launches
+            </button>
+          )}
           {hasClub && (
             <button data-active={active === "__dashboard"} onClick={() => setActive("__dashboard")}>
               Dashboard
@@ -443,6 +462,11 @@ function AdminInner() {
                   Clubs &amp; modules
                 </button>
               )}
+              {can("platform.clubs") && (
+                <button data-active={active === "__super_launches"} onClick={() => setActive("__super_launches")}>
+                  Launches
+                </button>
+              )}
               {can("platform.integrations") && (
                 <button data-active={active === "__super_integrations"} onClick={() => setActive("__super_integrations")}>
                   Integrations
@@ -555,6 +579,8 @@ function AdminInner() {
           <Reports section="communications" />
         ) : effectiveActive === "__super_clubs" && can("platform.clubs") ? (
           <SuperClubs />
+        ) : effectiveActive === "__super_launches" && (can("platform.clubs") || isOperator) ? (
+          <LaunchTracker />
         ) : effectiveActive === "__super_integrations" && can("platform.integrations") ? (
           <SuperIntegrations />
         ) : effectiveActive === "__super_studio" && can("platform.clubs") ? (
