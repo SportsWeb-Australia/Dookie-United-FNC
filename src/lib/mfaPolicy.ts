@@ -13,4 +13,4 @@
  *   3. deployed the mfa-admin-reset / mfa-recovery Edge Functions
  *      (so a lost phone is a quick reset, not a lock-out).
  */
-export const MFA_ENFORCED = false;
+export const MFA_ENFORCED = true;
