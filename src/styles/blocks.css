@@ -1009,6 +1009,94 @@
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  z-index: 50;
+  width: 84vw;
+  max-width: 320px;
+  overflow-y: auto;
+  transform: translateX(-100%);
+  transition: transform 0.25s ease;
+}
+.sw-admin-side[data-open="true"] { transform: translateX(0); }
+
+/* Mobile top bar (hidden on desktop) */
+.sw-admin-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.9rem;
+  background: var(--bg-invert);
+  color: var(--text-invert);
+}
+.sw-admin-burger {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 40px;
+  height: 40px;
+  padding: 9px;
+  border-radius: 9px;
+  background: color-mix(in srgb, var(--text-invert) 14%, transparent);
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+.sw-admin-burger span {
+  display: block;
+  height: 2px;
+  background: var(--text-invert);
+  border-radius: 2px;
+}
+.sw-admin-topbar-title {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+}
+.sw-admin-topbar-logo {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  object-fit: contain;
+  background: #fff;
+  padding: 2px;
+  flex: 0 0 auto;
+}
+.sw-admin-topbar-title strong {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  font-size: 1.02rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sw-admin-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.sw-admin-backdrop[data-open="true"] {
+  opacity: 1;
+  pointer-events: auto;
+}
+.sw-admin-drawerclose {
+  align-self: flex-end;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  color: var(--text-invert);
+  background: color-mix(in srgb, var(--text-invert) 12%, transparent);
+  font-size: 1rem;
+  cursor: pointer;
+  margin: -0.25rem -0.25rem -0.5rem 0;
 }
 .sw-admin-brand { display: flex; flex-direction: column; }
 .sw-admin-brand strong { font-family: var(--font-display); text-transform: uppercase; font-size: 1.2rem; }
@@ -1074,6 +1162,17 @@
 @media (min-width: 800px) {
   .sw-admin { grid-template-columns: 240px 1fr; }
   .sw-admin-main { padding: 2.5rem; }
+  .sw-admin-topbar { display: none; }
+  .sw-admin-backdrop { display: none; }
+  .sw-admin-drawerclose { display: none; }
+  .sw-admin-side {
+    position: static;
+    transform: none;
+    width: auto;
+    max-width: none;
+    z-index: auto;
+    overflow-y: visible;
+  }
 }
 
 /* ============================================================

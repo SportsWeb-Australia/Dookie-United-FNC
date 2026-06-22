@@ -56,14 +56,16 @@ function AdminInner() {
   const [webOpen, setWebOpen] = useState(true);
   const [officeOpen, setOfficeOpen] = useState(false);
   const [modulesOpen, setModulesOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false); // mobile drawer
   const [persona, setPersona] = useState<string>("general");
   const hasClub = !!clubId;
 
   // Back always returns to the dashboard home.
   const goBack = () => setActive("__dashboard");
 
-  // Whenever the screen changes, jump the content back to the top.
+  // Whenever the screen changes, close the mobile menu and jump content to top.
   useEffect(() => {
+    setNavOpen(false);
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     const main = document.querySelector(".sw-admin-main");
     if (main) main.scrollTop = 0;
@@ -170,7 +172,36 @@ function AdminInner() {
 
   return (
     <div className={`sw-admin${operatorConsole ? " sw-brandwrap" : ""}`} style={operatorConsole ? undefined : brandStyle}>
-      <aside className="sw-admin-side">
+      <header className="sw-admin-topbar">
+        <button
+          className="sw-admin-burger"
+          onClick={() => setNavOpen(true)}
+          aria-label="Open menu"
+          aria-expanded={navOpen}
+        >
+          <span /><span /><span />
+        </button>
+        <div className="sw-admin-topbar-title">
+          {hasClub && club.identity.logo && (
+            <img className="sw-admin-topbar-logo" src={club.identity.logo} alt="" />
+          )}
+          <strong>{hasClub ? clubName : "SportsWeb"}</strong>
+        </div>
+      </header>
+      <div
+        className="sw-admin-backdrop"
+        data-open={navOpen}
+        onClick={() => setNavOpen(false)}
+        aria-hidden="true"
+      />
+      <aside className="sw-admin-side" data-open={navOpen}>
+        <button
+          className="sw-admin-drawerclose"
+          onClick={() => setNavOpen(false)}
+          aria-label="Close menu"
+        >
+          ✕
+        </button>
         <div
           className={`sw-admin-brand${hasClub ? " sw-admin-brand--link" : ""}`}
           onClick={hasClub ? () => setActive("__dashboard") : undefined}
