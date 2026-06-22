@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useRef, useState, type ReactNode } from "react";
 import { supabase } from "./supabase";
 import type { PlatformRole } from "./roles";
 
@@ -94,6 +94,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userId, setUserId] = useState<string | null>(null);
   const [membership, setMembership] = useState<ClubMembership | null>(null);
   const [platformRole, setPlatformRole] = useState<PlatformRole | null>(null);
+  // The user id we've already resolved membership/role for. Token refreshes fire
+  // on every tab refocus; without this guard we'd re-resolve and flip `resolving`
+  // each time, which unmounts the open admin screen (see AdminApp's loading gate)
+  // and wipes any in-progress form input. We only re-resolve when the signed-in
+  // user actually changes.
+  const resolvedFor = useRef<string | null>(null);
 
   useEffect(() => {
     if (!supabase) {
@@ -105,6 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setEmail(user?.email ?? null);
       setUserId(user?.id ?? null);
       if (user) {
+        resolvedFor.current = user.id;
         setResolving(true);
         const [m, pr] = await Promise.all([resolveMembershipWithClaim(user.id), resolvePlatformRole()]);
         setMembership(m);
@@ -114,19 +121,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setReady(true);
     });
     const { data: sub } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      const user = session?.user;
-      setEmail(user?.email ?? null);
-      setUserId(user?.id ?? null);
-      if (user) {
-        setResolving(true);
-        const [m, pr] = await Promise.all([resolveMembershipWithClaim(user.id), resolvePlatformRole()]);
-        setMembership(m);
-        setPlatformRole(pr);
-        setResolving(false);
-      } else {
+      const user = session?.user ?? null;
+      const nextEmail = user?.email ?? null;
+      const nextId = user?.id ?? null;
+      // Avoid setting identical values (prevents needless re-renders on refresh).
+      setEmail((prev) => (prev === nextEmail ? prev : nextEmail));
+      setUserId((prev) => (prev === nextId ? prev : nextId));
+      if (!user) {
+        resolvedFor.current = null;
         setMembership(null);
         setPlatformRole(null);
+        return;
       }
+      // Same signed-in user as we've already resolved (e.g. a token refresh when
+      // the tab regains focus): nothing identity-level changed, so don't touch
+      // `resolving`/`membership`. Doing so would remount the open screen and lose
+      // unsaved form input. Only genuine user changes fall through to re-resolve.
+      if (resolvedFor.current === user.id) return;
+      resolvedFor.current = user.id;
+      setResolving(true);
+      const [m, pr] = await Promise.all([resolveMembershipWithClaim(user.id), resolvePlatformRole()]);
+      setMembership(m);
+      setPlatformRole(pr);
+      setResolving(false);
     });
     return () => sub.subscription.unsubscribe();
   }, []);
