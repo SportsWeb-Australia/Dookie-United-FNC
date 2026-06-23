@@ -4290,3 +4290,13 @@
   font-weight: 500;
 }
 .sw-crop-warn-cta a { font-weight: 700; white-space: nowrap; }
+
+/* Admin chrome stays SportsWeb-neutral — club colours belong on the live site,
+   not the admin. Pin the accent tokens to SportsWeb blue inside .sw-admin so the
+   nav highlight, buttons and accents never repaint to the club's/style's colour. */
+.sw-admin {
+  --accent: #2563eb;
+  --accent-deep: #1d4ed8;
+  --accent-soft: #e8eefc;
+  --accent-on-bg: #2563eb;
+}

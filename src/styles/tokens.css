@@ -773,3 +773,20 @@
   --radius: 16px;
   --radius-lg: 30px;
 }
+
+/* ==========================================================================
+   CLUB BRAND COLOURS ALWAYS WIN
+   A club's colours are the core of its brand, so the brand accent must show on
+   every template — not the template's demo accent. The sport templates above
+   hardcode their own --accent on purpose; this rule re-asserts the club's
+   accent across ALL variants (equal specificity, later in source = wins).
+   Templates still own layout, typography and structural mood (backgrounds,
+   hero panels); only the brand accent follows the club. --accent-soft mixes
+   into the template's own --bg so it stays readable on both light and dark.
+   ========================================================================== */
+[data-variant] {
+  --accent: var(--club-accent);
+  --accent-deep: color-mix(in srgb, var(--club-accent) 72%, #000000);
+  --accent-soft: color-mix(in srgb, var(--club-accent) 14%, var(--bg, #ffffff));
+  --accent-on-bg: var(--club-accent);
+}

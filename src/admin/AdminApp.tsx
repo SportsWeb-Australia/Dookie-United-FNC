@@ -543,7 +543,9 @@ function AdminInner() {
                   Clubs &amp; modules
                 </button>
               )}
-              {can("platform.clubs") && (
+              {/* Launches hidden from the nav (Carson's call) — internal go-live tracker,
+                  kept for when club launches are handed to an operator. Flip `false` to restore. */}
+              {false && can("platform.clubs") && (
                 <button data-active={active === "__super_launches"} onClick={() => setActive("__super_launches")}>
                   Launches
                 </button>

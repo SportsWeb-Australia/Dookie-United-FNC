@@ -8,6 +8,11 @@ import { uploadToStorage } from "../lib/upload";
  * - Crops client-side to a canvas, then uploads the result to the club's
  *   Supabase Storage bucket and returns the public URL.
  */
+// Image-quality coaching links. NOTE: placeholder URLs — Carson to confirm the
+// real "why image quality matters" explainer + the Click Sports Media booking page.
+const IMG_HELP_URL = "https://www.sportsweb.com.au/help/photo-quality";
+const IMG_BOOK_URL = "https://www.clicksportsmedia.com.au/book";
+
 export function ImageField({
   label,
   hint,
@@ -68,6 +73,10 @@ export function ImageField({
         </div>
         <div className="sw-imgfield-meta">
           {hint && <p className="sw-imgfield-hint">{hint}</p>}
+          <p className="sw-imgfield-coach">
+            Use the largest, sharpest photo you have — low-resolution images look blurry on big screens.{" "}
+            <a href={IMG_HELP_URL} target="_blank" rel="noreferrer">Why it matters</a>
+          </p>
           <button type="button" className="sw-btn sw-btn--ghost sw-btn--sm" onClick={() => inputRef.current?.click()} disabled={busy}>
             {busy ? "Uploading…" : value ? "Replace image" : "Upload image"}
           </button>
@@ -229,9 +238,13 @@ function CropModal({
           aria-label="Zoom"
         />
         {lowRes && (
-          <p className="sw-crop-warn">
-            Heads up: this image is smaller than the recommended size, so it may look a little soft. A larger photo will look sharper.
-          </p>
+          <div className="sw-crop-warn">
+            <p>Heads up: this image is smaller than the recommended size, so it may look a little soft. A larger photo will look sharper.</p>
+            <p className="sw-crop-warn-cta">
+              Want crisp, professional shots? SportsWeb's photography team can run a club action or media day.{" "}
+              <a href={IMG_BOOK_URL} target="_blank" rel="noreferrer">Book a Click Sports Media day →</a>
+            </p>
+          </div>
         )}
         <div className="sw-crop-actions">
           <button type="button" className="sw-btn sw-btn--ghost" onClick={onCancel}>
