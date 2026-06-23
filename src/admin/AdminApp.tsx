@@ -29,6 +29,7 @@ import { SuperStudio } from "./SuperStudio";
 import { LaunchTracker } from "./LaunchTracker";
 import { AddPerson } from "./AddPerson";
 import { StaffAccess } from "./StaffAccess";
+import { PlatformDashboard } from "./PlatformDashboard";
 import { Login } from "./Login";
 import { ZohoWorkspace, WS_ICON } from "./ZohoWorkspace";
 import { SportsWebAccount } from "./SportsWebAccount";
@@ -211,13 +212,13 @@ function AdminInner() {
 
   const resource = RESOURCES.find((r) => r.key === active) ?? RESOURCES[0];
   const isSuperView =
-    active === "__super_clubs" || active === "__super_integrations" || active === "__super_studio" || active === "__super_import" || active === "__super_launches" || active === "__super_team" || active === "__staff";
+    active === "__biz" || active === "__super_clubs" || active === "__super_integrations" || active === "__super_studio" || active === "__super_import" || active === "__super_launches" || active === "__super_team" || active === "__staff";
   // A scoped launch operator only ever sees the Launches screen.
   const operatorOnly = isOperator && !isPlatformAdmin && !hasClub;
   // A platform operator with no club of their own lands on the platform views.
   const effectiveActive = operatorOnly
     ? "__super_launches"
-    : !hasClub && !isSuperView ? "__super_clubs" : active;
+    : !hasClub && !isSuperView ? "__biz" : active;
   // The SportsWeb-branded console: platform admins and launch operators with no club.
   const operatorConsole = (isPlatformAdmin || isOperator) && !hasClub;
 
@@ -261,9 +262,11 @@ function AdminInner() {
           tabIndex={hasClub ? 0 : undefined}
           title={hasClub ? "Back to dashboard" : undefined}
         >
-          {hasClub && club.identity.logo && (
+          {hasClub && club.identity.logo ? (
             <img className="sw-admin-brandlogo" src={club.identity.logo} alt={`${clubName} logo`} />
-          )}
+          ) : !hasClub ? (
+            <img className="sw-admin-brandlogo" src="/sw1-icon-512.png" alt="SportsWeb One" />
+          ) : null}
           <div className="sw-admin-brandtext">
             <strong>{hasClub ? "Club Admin" : "Platform Admin"}</strong>
             <span>{hasClub ? clubName : "SportsWeb"}</span>
@@ -481,10 +484,15 @@ function AdminInner() {
           {(can("platform.clubs") || can("platform.integrations")) && (
             <>
               <button type="button" className="sw-admin-navgroup" data-open={groupOpen("platform")} onClick={() => toggleGroup("platform")}>
-                <span>Platform · SportsWeb</span>
+                <span>SportsWeb Workspace</span>
                 <span className="sw-admin-groupcaret">{groupOpen("platform") ? "▾" : "▸"}</span>
               </button>
               <div className="sw-admin-groupitems" data-open={groupOpen("platform")}>
+              {can("platform.clubs") && (
+                <button data-active={active === "__biz"} onClick={() => setActive("__biz")}>
+                  Dashboard
+                </button>
+              )}
               {can("platform.clubs") && (
                 <button data-active={active === "__super_clubs"} onClick={() => setActive("__super_clubs")}>
                   Clubs &amp; modules
@@ -496,13 +504,18 @@ function AdminInner() {
                 </button>
               )}
               {can("platform.clubs") && (
-                <button data-active={active === "__super_team"} onClick={() => setActive("__super_team")}>
-                  Add a person
+                <button data-active={active === "__staff"} onClick={() => setActive("__staff")}>
+                  Staff &amp; access
                 </button>
               )}
               {can("platform.clubs") && (
-                <button data-active={active === "__staff"} onClick={() => setActive("__staff")}>
-                  Staff &amp; access
+                <button
+                  className="sw-admin-subnav"
+                  style={{ paddingLeft: "2.1rem", fontSize: "0.94em" }}
+                  data-active={active === "__super_team"}
+                  onClick={() => setActive("__super_team")}
+                >
+                  Add a person
                 </button>
               )}
               {can("platform.integrations") && (
@@ -621,6 +634,8 @@ function AdminInner() {
           <Communications />
         ) : effectiveActive === "__comms_reports" && can("club.comms") ? (
           <Reports section="communications" />
+        ) : effectiveActive === "__biz" && can("platform.clubs") ? (
+          <PlatformDashboard go={setActive} />
         ) : effectiveActive === "__super_clubs" && can("platform.clubs") ? (
           <SuperClubs />
         ) : effectiveActive === "__super_launches" && (can("platform.clubs") || isOperator) ? (
