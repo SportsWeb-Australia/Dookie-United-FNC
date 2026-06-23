@@ -635,7 +635,7 @@ function AdminInner() {
         ) : effectiveActive === "__comms_reports" && can("club.comms") ? (
           <Reports section="communications" />
         ) : effectiveActive === "__biz" && can("platform.clubs") ? (
-          <PlatformDashboard go={setActive} />
+          <PlatformDashboard go={setActive} platformRole={platformRole} />
         ) : effectiveActive === "__super_clubs" && can("platform.clubs") ? (
           <SuperClubs />
         ) : effectiveActive === "__super_launches" && (can("platform.clubs") || isOperator) ? (

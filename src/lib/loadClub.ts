@@ -412,6 +412,28 @@ async function buildClubConfig(clubRow: Record<string, any>): Promise<ClubConfig
       if (map["contact.instagram"]) cfg.contact = { ...cfg.contact, instagram: map["contact.instagram"] };
       if (map["contact.facebook"]) cfg.contact = { ...cfg.contact, facebook: map["contact.facebook"] };
       if (map["contact.address"]) cfg.contact = { ...cfg.contact, addressLine: map["contact.address"] };
+      // Saved homepage hero copy (text) — neutralised above for new clubs, so
+      // re-apply whatever the club has edited. Without this, saved text vanishes
+      // on the next load.
+      if (map["hero.title"]) cfg.hero = { ...cfg.hero, title: map["hero.title"] };
+      if (map["hero.eyebrow"] != null) cfg.hero = { ...cfg.hero, eyebrow: map["hero.eyebrow"] };
+      if (map["hero.subtitle"] != null) cfg.hero = { ...cfg.hero, subtitle: map["hero.subtitle"] };
+      // President welcome.
+      if (map["president.name"] != null) cfg.president = { ...cfg.president, name: map["president.name"] };
+      if (map["president.role"] != null) cfg.president = { ...cfg.president, role: map["president.role"] };
+      if (map["president.body.0"] != null)
+        cfg.president = { ...cfg.president, body: map["president.body.0"] ? [map["president.body.0"]] : [] };
+      if (map["president.signoff"] != null) cfg.president = { ...cfg.president, signoff: map["president.signoff"] };
+      if (map["president.portrait"]) cfg.president = { ...cfg.president, portrait: map["president.portrait"] };
+      // Join section.
+      if (map["join.heading"] != null) cfg.join = { ...cfg.join, heading: map["join.heading"] };
+      if (map["join.blurb"] != null) cfg.join = { ...cfg.join, blurb: map["join.blurb"] };
+      // About body.
+      if (map["about.body.0"] != null)
+        cfg.about = { ...cfg.about, body: map["about.body.0"] ? [map["about.body.0"]] : [] };
+      // Footer acknowledgement.
+      if (map["footer.acknowledgement"] != null)
+        cfg.footer = { ...cfg.footer, acknowledgement: map["footer.acknowledgement"] };
     }
 
     return cfg;

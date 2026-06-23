@@ -4,6 +4,7 @@ import { useActiveClub } from "./ActiveClub";
 import { supabase, isPlatformHost } from "../lib/supabase";
 import { ImageField } from "./ImageCropper";
 import { SectionHelp } from "./SectionHelp";
+import { HelpDot } from "./HelpDot";
 
 /**
  * A titled, collapsible editor card. Title is prominent; an optional subtitle
@@ -172,11 +173,16 @@ export function AdminSiteEditor({ page = "all" }: { page?: SitePage }) {
 
       {headingKey && (
         <EdCard title={`${PAGE_LABELS[page] ?? "Page"} heading`} subtitle="The banner at the top of this page. Leave a field blank to use the built-in default." defaultOpen>
-          <label className="sw-ed-l">Eyebrow (small line above the title)</label>
+          <label className="sw-ed-l">
+            Eyebrow (small line above the title)
+            <HelpDot example="“Est. 1952 · Melbourne's East”, or a netball club might use “Winter & summer comps”.">
+              A short line that sits <em>above</em> your main heading — a label or tagline, just a few words. Clubs often use their founding year, location, or what they offer.
+            </HelpDot>
+          </label>
           <input className="sw-input" value={heading.eyebrow} onChange={(e) => setHeading({ ...heading, eyebrow: e.target.value })} />
           <label className="sw-ed-l">Title</label>
           <input className="sw-input" value={heading.title} onChange={(e) => setHeading({ ...heading, title: e.target.value })} />
-          <label className="sw-ed-l">Intro</label>
+          <label className="sw-ed-l">Intro <HelpDot example="On a Teams page: “Find your team, fixtures and results for the season.”">A sentence under the page's heading that sets the scene. Optional — leave blank to skip it.</HelpDot></label>
           <textarea className="sw-input" rows={3} value={heading.intro} onChange={(e) => setHeading({ ...heading, intro: e.target.value })} />
           <div className="sw-ed-foot">
             <button
@@ -230,11 +236,16 @@ export function AdminSiteEditor({ page = "all" }: { page?: SitePage }) {
 
       {show("home") && (
         <EdCard title="Homepage hero" subtitle="The big banner at the very top of your homepage" defaultOpen>
-        <label className="sw-ed-l">Eyebrow (small line above the title)</label>
+        <label className="sw-ed-l">
+          Eyebrow (small line above the title)
+          <HelpDot example="“Est. 1952 · Melbourne's East”, or a netball club might use “Winter & summer comps”.">
+            A short line that sits <em>above</em> your main heading — a label or tagline, just a few words. Clubs often use their founding year, location, or what they offer.
+          </HelpDot>
+        </label>
         <input className="sw-input" value={hero.eyebrow} onChange={(e) => setHero({ ...hero, eyebrow: e.target.value })} />
         <label className="sw-ed-l">Title</label>
         <input className="sw-input" value={hero.title} onChange={(e) => setHero({ ...hero, title: e.target.value })} />
-        <label className="sw-ed-l">Subtitle</label>
+        <label className="sw-ed-l">Subtitle <HelpDot example="“Junior &amp; senior lacrosse in Melbourne's east.”">The line under your big hero title — a short tagline or what your club is about.</HelpDot></label>
         <textarea className="sw-input" rows={2} value={hero.subtitle} onChange={(e) => setHero({ ...hero, subtitle: e.target.value })} />
         <ImageField
           label="Hero image"
@@ -249,7 +260,7 @@ export function AdminSiteEditor({ page = "all" }: { page?: SitePage }) {
             await saveContent("hero", { "hero.image": url });
           }}
         />
-        <label className="sw-ed-l">Hero video link (optional — YouTube, Vimeo or MP4 URL)</label>
+        <label className="sw-ed-l">Hero video link (optional — YouTube, Vimeo or MP4 URL) <HelpDot>When set, a muted video loops behind your hero instead of the image. Leave blank to use the image.</HelpDot></label>
         <input
           className="sw-input"
           placeholder="https://…"
@@ -291,11 +302,11 @@ export function AdminSiteEditor({ page = "all" }: { page?: SitePage }) {
             <input className="sw-input" value={pres.name} onChange={(e) => setPres({ ...pres, name: e.target.value })} />
           </div>
           <div>
-            <label className="sw-ed-l">Role</label>
+            <label className="sw-ed-l">Role <HelpDot example="“President”, or “Club President 2026”.">The person's title — not their name.</HelpDot></label>
             <input className="sw-input" value={pres.role} onChange={(e) => setPres({ ...pres, role: e.target.value })} />
           </div>
         </div>
-        <label className="sw-ed-l">Welcome message</label>
+        <label className="sw-ed-l">Welcome message <HelpDot example="“Welcome to our club. Whether you're new or returning, we're glad to have you with us this season…”">A short, warm hello from your president — two or three sentences is plenty.</HelpDot></label>
         <textarea className="sw-input" rows={4} value={pres.body} onChange={(e) => setPres({ ...pres, body: e.target.value })} />
         <label className="sw-ed-l">Sign-off (optional)</label>
         <input className="sw-input" value={pres.signoff} onChange={(e) => setPres({ ...pres, signoff: e.target.value })} />
@@ -325,7 +336,7 @@ export function AdminSiteEditor({ page = "all" }: { page?: SitePage }) {
         <EdCard title="Join / membership call-to-action" subtitle="The prompt that invites people to join your club">
         <label className="sw-ed-l">Heading</label>
         <input className="sw-input" value={join.heading} onChange={(e) => setJoin({ ...join, heading: e.target.value })} />
-        <label className="sw-ed-l">Blurb</label>
+        <label className="sw-ed-l">Blurb <HelpDot example="“New players welcome at every level — registrations are open now.”">One or two lines inviting people to get involved — players, volunteers or members.</HelpDot></label>
         <textarea className="sw-input" rows={2} value={join.blurb} onChange={(e) => setJoin({ ...join, blurb: e.target.value })} />
         <div className="sw-ed-foot">
           <button className="sw-btn" onClick={() => saveContent("join", { "join.heading": join.heading, "join.blurb": join.blurb })}>
@@ -364,7 +375,7 @@ export function AdminSiteEditor({ page = "all" }: { page?: SitePage }) {
 
       {show("footer") && (
         <EdCard title="Footer" subtitle="Acknowledgement of Country and footer logos or flags">
-        <label className="sw-ed-l">Acknowledgement of Country</label>
+        <label className="sw-ed-l">Acknowledgement of Country <HelpDot example="“We acknowledge the Traditional Custodians of the land on which we play, and pay our respects to Elders past and present.”">A short statement recognising the Traditional Owners of the land your club is on. Many clubs use their league's or council's wording.</HelpDot></label>
         <textarea className="sw-input" rows={3} value={footer.acknowledgement} onChange={(e) => setFooter({ acknowledgement: e.target.value })} />
         <div className="sw-ed-foot">
           <button className="sw-btn" onClick={() => saveContent("footer", { "footer.acknowledgement": footer.acknowledgement })}>
