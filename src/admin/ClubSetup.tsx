@@ -2,13 +2,15 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "../lib/supabase";
 
 /**
- * ClubSetup — the club-facing "Getting started" checklist.
+ * ClubSetup — the club-facing "Get started" checklist, Shopify-style.
  *
- * Runs on the shared launch engine (launch_step_catalog / launch_step_progress)
- * filtered to audience='club'. Ensures the club has a launch (start_club_launch,
- * idempotent — also back-fills any newly added steps), shows a progress bar and
- * an ordered list of steps, deep-links each step to the right admin screen via
- * `onGo`, and lets the user tick steps done.
+ * Steps tick THEMSELVES from real data (club_setup_status RPC): add a logo and
+ * the branding step goes green on your next visit — no manual ticking needed.
+ * The first unfinished step opens automatically; finished steps collapse. A
+ * manual override stays available for anything detection can't see.
+ *
+ * Engine: shared launch_step_catalog / launch_step_progress (audience='club')
+ * for the step list + manual overrides; club_setup_status for auto-detection.
  *
  * Props:
  *   clubId   — the active club.
@@ -41,16 +43,16 @@ export function ClubSetup({
   const [launchId, setLaunchId] = useState<string | null>(null);
   const [steps, setSteps] = useState<CatalogStep[]>([]);
   const [status, setStatus] = useState<Record<string, StepStatus>>({});
+  const [auto, setAuto] = useState<Record<string, boolean>>({});
   const [busy, setBusy] = useState<string | null>(null);
+  const [openKey, setOpenKey] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
       // 1) Ensure a launch exists (idempotent; back-fills new steps).
-      const { data: lid, error: lerr } = await supabase.rpc("start_club_launch", {
-        p_club_id: clubId,
-      });
+      const { data: lid, error: lerr } = await supabase.rpc("start_club_launch", { p_club_id: clubId });
       if (lerr) throw lerr;
       const launch = lid as string;
       setLaunchId(launch);
@@ -63,9 +65,10 @@ export function ClubSetup({
         .in("audience", ["club", "both"])
         .order("sort");
       if (cerr) throw cerr;
-      setSteps((cat ?? []) as CatalogStep[]);
+      const catalog = (cat ?? []) as CatalogStep[];
+      setSteps(catalog);
 
-      // 3) Progress for this launch.
+      // 3) Manual overrides for this launch.
       const { data: prog, error: perr } = await supabase
         .from("launch_step_progress")
         .select("step_key,status")
@@ -74,6 +77,20 @@ export function ClubSetup({
       const map: Record<string, StepStatus> = {};
       for (const r of prog ?? []) map[r.step_key as string] = r.status as StepStatus;
       setStatus(map);
+
+      // 4) Auto-detection — best effort; never blocks the checklist.
+      let autoMap: Record<string, boolean> = {};
+      try {
+        const { data: a } = await supabase.rpc("club_setup_status", { p_club_id: clubId });
+        if (a && typeof a === "object") autoMap = a as Record<string, boolean>;
+      } catch {
+        /* detection is optional — run club-setup-status.sql to enable it */
+      }
+      setAuto(autoMap);
+
+      // 5) Auto-advance: open the first step that isn't done yet.
+      const firstOpen = catalog.find((s) => !(autoMap[s.step_key] || map[s.step_key] === "done"));
+      setOpenKey(firstOpen ? firstOpen.step_key : null);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Couldn't load the setup checklist.");
     } finally {
@@ -84,6 +101,8 @@ export function ClubSetup({
   useEffect(() => {
     if (clubId) load();
   }, [clubId, load]);
+
+  const isDone = (key: string) => auto[key] || status[key] === "done";
 
   async function toggle(stepKey: string) {
     if (!launchId) return;
@@ -104,13 +123,13 @@ export function ClubSetup({
   }
 
   const total = steps.length;
-  const done = steps.filter((s) => status[s.step_key] === "done").length;
+  const done = steps.filter((s) => isDone(s.step_key)).length;
   const pct = total ? Math.round((done / total) * 100) : 0;
 
   if (loading) {
     return (
       <div className="sw-admin-screen">
-        <h2 className="sw-admin-title">Getting started</h2>
+        <h2 className="sw-admin-title">Get started</h2>
         <p>Loading your setup checklist…</p>
       </div>
     );
@@ -118,10 +137,10 @@ export function ClubSetup({
 
   return (
     <div className="sw-admin-screen">
-      <h2 className="sw-admin-title">Getting started</h2>
+      <h2 className="sw-admin-title">Get started</h2>
       <p style={{ color: "#5b6573", marginTop: -4 }}>
-        {clubName ? `${clubName} — ` : ""}work through these to get the club ready. You can do them in any order;
-        each opens the right screen. DNS &amp; go-live are handled by SportsWeb.
+        {clubName ? `${clubName} — ` : ""}work through these to get your club ready. Steps tick themselves as you go,
+        and the next one opens automatically. DNS &amp; go-live are handled by SportsWeb.
       </p>
 
       {error && (
@@ -129,7 +148,8 @@ export function ClubSetup({
           {error}
           {steps.length === 0 && (
             <div style={{ marginTop: 6, fontSize: 13 }}>
-              If this is the first run, make sure <code>club-setup-steps.sql</code> has been run in Supabase.
+              If this is the first run, make sure <code>club-setup-steps.sql</code> and{" "}
+              <code>club-setup-status.sql</code> have been run in Supabase.
             </div>
           )}
         </div>
@@ -158,77 +178,119 @@ export function ClubSetup({
         )}
       </div>
 
-      {/* Steps */}
+      {/* Steps — accordion, one open at a time, auto-advancing */}
       <ol style={{ listStyle: "none", padding: 0, margin: 0, display: "grid", gap: 10 }}>
         {steps.map((s, i) => {
-          const isDone = status[s.step_key] === "done";
+          const stepDone = isDone(s.step_key);
+          const open = openKey === s.step_key;
+          const autoDone = !!auto[s.step_key];
           return (
             <li
               key={s.step_key}
               style={{
                 border: "1px solid #e7e9ee",
                 borderRadius: 12,
-                padding: "14px 16px",
-                background: isDone ? "#f4faf6" : "#fff",
-                display: "flex",
-                gap: 14,
-                alignItems: "flex-start",
+                background: stepDone ? "#f4faf6" : "#fff",
+                overflow: "hidden",
               }}
             >
+              {/* Header — click to expand / collapse */}
               <button
-                onClick={() => toggle(s.step_key)}
-                disabled={busy === s.step_key}
-                aria-label={isDone ? "Mark not done" : "Mark done"}
+                onClick={() => setOpenKey(open ? null : s.step_key)}
                 style={{
-                  flex: "0 0 auto",
-                  width: 26,
-                  height: 26,
-                  borderRadius: 999,
-                  border: isDone ? "none" : "2px solid #c2c8d2",
-                  background: isDone ? "#1f9d57" : "#fff",
-                  color: "#fff",
+                  width: "100%",
+                  display: "flex",
+                  gap: 14,
+                  alignItems: "center",
+                  padding: "14px 16px",
+                  background: "transparent",
+                  border: "none",
                   cursor: "pointer",
-                  fontSize: 15,
-                  lineHeight: "22px",
-                  marginTop: 2,
+                  textAlign: "left",
                 }}
               >
-                {isDone ? "✓" : ""}
+                <span
+                  aria-hidden
+                  style={{
+                    flex: "0 0 auto",
+                    width: 26,
+                    height: 26,
+                    borderRadius: 999,
+                    border: stepDone ? "none" : "2px solid #c2c8d2",
+                    background: stepDone ? "#1f9d57" : "#fff",
+                    color: "#fff",
+                    fontSize: 15,
+                    lineHeight: "26px",
+                    textAlign: "center",
+                  }}
+                >
+                  {stepDone ? "✓" : ""}
+                </span>
+                <span
+                  style={{
+                    flex: 1,
+                    minWidth: 0,
+                    fontWeight: 700,
+                    color: stepDone ? "#5b6573" : "#11161f",
+                    textDecoration: stepDone ? "line-through" : "none",
+                  }}
+                >
+                  {i + 1}. {s.title}
+                </span>
+                {s.expected_label && !stepDone && (
+                  <span style={{ fontSize: 12, color: "#7b8494", background: "#f1f3f6", padding: "2px 8px", borderRadius: 999 }}>
+                    {s.expected_label}
+                  </span>
+                )}
+                <span style={{ flex: "0 0 auto", color: "#9aa3b2", transform: open ? "rotate(90deg)" : "none", transition: "transform .15s" }}>
+                  ›
+                </span>
               </button>
 
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: "flex", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
-                  <span style={{ fontWeight: 700, textDecoration: isDone ? "line-through" : "none", color: isDone ? "#5b6573" : "#11161f" }}>
-                    {i + 1}. {s.title}
-                  </span>
-                  {s.expected_label && (
-                    <span style={{ fontSize: 12, color: "#7b8494", background: "#f1f3f6", padding: "2px 8px", borderRadius: 999 }}>
-                      {s.expected_label}
-                    </span>
-                  )}
+              {/* Body */}
+              {open && (
+                <div style={{ padding: "0 16px 16px 56px" }}>
+                  {s.help_md && <p style={{ margin: "0 0 10px", fontSize: 13.5, color: "#5b6573" }}>{s.help_md}</p>}
+                  <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+                    {s.cta_route && (
+                      <button
+                        onClick={() => onGo(s.cta_route!)}
+                        style={{
+                          border: "none",
+                          color: "#fff",
+                          background: "var(--club-accent, #2F6BFF)",
+                          borderRadius: 8,
+                          padding: "8px 14px",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          fontSize: 13.5,
+                        }}
+                      >
+                        {stepDone ? "Open again" : "Go there"} →
+                      </button>
+                    )}
+                    {autoDone ? (
+                      <span style={{ fontSize: 12.5, color: "#1f9d57" }}>✓ Detected automatically</span>
+                    ) : (
+                      <button
+                        onClick={() => toggle(s.step_key)}
+                        disabled={busy === s.step_key}
+                        style={{
+                          border: "none",
+                          background: "transparent",
+                          color: "#7b8494",
+                          cursor: "pointer",
+                          fontSize: 12.5,
+                          textDecoration: "underline",
+                          padding: 0,
+                        }}
+                      >
+                        {status[s.step_key] === "done" ? "Mark as not done" : "Mark as done"}
+                      </button>
+                    )}
+                  </div>
                 </div>
-                {s.help_md && (
-                  <p style={{ margin: "6px 0 0", fontSize: 13.5, color: "#5b6573" }}>{s.help_md}</p>
-                )}
-                {s.cta_route && (
-                  <button
-                    onClick={() => onGo(s.cta_route!)}
-                    style={{
-                      marginTop: 10,
-                      border: "1px solid var(--club-accent, #2F6BFF)",
-                      color: "var(--club-accent, #2F6BFF)",
-                      background: "transparent",
-                      borderRadius: 8,
-                      padding: "6px 12px",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                      fontSize: 13.5,
-                    }}
-                  >
-                    {isDone ? "Open again" : "Go there"} →
-                  </button>
-                )}
-              </div>
+              )}
             </li>
           );
         })}

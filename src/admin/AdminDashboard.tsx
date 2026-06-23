@@ -1,5 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useClub } from "../components/ClubContext";
+import { SetupCard } from "./SetupCard";
 import { useActiveClub } from "./ActiveClub";
 import { useAuth } from "../lib/auth";
 import { usePermissions, toModelRole } from "../lib/permissions";
@@ -130,7 +131,19 @@ const personaLabel = (p: Persona) => PERSONA_TABS.find((t) => t.key === p)?.labe
  * Admin landing dashboard — a personalised, role-aware snapshot of the club
  * with quick shortcuts to the jobs people do most.
  */
-export function AdminDashboard({ go, canSwitchView = false }: { go: (key: string) => void; canSwitchView?: boolean }) {
+export function AdminDashboard({
+  go,
+  canSwitchView = false,
+  previewPersona = null,
+  setPreviewPersona,
+  realIsSuper = false,
+}: {
+  go: (key: string) => void;
+  canSwitchView?: boolean;
+  previewPersona?: string | null;
+  setPreviewPersona?: (p: string | null) => void;
+  realIsSuper?: boolean;
+}) {
   const { club } = useClub();
   const { can } = usePermissions();
   const { clubId, role: activeRole, isActingAs } = useActiveClub();
@@ -149,7 +162,9 @@ export function AdminDashboard({ go, canSwitchView = false }: { go: (key: string
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ name: "", title: "" });
   const [saveMsg, setSaveMsg] = useState("");
-  const [viewAs, setViewAs] = useState<Persona | null>(null);
+  // Preview persona is owned by AdminApp so the nav can scope to it too.
+  const viewAs = (previewPersona ?? null) as Persona | null;
+  const setViewAs = (p: Persona | null) => setPreviewPersona?.(p);
 
   // Only a SportsWeb admin or the club's senior (signup) admin assigns committee
   // titles. A regular club admin can correct their display name, not their title.
@@ -330,24 +345,38 @@ export function AdminDashboard({ go, canSwitchView = false }: { go: (key: string
         </div>
       </div>
 
+      {clubId && <SetupCard clubId={clubId} go={go} />}
+
       {canSwitchView && (
         <div className="sw-dash-viewas">
           <span className="sw-dash-viewas-cap">View dashboard as</span>
           <div className="sw-dash-viewas-pills">
+            {realIsSuper && (
+              <button
+                className="sw-dash-viewas-pill"
+                data-active={!viewAs}
+                onClick={() => setViewAs(null)}
+                title="Your real platform-admin view, with the full menu"
+              >
+                Admin (full access)
+              </button>
+            )}
             {PERSONA_TABS.map((t) => (
               <button
                 key={t.key}
                 className="sw-dash-viewas-pill"
-                data-active={persona === t.key}
-                onClick={() => setViewAs(t.key === resolvedPersona ? null : t.key)}
+                data-active={realIsSuper ? viewAs === t.key : persona === t.key}
+                onClick={() => setViewAs(realIsSuper ? t.key : t.key === resolvedPersona ? null : t.key)}
               >
                 {t.label}
               </button>
             ))}
           </div>
-          {viewAs && viewAs !== resolvedPersona && (
+          {viewAs && (
             <span className="sw-dash-viewas-note">
-              Previewing the {personaLabel(viewAs)} view — your own role is {personaLabel(resolvedPersona)}.
+              {realIsSuper
+                ? `Previewing the ${personaLabel(viewAs)} experience — the menu is scoped to match. Pick “Admin” to exit.`
+                : `Previewing the ${personaLabel(viewAs)} view — your own role is ${personaLabel(resolvedPersona)}.`}
             </span>
           )}
         </div>

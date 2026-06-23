@@ -24,6 +24,7 @@ import { Communications } from "./Communications";
 import { SuperClubs } from "./SuperClubs";
 import { AdminImport } from "./AdminImport";
 import { ClubSetup } from "./ClubSetup";
+import { SETUP_ROUTES } from "./setupRoutes";
 import { SuperIntegrations } from "./SuperIntegrations";
 import { SuperStudio } from "./SuperStudio";
 import { LaunchTracker } from "./LaunchTracker";
@@ -45,15 +46,8 @@ const SITE_PAGES: { key: string; label: string }[] = [
   { key: "__page_footer", label: "Footer & site-wide" },
 ];
 
-/** Maps a Getting-started step's cta_route to the admin screen it opens. */
-const SETUP_ROUTES: Record<string, string> = {
-  import: "__super_import",
-  branding: "__site",
-  style: "__website",
-  website: "__site",
-  teams: "__teams_seasons",
-  invite: "__members",
-};
+/** SETUP_ROUTES (cta_route → admin screen) now lives in ./setupRoutes,
+ *  shared with SetupCard so the checklist and the dashboard card never drift. */
 
 function AdminInner() {
   const { ready, resolving, email, platformRole, isPlatformAdmin, signOut, userId } = useAuth();
@@ -73,6 +67,8 @@ function AdminInner() {
   const [active, setActive] = useState("__dashboard");
   const [webOpen, setWebOpen] = useState(false);
   const [officeOpen, setOfficeOpen] = useState(false);
+  const [staffOpen, setStaffOpen] = useState(false);
+  const [previewPersona, setPreviewPersona] = useState<string | null>(null);
   const [modulesOpen, setModulesOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(false); // mobile drawer
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
@@ -211,6 +207,11 @@ function AdminInner() {
   }
 
   const resource = RESOURCES.find((r) => r.key === active) ?? RESOURCES[0];
+  // When a platform admin previews a club persona from the dashboard, scope the
+  // whole shell to that persona: the SportsWeb (platform) menu hides and club
+  // items gate on the previewed role, not the admin's real powers.
+  const previewing = isPlatformAdmin && previewPersona != null;
+  const effPersona = previewPersona ?? persona;
   const isSuperView =
     active === "__biz" || active === "__super_clubs" || active === "__super_integrations" || active === "__super_studio" || active === "__super_import" || active === "__super_launches" || active === "__super_team" || active === "__staff";
   // A scoped launch operator only ever sees the Launches screen.
@@ -278,6 +279,20 @@ function AdminInner() {
               Launches
             </button>
           )}
+          {previewing && (
+            <button
+              type="button"
+              onClick={() => setPreviewPersona(null)}
+              style={{
+                display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8,
+                background: "#2F6BFF", color: "#fff", border: "none", borderRadius: 8,
+                padding: "9px 12px", margin: "0 0 8px", cursor: "pointer", fontWeight: 600, fontSize: "0.86rem",
+              }}
+            >
+              <span>Previewing as {previewPersona}</span>
+              <span style={{ opacity: 0.9 }}>Exit ✕</span>
+            </button>
+          )}
           {hasClub && (
             <button data-active={active === "__dashboard"} onClick={() => setActive("__dashboard")}>
               Dashboard
@@ -324,11 +339,11 @@ function AdminInner() {
               )}
               <button data-active={active === "__ws_meeting"} onClick={() => setActive("__ws_meeting")}><span className="sw-nav-ic">{WS_ICON.meeting}</span>Meeting</button>
               <button data-active={active === "__ws_calendar"} onClick={() => setActive("__ws_calendar")}><span className="sw-nav-ic">{WS_ICON.calendar}</span>Calendar</button>
-              {(persona === "president" || persona === "secretary" || isPlatformAdmin) && (
+              {(effPersona === "president" || effPersona === "secretary" || (isPlatformAdmin && !previewing)) && (
                 <button data-active={active === "__ws_vault"} onClick={() => setActive("__ws_vault")}><span className="sw-nav-ic">{WS_ICON.vault}</span>Vault</button>
               )}
               <button data-active={active === "__ws_todo"} onClick={() => setActive("__ws_todo")}><span className="sw-nav-ic">{WS_ICON.todo}</span>To-Do</button>
-              <button data-active={active === "__ws_committee"} onClick={() => setActive("__ws_committee")}><span className="sw-nav-ic">{WS_ICON.committee}</span>Committee Room</button>
+              <button data-active={active === "__ws_committee"} onClick={() => setActive("__ws_committee")}><span className="sw-nav-ic">{WS_ICON.committee}</span>Cliq</button>
               </div>
             </>
           )}
@@ -375,7 +390,7 @@ function AdminInner() {
           {hasClub && can("club.users") && (
             <>
               <button type="button" className="sw-admin-navgroup" data-open={groupOpen("club")} onClick={() => toggleGroup("club")}>
-                <span>Club</span>
+                <span>Membership</span>
                 <span className="sw-admin-groupcaret">{groupOpen("club") ? "▾" : "▸"}</span>
               </button>
               <div className="sw-admin-groupitems" data-open={groupOpen("club")}>
@@ -462,7 +477,7 @@ function AdminInner() {
               </div>
             </>
           )}
-          {hasClub && (persona === "president" || persona === "secretary" || persona === "treasurer" || isPlatformAdmin) && (
+          {hasClub && (effPersona === "president" || effPersona === "secretary" || effPersona === "treasurer" || (isPlatformAdmin && !previewing)) && (
             <>
               <button type="button" className="sw-admin-navgroup" data-open={groupOpen("account")} onClick={() => toggleGroup("account")}>
                 <span>Account</span>
@@ -481,7 +496,7 @@ function AdminInner() {
               </div>
             </>
           )}
-          {(can("platform.clubs") || can("platform.integrations")) && (
+          {(can("platform.clubs") || can("platform.integrations")) && !previewing && (
             <>
               <button type="button" className="sw-admin-navgroup" data-open={groupOpen("platform")} onClick={() => toggleGroup("platform")}>
                 <span>SportsWeb Workspace</span>
@@ -504,19 +519,33 @@ function AdminInner() {
                 </button>
               )}
               {can("platform.clubs") && (
-                <button data-active={active === "__staff"} onClick={() => setActive("__staff")}>
-                  Staff &amp; access
-                </button>
+                <div className="sw-admin-parentrow">
+                  <button
+                    className="sw-admin-parent"
+                    data-active={active === "__staff"}
+                    onClick={() => { setActive("__staff"); setStaffOpen(true); }}
+                  >
+                    Staff &amp; access
+                  </button>
+                  <button
+                    className="sw-admin-caret"
+                    aria-label={staffOpen ? "Collapse staff & access" : "Expand staff & access"}
+                    aria-expanded={staffOpen}
+                    onClick={() => setStaffOpen((o) => !o)}
+                  >
+                    {staffOpen ? "▾" : "▸"}
+                  </button>
+                </div>
               )}
-              {can("platform.clubs") && (
-                <button
-                  className="sw-admin-subnav"
-                  style={{ paddingLeft: "2.1rem", fontSize: "0.94em" }}
-                  data-active={active === "__super_team"}
-                  onClick={() => setActive("__super_team")}
-                >
-                  Add a person
-                </button>
+              {can("platform.clubs") && staffOpen && (
+                <div className="sw-admin-subnav">
+                  <button
+                    data-active={active === "__super_team"}
+                    onClick={() => setActive("__super_team")}
+                  >
+                    Add a person
+                  </button>
+                </div>
               )}
               {can("platform.integrations") && (
                 <button data-active={active === "__super_integrations"} onClick={() => setActive("__super_integrations")}>
@@ -585,7 +614,13 @@ function AdminInner() {
           )}
         </div>
         {effectiveActive === "__dashboard" && hasClub ? (
-          <AdminDashboard go={setActive} canSwitchView={isPlatformAdmin || activeRole === "club_senior_admin"} />
+          <AdminDashboard
+            go={setActive}
+            canSwitchView={isPlatformAdmin || activeRole === "club_senior_admin"}
+            previewPersona={previewPersona}
+            setPreviewPersona={setPreviewPersona}
+            realIsSuper={isPlatformAdmin}
+          />
         ) : effectiveActive === "__setup" && hasClub ? (
           <ClubSetup
             clubId={clubId!}
