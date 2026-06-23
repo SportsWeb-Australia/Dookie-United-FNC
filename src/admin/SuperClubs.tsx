@@ -31,8 +31,36 @@ export function SuperClubs() {
 
   // Search + grouping for the clubs list.
   const [search, setSearch] = useState("");
-  const [groupBy, setGroupBy] = useState<"none" | "account_status" | "plan" | "sport">("none");
-  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [groupBy, setGroupBy] = useState<"none" | "account_status" | "plan" | "sport">(() => {
+    try {
+      const v = localStorage.getItem("sw1.clubs.groupBy");
+      return v === "account_status" || v === "plan" || v === "sport" ? v : "none";
+    } catch {
+      return "none";
+    }
+  });
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() => {
+    try {
+      return JSON.parse(localStorage.getItem("sw1.clubs.collapsed") || "{}");
+    } catch {
+      return {};
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("sw1.clubs.groupBy", groupBy);
+    } catch {
+      /* ignore */
+    }
+  }, [groupBy]);
+  useEffect(() => {
+    try {
+      localStorage.setItem("sw1.clubs.collapsed", JSON.stringify(collapsed));
+    } catch {
+      /* ignore */
+    }
+  }, [collapsed]);
   const [savingAccount, setSavingAccount] = useState<string | null>(null);
 
   // Create-club form
@@ -313,12 +341,24 @@ export function SuperClubs() {
       {/* Search + grouping controls */}
       {!loading && clubs.length > 0 && (
         <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center", margin: "0 0 1rem" }}>
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search clubs…"
-            style={{ flex: "1 1 220px", minWidth: 180, padding: "8px 12px", borderRadius: 8, border: "1px solid #d7dbe3", fontSize: 14 }}
-          />
+          <div style={{ position: "relative", flex: "1 1 220px", minWidth: 180 }}>
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search clubs…"
+              style={{ width: "100%", boxSizing: "border-box", padding: "8px 30px 8px 12px", borderRadius: 8, border: "1px solid #d7dbe3", fontSize: 14 }}
+            />
+            {search && (
+              <button
+                type="button"
+                onClick={() => setSearch("")}
+                aria-label="Clear search"
+                style={{ position: "absolute", right: 8, top: "50%", transform: "translateY(-50%)", border: "none", background: "none", color: "#8a94a6", cursor: "pointer", fontSize: 16, lineHeight: 1 }}
+              >
+                ×
+              </button>
+            )}
+          </div>
           <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, color: "#667085" }}>
             Group by
             <select
@@ -332,6 +372,19 @@ export function SuperClubs() {
               <option value="sport">Sport</option>
             </select>
           </label>
+          {groupBy !== "none" && (
+            <div style={{ display: "flex", gap: 6 }}>
+              <button type="button" onClick={() => setCollapsed({})} style={{ border: "1px solid #d7dbe3", background: "#fff", color: "#475467", borderRadius: 8, padding: "6px 10px", fontSize: 12.5, cursor: "pointer" }}>
+                Expand all
+              </button>
+              <button type="button" onClick={() => setCollapsed(Object.fromEntries(groups.map(([k]) => [k, true])))} style={{ border: "1px solid #d7dbe3", background: "#fff", color: "#475467", borderRadius: 8, padding: "6px 10px", fontSize: 12.5, cursor: "pointer" }}>
+                Collapse all
+              </button>
+            </div>
+          )}
+          <span style={{ fontSize: 12.5, color: "#8a94a6", marginLeft: "auto" }}>
+            {search ? `Showing ${filtered.length} of ${clubs.length}` : `${clubs.length} ${clubs.length === 1 ? "club" : "clubs"}`}
+          </span>
         </div>
       )}
 
