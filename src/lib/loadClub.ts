@@ -123,19 +123,65 @@ async function buildClubConfig(clubRow: Record<string, any>): Promise<ClubConfig
 
     const cfg: ClubConfig = { ...staticClub };
 
+    // Is this the built-in demo/template club (Dookie)? Only the demo keeps the
+    // rich sample identity + content. EVERY other club is a clean slate that
+    // shows only its own data — never Dookie's logo, sports, hero copy, etc.
+    const isDemoClub = (clubRow.slug ?? "") === staticClub.identity.slug;
+
     // Identity + colours
+    const colours = deriveColours(
+      clubRow.primary_colour ?? null,
+      clubRow.secondary_colour ?? null,
+      clubRow.tertiary_colour ?? null,
+      staticClub.identity.colours
+    );
+    const clubName: string = clubRow.name ?? staticClub.identity.name;
     cfg.identity = {
       ...staticClub.identity,
-      name: clubRow.name ?? staticClub.identity.name,
+      name: clubName,
       slug: clubRow.slug ?? staticClub.identity.slug,
-      logo: clubRow.logo_url ?? staticClub.identity.logo,
-      colours: deriveColours(
-        clubRow.primary_colour ?? null,
-        clubRow.secondary_colour ?? null,
-        clubRow.tertiary_colour ?? null,
-        staticClub.identity.colours
-      ),
+      colours,
+      logo:
+        clubRow.logo_url ??
+        (isDemoClub
+          ? staticClub.identity.logo
+          : placeholderLogo(initialsFrom(clubName), colours.accent, colours.paper)),
+      ...(isDemoClub
+        ? {}
+        : {
+            shortName: clubName,
+            initials: initialsFrom(clubName),
+            nickname: "",
+            sports: sportsFromType(clubRow.sport_type),
+            location: "",
+            ground: "",
+            league: "",
+            leagueHref: undefined,
+            foundedNote: "",
+          }),
     };
+
+    // A non-demo club starts empty: strip Dookie's sample identity-led content
+    // so nothing of Dookie's leaks in. The club's own DB data fills these below.
+    if (!isDemoClub) {
+      cfg.hero = { ...staticClub.hero, eyebrow: "", title: clubName, subtitle: "", backgroundImage: undefined };
+      cfg.announcement = { ...staticClub.announcement, enabled: false };
+      cfg.president = { ...staticClub.president, name: "", body: [], portrait: undefined, signoff: undefined };
+      cfg.about = { ...staticClub.about, heading: `About ${clubName}`, body: [], values: [], history: [], facts: [] };
+      cfg.join = { ...staticClub.join, blurb: "" };
+      cfg.quickLinks = [
+        { label: "Fixtures", href: "/fixtures" },
+        { label: "Register", href: "/register" },
+        { label: "Volunteer", href: "/register" },
+      ];
+      cfg.news = [];
+      cfg.events = [];
+      cfg.sponsors = [];
+      cfg.teams = [];
+      cfg.committee = [];
+      cfg.documents = [];
+      cfg.matchCentre = { ...staticClub.matchCentre, fixtures: [], results: [], ladder: [] };
+    }
 
     // Contact
     cfg.contact = {
@@ -374,6 +420,51 @@ async function buildClubConfig(clubRow: Record<string, any>): Promise<ClubConfig
 function sentenceCase(s: string | null): string | null {
   if (!s) return null;
   return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/** Up to 4 initials from a club name (e.g. "Chadstone Lacrosse" -> "CL"). */
+function initialsFrom(name: string): string {
+  const letters = (name ?? "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 4)
+    .toUpperCase();
+  return letters || "CLUB";
+}
+
+/** Map the clubs.sport_type enum to display sport labels for the website skin
+ *  filter. 'other' (and anything unknown) returns [] so only generic styles
+ *  show — never Dookie's Football/Netball. True multi-sport lives in a future
+ *  sports array; this is the single-enum best effort. */
+function sportsFromType(t: string | null | undefined): string[] {
+  switch ((t ?? "").toLowerCase()) {
+    case "afl": return ["AFL"];
+    case "afl_netball": return ["AFL", "Netball"];
+    case "netball": return ["Netball"];
+    case "soccer": return ["Soccer"];
+    case "cricket": return ["Cricket"];
+    case "basketball": return ["Basketball"];
+    case "rugby_union": return ["Rugby Union"];
+    case "rugby_league": return ["Rugby League"];
+    default: return [];
+  }
+}
+
+/** Neutral placeholder crest for a club with no logo yet: an initials badge in
+ *  the club's own colours, as an inline SVG data URI (so it needs no upload and
+ *  never shows another club's logo). */
+function placeholderLogo(initials: string, bg: string, fg: string): string {
+  const text = (initials || "CLUB").slice(0, 4);
+  const size = text.length > 2 ? 30 : 42;
+  const svg =
+    `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>` +
+    `<rect width='100' height='100' rx='16' fill='${bg}'/>` +
+    `<text x='50' y='54' font-family='Arial,Helvetica,sans-serif' font-size='${size}' ` +
+    `font-weight='700' fill='${fg}' text-anchor='middle' dominant-baseline='middle'>${text}</text>` +
+    `</svg>`;
+  return "data:image/svg+xml;utf8," + encodeURIComponent(svg);
 }
 
 /** Roles (case-insensitive substring) treated as public committee/officials. */
