@@ -36,9 +36,15 @@ type Dash = {
   clubs_paying?: number | null;
   clubs_trial?: number | null;
   clubs_demo?: number | null;
+  clubs_churned?: number | null;
   avg_modules_per_club?: number | null;
   total_members?: number | null;
   total_teams?: number | null;
+  avg_members_per_club?: number | null;
+  activation_rate?: number | null;
+  conversion_rate?: number | null;
+  messages_month?: number | null;
+  members_new_month?: number | null;
   at_risk: AtRisk[];
 };
 
@@ -333,14 +339,24 @@ export function PlatformDashboard({
           </h2>
           <div style={{ display: "grid", gap: "1rem", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))" }}>
             <div style={card}>
-              <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
                 <Stat label="Paying" value={d.clubs_paying ?? 0} tone="#1f9d57" />
                 <Stat label="On trial" value={d.clubs_trial ?? 0} tone="#2F6BFF" />
                 <Stat label="Demo" value={d.clubs_demo ?? 0} tone="#8a94a6" />
+                <Stat label="Churned" value={d.clubs_churned ?? 0} tone="#d64545" />
               </div>
               <p style={{ margin: "12px 0 0", fontSize: 12.5, color: "#667085" }}>
                 {(d.clubs_trial ?? 0) + (d.clubs_demo ?? 0)} trial/demo{" "}
                 {(d.clubs_trial ?? 0) + (d.clubs_demo ?? 0) === 1 ? "club is a potential upgrade" : "clubs are potential upgrades"}.
+              </p>
+            </div>
+            <div style={card}>
+              <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
+                <Stat label="Activation" value={d.activation_rate ?? 0} tone="#11161f" />
+                <Stat label="Trial → paid" value={d.conversion_rate ?? 0} tone="#7a3df5" />
+              </div>
+              <p style={{ margin: "12px 0 0", fontSize: 12.5, color: "#667085" }}>
+                Activation = % of clubs live; conversion = paying ÷ (paying + trial). Shown as %.
               </p>
             </div>
             <div style={card}>
@@ -354,6 +370,16 @@ export function PlatformDashboard({
                 Clubs by plan
               </div>
               <PlanBars data={d.clubs_by_plan ?? {}} />
+            </div>
+            <div style={{ ...card, gridColumn: "1 / -1" }}>
+              <div style={{ fontSize: 12, color: "#667085", textTransform: "uppercase", letterSpacing: ".04em", marginBottom: 12 }}>
+                Growth &amp; engagement (this month)
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-around", gap: 12, flexWrap: "wrap" }}>
+                <Stat label="New members" value={d.members_new_month ?? 0} tone="#1f9d57" />
+                <Stat label="Avg members / club" value={d.avg_members_per_club ?? 0} tone="#11161f" />
+                <Stat label="Messages sent" value={d.messages_month ?? 0} tone="#2F6BFF" />
+              </div>
             </div>
           </div>
         </div>
