@@ -23,33 +23,30 @@ const DEFAULT: SalesTarget = {
 };
 
 const fmt = (n: number) => n.toLocaleString("en-AU");
-const card: React.CSSProperties = { background: "#fff", border: "1px solid #e7eaf0", borderRadius: 14, padding: "1.1rem 1.25rem" };
 
 function RateField({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
   return (
-    <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 12.5, color: "#475467" }}>
+    <label className="sw-sales-field sw-sales-rate">
       {label}
-      <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}>
+      <span className="sw-sales-rate-in">
         <input
           type="number"
           min={0}
           max={100}
           value={Math.round(value * 100)}
           onChange={(e) => onChange(Math.max(0, Math.min(100, Number(e.target.value))) / 100)}
-          style={{ width: 70, padding: "6px 8px", borderRadius: 8, border: "1px solid #d7dbe3", fontSize: 14 }}
         />
-        <span style={{ color: "#8a94a6" }}>%</span>
+        <span className="sw-sales-pct">%</span>
       </span>
     </label>
   );
 }
 
-function Rung({ label, value, sub }: { label: string; value: number; sub?: string }) {
+function Rung({ label, value }: { label: string; value: number }) {
   return (
-    <div style={{ ...card, textAlign: "center", minWidth: 120, flex: 1 }}>
-      <div style={{ fontSize: 26, fontWeight: 800, color: "#11161f", fontFamily: "var(--font-display, inherit)" }}>{fmt(value)}</div>
-      <div style={{ fontSize: 12, color: "#475467", marginTop: 2 }}>{label}</div>
-      {sub && <div style={{ fontSize: 11, color: "#8a94a6", marginTop: 2 }}>{sub}</div>}
+    <div className="sw-sales-rung">
+      <div className="sw-sales-rung-n">{fmt(value)}</div>
+      <div className="sw-sales-rung-l">{label}</div>
     </div>
   );
 }
@@ -107,46 +104,31 @@ export function SalesFormula() {
         </div>
       </header>
 
-      <div
-        style={{
-          background: "#fff7ed",
-          border: "1px solid #fed7aa",
-          color: "#9a3412",
-          borderRadius: 10,
-          padding: "8px 12px",
-          fontSize: 12.5,
-          marginBottom: "1.25rem",
-        }}
-      >
+      <div className="sw-sales-banner">
         <strong>In development</strong> — deal values and conversion rates are placeholders until you set real numbers. Anything tagged
         “placeholder” is a starting assumption, not live data.
       </div>
 
-      <div style={{ display: "grid", gap: "1.5rem", gridTemplateColumns: "minmax(280px, 360px) 1fr", alignItems: "start" }}>
+      <div className="sw-sales-grid">
         {/* Inputs */}
-        <div style={{ ...card, display: "grid", gap: 14 }}>
-          <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 12.5, color: "#475467" }}>
+        <div className="sw-sales-card sw-sales-form">
+          <label className="sw-sales-field">
             Target name
-            <input
-              value={t.name}
-              onChange={(e) => set({ name: e.target.value })}
-              placeholder="e.g. Q3 SportsWeb One"
-              style={{ padding: "8px 10px", borderRadius: 8, border: "1px solid #d7dbe3", fontSize: 14 }}
-            />
+            <input value={t.name} onChange={(e) => set({ name: e.target.value })} placeholder="e.g. Q3 SportsWeb One" />
           </label>
 
-          <div style={{ display: "flex", gap: 10 }}>
-            <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 12.5, color: "#475467", flex: 2 }}>
+          <div className="sw-sales-row sw-sales-row--3">
+            <label className="sw-sales-field">
               Product
-              <select value={t.product_key ?? ""} onChange={(e) => pickProduct(e.target.value)} style={{ padding: "8px 10px", borderRadius: 8, border: "1px solid #d7dbe3", fontSize: 14 }}>
+              <select value={t.product_key ?? ""} onChange={(e) => pickProduct(e.target.value)}>
                 {products.map((p) => (
                   <option key={p.key} value={p.key}>{p.name}</option>
                 ))}
               </select>
             </label>
-            <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 12.5, color: "#475467", flex: 1 }}>
+            <label className="sw-sales-field">
               Period
-              <select value={t.period} onChange={(e) => set({ period: e.target.value })} style={{ padding: "8px 10px", borderRadius: 8, border: "1px solid #d7dbe3", fontSize: 14 }}>
+              <select value={t.period} onChange={(e) => set({ period: e.target.value })}>
                 <option value="monthly">Monthly</option>
                 <option value="quarterly">Quarterly</option>
                 <option value="annual">Annual</option>
@@ -154,19 +136,19 @@ export function SalesFormula() {
             </label>
           </div>
 
-          <div style={{ display: "flex", gap: 10 }}>
-            <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 12.5, color: "#475467", flex: 1 }}>
+          <div className="sw-sales-row">
+            <label className="sw-sales-field">
               Revenue target ($)
-              <input type="number" min={0} value={t.revenue_target} onChange={(e) => set({ revenue_target: Number(e.target.value) })} style={{ padding: "8px 10px", borderRadius: 8, border: "1px solid #d7dbe3", fontSize: 14 }} />
+              <input type="number" min={0} value={t.revenue_target} onChange={(e) => set({ revenue_target: Number(e.target.value) })} />
             </label>
-            <label style={{ display: "flex", flexDirection: "column", gap: 4, fontSize: 12.5, color: "#475467", flex: 1 }}>
-              Avg deal value ($){product?.is_placeholder && <em style={{ color: "#b45309", fontStyle: "normal", fontSize: 10.5 }}> · placeholder</em>}
-              <input type="number" min={0} value={t.avg_deal_value} onChange={(e) => set({ avg_deal_value: Number(e.target.value) })} style={{ padding: "8px 10px", borderRadius: 8, border: "1px solid #d7dbe3", fontSize: 14 }} />
+            <label className="sw-sales-field">
+              <span>Avg deal value ($){product?.is_placeholder && <em className="sw-sales-ph"> · placeholder</em>}</span>
+              <input type="number" min={0} value={t.avg_deal_value} onChange={(e) => set({ avg_deal_value: Number(e.target.value) })} />
             </label>
           </div>
 
-          <div style={{ fontSize: 11.5, color: "#8a94a6", textTransform: "uppercase", letterSpacing: ".04em", marginTop: 4 }}>Conversion assumptions</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+          <div className="sw-sales-sub">Conversion assumptions</div>
+          <div className="sw-sales-rates">
             <RateField label="Close rate" value={t.close_rate} onChange={(v) => set({ close_rate: v })} />
             <RateField label="Demo show rate" value={t.show_rate} onChange={(v) => set({ show_rate: v })} />
             <RateField label="Conversation → booking" value={t.booking_rate} onChange={(v) => set({ booking_rate: v })} />
@@ -174,46 +156,43 @@ export function SalesFormula() {
             <RateField label="CTA conversion" value={t.cta_conversion_rate} onChange={(v) => set({ cta_conversion_rate: v })} />
           </div>
 
-          <div style={{ display: "flex", gap: 10, alignItems: "center", marginTop: 4 }}>
-            <button onClick={save} disabled={busy} className="sw-btn" style={{ background: "var(--accent, #2F6BFF)", color: "#fff", border: "none", borderRadius: 8, padding: "9px 16px", fontWeight: 600, cursor: "pointer" }}>
-              {t.id ? "Update target" : "Save target"}
-            </button>
-            {t.id && (
-              <button onClick={() => setT(DEFAULT)} style={{ background: "none", border: "none", color: "#667085", cursor: "pointer", fontSize: 13 }}>New</button>
-            )}
-            {msg && <span style={{ fontSize: 12.5, color: msg === "Saved." ? "#1f9d57" : "#b42318" }}>{msg}</span>}
+          <div className="sw-sales-actions">
+            <button onClick={save} disabled={busy} className="sw-btn">{t.id ? "Update target" : "Save target"}</button>
+            {t.id && <button onClick={() => setT(DEFAULT)} className="sw-sales-link">New</button>}
+            {msg && <span className={`sw-sales-msg${msg === "Saved." ? " is-ok" : " is-err"}`}>{msg}</span>}
           </div>
         </div>
 
         {/* Ladder */}
-        <div style={{ display: "grid", gap: "1rem" }}>
-          <div style={{ fontSize: 15, color: "#11161f", fontWeight: 600 }}>
+        <div className="sw-sales-col">
+          <div className="sw-sales-lead">
             To win <strong>{fmt(ladder.wins)}</strong> {ladder.wins === 1 ? "deal" : "deals"} ({t.period}), the funnel needs:
           </div>
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "stretch" }}>
+          <div className="sw-sales-rungs">
             <Rung label="Wins" value={ladder.wins} />
             <Rung label="Presentations" value={ladder.presentations} />
             <Rung label="Demos booked" value={ladder.demos} />
             <Rung label="Conversations" value={ladder.conversations} />
             <Rung label="Contact attempts" value={ladder.contacts} />
-            <Rung label="CTA views" value={ladder.ctaViews} />
           </div>
-          <div style={{ ...card, fontSize: 14, color: "#475467", lineHeight: 1.6 }}>
-            <strong style={{ color: "#11161f" }}>{fmt(ladder.wins)} sales</strong> = {fmt(ladder.presentations)} presentations = {fmt(ladder.demos)} demos booked ={" "}
-            {fmt(ladder.conversations)} conversations = {fmt(ladder.contacts)} targeted contacts = <strong style={{ color: "#11161f" }}>{fmt(ladder.ctaViews)} CTA views</strong>.
+          <div className="sw-sales-cta">
+            <div className="sw-sales-cta-n">{fmt(ladder.ctaViews)}</div>
+            <div className="sw-sales-rung-l">CTA views</div>
+          </div>
+          <div className="sw-sales-chain">
+            <strong>{fmt(ladder.wins)} sales</strong> = {fmt(ladder.presentations)} presentations = {fmt(ladder.demos)} demos booked ={" "}
+            {fmt(ladder.conversations)} conversations = {fmt(ladder.contacts)} targeted contacts = <strong>{fmt(ladder.ctaViews)} CTA views</strong>.
           </div>
 
           {targets.length > 0 && (
-            <div style={{ ...card }}>
-              <div style={{ fontSize: 12, color: "#667085", textTransform: "uppercase", letterSpacing: ".04em", marginBottom: 10 }}>Saved targets</div>
-              <div style={{ display: "grid", gap: 8 }}>
+            <div className="sw-sales-card">
+              <div className="sw-sales-sub">Saved targets</div>
+              <div className="sw-sales-saved">
                 {targets.map((s) => (
-                  <div key={s.id} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13.5 }}>
-                    <button onClick={() => setT(s)} style={{ flex: 1, textAlign: "left", background: "none", border: "none", cursor: "pointer", color: "#11161f", fontWeight: 600 }}>
-                      {s.name}
-                    </button>
-                    <span style={{ color: "#8a94a6", fontSize: 12.5 }}>${fmt(s.revenue_target)} · {s.period}</span>
-                    <button onClick={() => remove(s.id)} aria-label="Delete" style={{ background: "none", border: "none", color: "#b42318", cursor: "pointer", fontSize: 13 }}>Remove</button>
+                  <div key={s.id} className="sw-sales-saved-row">
+                    <button onClick={() => setT(s)} className="sw-sales-saved-name">{s.name}</button>
+                    <span className="sw-sales-saved-meta">${fmt(s.revenue_target)} · {s.period}</span>
+                    <button onClick={() => remove(s.id)} className="sw-sales-link is-danger">Remove</button>
                   </div>
                 ))}
               </div>

@@ -246,7 +246,8 @@ export function AdminSiteEditor({ page = "all" }: { page?: SitePage }) {
         <label className="sw-ed-l">Title</label>
         <input className="sw-input" value={hero.title} onChange={(e) => setHero({ ...hero, title: e.target.value })} />
         <label className="sw-ed-l">Subtitle <HelpDot example="“Junior &amp; senior lacrosse in Melbourne's east.”">The line under your big hero title — a short tagline or what your club is about.</HelpDot></label>
-        <textarea className="sw-input" rows={2} value={hero.subtitle} onChange={(e) => setHero({ ...hero, subtitle: e.target.value })} />
+        <textarea className="sw-input" rows={2} maxLength={140} value={hero.subtitle} onChange={(e) => setHero({ ...hero, subtitle: e.target.value })} />
+        <p className="sw-ed-hint" style={{ textAlign: "right", color: hero.subtitle.length > 130 ? "#b54708" : undefined }}>{hero.subtitle.length}/140 — a short tagline reads best</p>
         <ImageField
           label="Hero image"
           hint="Wide banner image. Recommended 1920 × 1080 (16:9). Landscape photos work best."

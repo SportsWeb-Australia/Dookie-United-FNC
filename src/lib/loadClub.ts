@@ -60,11 +60,20 @@ export async function getClubConfig(): Promise<ClubConfig> {
   if (!supabase) return staticClub;
   try {
     const slug = await resolveClubSlug();
-    const { data: clubRow } = await supabase
-      .from("clubs")
-      .select("*")
-      .eq("slug", slug)
-      .maybeSingle();
+    let clubRow: Record<string, any> | null = null;
+    const direct = await supabase.from("clubs").select("*").eq("slug", slug).maybeSingle();
+    clubRow = direct.data ?? null;
+
+    // RLS fallback. The clubs SELECT policy only exposes status = 'published'
+    // rows, so a platform admin previewing an unpublished club by slug reads no
+    // row and would fall back to staticClub (Dookie). admin_get_club_by_slug is
+    // a platform-admin-gated SECURITY DEFINER RPC that returns the full row. If
+    // it isn't deployed yet, this is a safe no-op (errors swallowed).
+    if (!clubRow) {
+      const { data: rpcRow } = await supabase.rpc("admin_get_club_by_slug", { p_slug: slug });
+      clubRow = Array.isArray(rpcRow) ? (rpcRow[0] ?? null) : (rpcRow ?? null);
+    }
+
     if (!clubRow) return staticClub;
     return await buildClubConfig(clubRow);
   } catch {

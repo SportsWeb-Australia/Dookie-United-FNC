@@ -72,7 +72,7 @@ export function HelpDot({
               border: "1px solid #e6e8ec",
               borderRadius: 10,
               boxShadow: "0 8px 24px rgba(16,24,40,0.14)",
-              padding: "0.75rem 0.85rem",
+              padding: "0.75rem 1.9rem 0.75rem 0.85rem",
               fontSize: "0.85rem",
               lineHeight: 1.5,
               fontWeight: 400,
@@ -81,6 +81,31 @@ export function HelpDot({
               whiteSpace: "normal",
             }}
           >
+            <button
+              type="button"
+              aria-label="Close"
+              onClick={(e) => {
+                e.preventDefault();
+                setOpen(false);
+              }}
+              style={{
+                position: "absolute",
+                top: 4,
+                right: 4,
+                width: 22,
+                height: 22,
+                borderRadius: 6,
+                border: "none",
+                background: "none",
+                color: "#98a2b3",
+                fontSize: 16,
+                lineHeight: "22px",
+                cursor: "pointer",
+                padding: 0,
+              }}
+            >
+              ×
+            </button>
             {children}
             {example && (
               <span style={{ display: "block", marginTop: "0.5rem", color: "#475467" }}>
