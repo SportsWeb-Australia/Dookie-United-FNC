@@ -253,21 +253,41 @@ export function ClubSetup({
                   {s.help_md && <p style={{ margin: "0 0 10px", fontSize: 13.5, color: "#5b6573" }}>{s.help_md}</p>}
                   <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
                     {s.cta_route && (
-                      <button
-                        onClick={() => onGo(s.cta_route!)}
-                        style={{
-                          border: "none",
-                          color: "#fff",
-                          background: "var(--club-accent, #2F6BFF)",
-                          borderRadius: 8,
-                          padding: "8px 14px",
-                          fontWeight: 600,
-                          cursor: "pointer",
-                          fontSize: 13.5,
-                        }}
-                      >
-                        {stepDone ? "Open again" : "Go there"} →
-                      </button>
+                      /^https?:\/\//.test(s.cta_route) ? (
+                        <a
+                          href={s.cta_route}
+                          target="_blank"
+                          rel="noreferrer"
+                          style={{
+                            color: "#fff",
+                            background: "var(--club-accent, #2F6BFF)",
+                            borderRadius: 8,
+                            padding: "8px 14px",
+                            fontWeight: 600,
+                            fontSize: 13.5,
+                            textDecoration: "none",
+                            display: "inline-block",
+                          }}
+                        >
+                          {stepDone ? "Open again" : "Open Pixefy"} ↗
+                        </a>
+                      ) : (
+                        <button
+                          onClick={() => onGo(s.cta_route!)}
+                          style={{
+                            border: "none",
+                            color: "#fff",
+                            background: "var(--club-accent, #2F6BFF)",
+                            borderRadius: 8,
+                            padding: "8px 14px",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            fontSize: 13.5,
+                          }}
+                        >
+                          {stepDone ? "Open again" : "Go there"} →
+                        </button>
+                      )
                     )}
                     {autoDone ? (
                       <span style={{ fontSize: 12.5, color: "#1f9d57" }}>✓ Detected automatically</span>
