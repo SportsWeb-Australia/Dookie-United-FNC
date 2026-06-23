@@ -9,10 +9,20 @@ const MSG_PROVIDERS: { key: keyof ProviderStatus; name: string; manage: string; 
   { key: "push", name: "Push · WebPushr", manage: "https://dashboard.webpushr.com/", manageLabel: "Manage plan ↗", report: "https://dashboard.webpushr.com/" },
 ];
 
+const favicon = (domain: string) => `https://www.google.com/s2/favicons?domain=${domain}&sz=64`;
+
 const AI_TOOLS = [
-  { name: "ChatGPT", url: "https://chatgpt.com/" },
-  { name: "Claude", url: "https://claude.ai/" },
-  { name: "Canva", url: "https://www.canva.com/" },
+  { name: "ChatGPT", url: "https://chatgpt.com/", domain: "chatgpt.com" },
+  { name: "Claude", url: "https://claude.ai/", domain: "claude.ai" },
+  { name: "Canva", url: "https://www.canva.com/", domain: "canva.com" },
+];
+
+const INFRA_TOOLS = [
+  { name: "Supabase", url: "https://supabase.com/dashboard/project/uzibfawcwoapfbigpzum", domain: "supabase.com" },
+  { name: "Vercel", url: "https://vercel.com/dashboard", domain: "vercel.com" },
+  { name: "GitHub", url: "https://github.com/SportsWeb-Australia/SportsWeb-One", domain: "github.com" },
+  { name: "VentraIP", url: "https://vip.ventraip.com.au/", domain: "ventraip.com.au" },
+  { name: "Pixefy (device preview)", url: "https://www.pixefy.io/", domain: "pixefy.io" },
 ];
 
 type AtRisk = {
@@ -449,13 +459,29 @@ export function PlatformDashboard({
             <button onClick={() => go("__super_integrations")} className="sw-btn sw-btn--ghost" style={{ fontSize: 13 }}>Manage / reconnect</button>
           </div>
 
-          {/* Creative & AI deep links */}
+          {/* Creative & AI — logos with pill buttons underneath */}
+          <div style={{ ...card, marginTop: "1rem" }}>
+            <div style={{ fontSize: 12, color: "#667085", textTransform: "uppercase", letterSpacing: ".04em", marginBottom: 12 }}>Creative &amp; AI</div>
+            <div style={{ display: "flex", gap: 22, flexWrap: "wrap" }}>
+              {AI_TOOLS.map((t) => (
+                <div key={t.name} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+                  <img src={favicon(t.domain)} alt={t.name} width={36} height={36} style={{ borderRadius: 8 }} />
+                  <a href={t.url} target="_blank" rel="noreferrer" style={{ fontSize: 13, fontWeight: 600, color: "var(--accent, #2F6BFF)", textDecoration: "none", padding: "5px 14px", border: "1px solid #e3e8ef", borderRadius: 999 }}>{t.name} ↗</a>
+                </div>
+              ))}
+            </div>
+            <span style={{ fontSize: 12, color: "#8a94a6", display: "block", marginTop: 10 }}>Opens your account in a new tab.</span>
+          </div>
+
+          {/* Dev & infrastructure shortcuts */}
           <div style={{ ...card, marginTop: "1rem", display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
-            <span style={{ fontSize: 12, color: "#667085", textTransform: "uppercase", letterSpacing: ".04em", marginRight: 4 }}>Creative &amp; AI</span>
-            {AI_TOOLS.map((t) => (
-              <a key={t.name} href={t.url} target="_blank" rel="noreferrer" style={{ fontSize: 13, fontWeight: 600, color: "var(--accent, #2F6BFF)", textDecoration: "none", padding: "5px 12px", border: "1px solid #e3e8ef", borderRadius: 999 }}>{t.name} ↗</a>
+            <span style={{ fontSize: 12, color: "#667085", textTransform: "uppercase", letterSpacing: ".04em", marginRight: 4 }}>Dev &amp; infrastructure</span>
+            {INFRA_TOOLS.map((t) => (
+              <a key={t.name} href={t.url} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 7, fontSize: 13, fontWeight: 600, color: "#11161f", textDecoration: "none", padding: "5px 12px", border: "1px solid #e3e8ef", borderRadius: 999 }}>
+                <img src={favicon(t.domain)} alt="" width={16} height={16} style={{ borderRadius: 4 }} />
+                {t.name} ↗
+              </a>
             ))}
-            <span style={{ fontSize: 12, color: "#8a94a6" }}>Opens your account in a new tab.</span>
           </div>
         </div>
       )}
