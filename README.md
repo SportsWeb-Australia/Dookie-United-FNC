@@ -270,3 +270,5 @@ authoring environment, so the production build is verified by Vercel on push rat
 than locally. The code uses only standard, current dependencies and a conventional
 Vite + React + TS structure. A filesystem import/export check was run over all
 modules before delivery.
+
+<!-- pipeline check: 25 Jun 2026 -->
