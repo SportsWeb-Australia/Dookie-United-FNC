@@ -24,6 +24,7 @@ import { Communications } from "./Communications";
 import { SuperClubs } from "./SuperClubs";
 import { AdminImport } from "./AdminImport";
 import { ClubSetup } from "./ClubSetup";
+import { NeedsWizard } from "./NeedsWizard";
 import { SETUP_ROUTES } from "./setupRoutes";
 import { SuperIntegrations } from "./SuperIntegrations";
 import { SuperStudio } from "./SuperStudio";
@@ -390,6 +391,11 @@ function AdminInner() {
           {hasClub && (
             <button data-active={active === "__setup"} onClick={() => setActive("__setup")}>
               Get started
+            </button>
+          )}
+          {hasClub && (
+            <button data-active={active === "__needs"} onClick={() => setActive("__needs")}>
+              Needs analysis
             </button>
           )}
           {hasClub && (
@@ -788,6 +794,8 @@ function AdminInner() {
             clubName={clubName}
             onGo={(route) => setActive(SETUP_ROUTES[route] ?? "__dashboard")}
           />
+        ) : effectiveActive === "__needs" && hasClub ? (
+          <NeedsWizard clubId={clubId!} filledBy={isPlatformAdmin ? "admin" : "club"} />
         ) : effectiveActive.startsWith("__ws_") && hasClub ? (
           <ZohoWorkspace appKey={effectiveActive.slice("__ws_".length)} />
         ) : effectiveActive.startsWith("__partner_") ? (
