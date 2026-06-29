@@ -6,6 +6,7 @@ import { MODULE_CATALOG } from "../lib/modules";
 import { getSportswebMetrics, type Metrics } from "../lib/roleKpis";
 import { MfaSettings } from "./MfaSettings";
 import { MFA_ENFORCED } from "../lib/mfaPolicy";
+import { SidebarAppearance } from "./SidebarAppearance";
 
 /** Illustrative standalone pricing ($/month) for the jobs SportsWeb One covers. */
 const SAVINGS = [
@@ -134,6 +135,12 @@ export function SportsWebAccount() {
         <section className="sw-acc-card">
           <span className="sw-acc-cap">Security</span>
           <MfaSettings enforced={MFA_ENFORCED && mfaAdminTier} />
+        </section>
+
+        {/* Appearance */}
+        <section className="sw-acc-card">
+          <span className="sw-acc-cap">Appearance</span>
+          <SidebarAppearance />
         </section>
 
         {/* Support team */}

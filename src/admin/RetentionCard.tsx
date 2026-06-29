@@ -52,7 +52,7 @@ export function RetentionCard({ clubId }: { clubId: string }) {
             </div>
             <div style={{ display: "flex", gap: 20, flexWrap: "wrap" }}>
               <Mini label="Retained" value={r.retained} tone="#1f9d57" />
-              <Mini label="New" value={r.new} tone="#2F6BFF" />
+              <Mini label="New" value={r.new} tone="#2563eb" />
               <Mini label="Not back" value={r.churned} tone="#d64545" />
             </div>
           </div>

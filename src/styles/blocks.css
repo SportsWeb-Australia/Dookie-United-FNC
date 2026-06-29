@@ -1138,6 +1138,33 @@
   width: 3px; background: var(--accent); border-radius: 0 3px 3px 0;
 }
 .sw-admin-nav button[data-active="true"] .sw-nav-ic { color: var(--accent); opacity: 1; }
+
+/* ---- Sidebar appearance looks (Settings > Appearance) -----------------------
+   Calm is the baseline above and needs no attribute. Workspace and Refined are
+   lean overrides that touch ONLY the active-item treatment + row density; every
+   item, group, icon and the hover behaviour stay shared. ---------------------- */
+/* Workspace - roomier rows, soft translucent-blue active fill, no accent bar. */
+[data-sidebar-look="workspace"] .sw-admin-nav button { padding-top: 0.72rem; padding-bottom: 0.72rem; }
+[data-sidebar-look="workspace"] .sw-admin-nav button[data-active="true"] {
+  background: color-mix(in srgb, var(--accent) 20%, transparent);
+}
+[data-sidebar-look="workspace"] .sw-admin-nav button[data-active="true"]::before { display: none; }
+/* Refined - slightly roomier rows, solid blue active pill with a soft glow,
+   a light accent bar that reads on the solid fill, white icon, firmer header divider. */
+[data-sidebar-look="refined"] .sw-admin-nav button { padding-top: 0.62rem; padding-bottom: 0.62rem; }
+[data-sidebar-look="refined"] .sw-admin-nav button[data-active="true"] {
+  background: var(--accent);
+  box-shadow: 0 1px 8px color-mix(in srgb, var(--accent) 38%, transparent);
+}
+[data-sidebar-look="refined"] .sw-admin-nav button[data-active="true"]::before {
+  background: color-mix(in srgb, var(--text-invert) 60%, var(--accent));
+}
+[data-sidebar-look="refined"] .sw-admin-nav button[data-active="true"] .sw-nav-ic { color: var(--text-invert); }
+[data-sidebar-look="refined"] .sw-admin-brand {
+  border-bottom: 1px solid color-mix(in srgb, var(--text-invert) 16%, transparent);
+  padding-bottom: 0.85rem;
+}
+
 .sw-admin-side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 0.75rem; font-family: var(--font-mono); font-size: 0.8rem; }
 .sw-admin-side-foot button { color: color-mix(in srgb, var(--text-invert) 70%, transparent); text-align: left; }
 .sw-admin-main { padding: 1.5rem; min-width: 0; overflow-x: clip; }
@@ -3643,6 +3670,22 @@
 .sw-acc-status { display: inline-block; color: #166534 !important; background: #dcfce7; padding: 0.2rem 0.55rem; border-radius: 999px; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
 .sw-acc-soft { color: var(--text-soft, #94a3b8) !important; font-weight: 500; }
 .sw-acc-foot { margin: 1rem 0 0; font-size: 0.78rem; color: var(--text-soft, #94a3b8); line-height: 1.45; }
+
+/* Sidebar appearance picker (Settings > Appearance) - segmented option cards. */
+.sw-look-label { display: block; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-soft); margin-bottom: 0.6rem; }
+.sw-look-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; }
+.sw-look-opt {
+  display: flex; flex-direction: column; gap: 0.2rem; text-align: left;
+  padding: 0.6rem 0.7rem; border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); color: var(--text); cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.sw-look-opt:hover { border-color: color-mix(in srgb, var(--accent) 50%, var(--border)); }
+.sw-look-opt[data-active="true"] { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+.sw-look-name { font-weight: 600; font-size: 0.9rem; }
+.sw-look-opt[data-active="true"] .sw-look-name { color: var(--accent-on-bg); }
+.sw-look-hint { font-size: 0.72rem; color: var(--text-soft); line-height: 1.3; }
+@media (max-width: 520px) { .sw-look-row { grid-template-columns: 1fr; } }
 .sw-acc-savehead { display: flex; align-items: baseline; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.9rem; }
 .sw-acc-savebig { font-family: var(--font-display, inherit); font-size: 2rem; color: #16a34a; line-height: 1; }
 .sw-acc-savesub { font-size: 0.85rem; color: var(--text-soft, #64748b); }

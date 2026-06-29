@@ -354,7 +354,7 @@ export function PlatformDashboard({
             <div style={card}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 10 }}>
                 <Stat label="Paying" value={d.clubs_paying ?? 0} tone="#1f9d57" />
-                <Stat label="On trial" value={d.clubs_trial ?? 0} tone="#2F6BFF" />
+                <Stat label="On trial" value={d.clubs_trial ?? 0} tone="#2563eb" />
                 <Stat label="Demo" value={d.clubs_demo ?? 0} tone="#8a94a6" />
                 <Stat label="Churned" value={d.clubs_churned ?? 0} tone="#d64545" />
               </div>
@@ -391,7 +391,7 @@ export function PlatformDashboard({
               <div style={{ display: "flex", justifyContent: "space-around", gap: 12, flexWrap: "wrap" }}>
                 <Stat label="New members" value={d.members_new_month ?? 0} tone="#1f9d57" />
                 <Stat label="Avg members / club" value={d.avg_members_per_club ?? 0} tone="#11161f" />
-                <Stat label="Messages sent" value={d.messages_month ?? 0} tone="#2F6BFF" />
+                <Stat label="Messages sent" value={d.messages_month ?? 0} tone="#2563eb" />
                 <Stat label="Returning players %" value={retention?.retention_rate ?? 0} tone="#7a3df5" />
               </div>
             </div>

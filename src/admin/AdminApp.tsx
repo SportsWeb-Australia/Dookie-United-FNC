@@ -35,6 +35,7 @@ import { PlatformDashboard } from "./PlatformDashboard";
 import { Login } from "./Login";
 import { ZohoWorkspace, WS_ICON, WORKSPACE } from "./ZohoWorkspace";
 import { SportsWebAccount } from "./SportsWebAccount";
+import { readSidebarLook, SIDEBAR_LOOK_EVENT } from "./sidebarLook";
 import { loadCommitteeProfile } from "../lib/committee";
 import { personaFromTitle } from "../lib/roleKpis";
 
@@ -130,6 +131,19 @@ function AdminInner() {
       swOffice: swOfficeOpen,
     });
   }, [openGroups, webOpen, officeOpen, modulesOpen, staffOpen, swOfficeOpen]);
+
+  // Sidebar appearance preference (calm/workspace/refined). Re-reads on the
+  // in-app change event and on cross-tab storage changes so the look applies live.
+  const [sidebarLook, setSidebarLook] = useState(readSidebarLook);
+  useEffect(() => {
+    const sync = () => setSidebarLook(readSidebarLook());
+    window.addEventListener(SIDEBAR_LOOK_EVENT, sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener(SIDEBAR_LOOK_EVENT, sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
   const [persona, setPersona] = useState<string>("general");
   const hasClub = !!clubId;
   // Scoped launch operator: SportsWeb staff, not a platform admin, no club.
@@ -291,7 +305,7 @@ function AdminInner() {
 
   return (
     <MfaGate required={mfaRequired} email={email} onSignOut={signOut}>
-    <div className={`sw-admin${operatorConsole ? " sw-brandwrap" : ""}`} style={operatorConsole ? undefined : brandStyle}>
+    <div className={`sw-admin${operatorConsole ? " sw-brandwrap" : ""}`} data-sidebar-look={sidebarLook} style={operatorConsole ? undefined : brandStyle}>
       <header className="sw-admin-topbar">
         <button
           className="sw-admin-burger"
