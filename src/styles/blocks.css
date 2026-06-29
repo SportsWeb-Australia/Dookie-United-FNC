@@ -1119,15 +1119,18 @@
   background: color-mix(in srgb, var(--text-invert) 6%, transparent);
   color: var(--text-invert);
 }
-/* Calm active state: quiet tinted background + thin left accent bar (no solid fill). */
+/* Calm active state: clearly "on" — soft blue tint + a solid 3px left accent bar,
+   full-strength label and accent-tinted icon. Calmer than the old solid-blue fill,
+   but unmistakably the selected row. The selector also matches subnav buttons
+   (.sw-admin-subnav button), so nested selections get the same treatment. */
 .sw-admin-nav button[data-active="true"] {
-  background: color-mix(in srgb, var(--text-invert) 8%, transparent);
+  background: color-mix(in srgb, var(--accent) 17%, var(--bg-invert));
   color: var(--text-invert);
   font-weight: 600;
 }
 .sw-admin-nav button[data-active="true"]::before {
-  content: ""; position: absolute; left: 0; top: 6px; bottom: 6px; height: auto;
-  width: 2px; background: var(--accent); border-radius: 0 2px 2px 0;
+  content: ""; position: absolute; left: 0; top: 5px; bottom: 5px; height: auto;
+  width: 3px; background: var(--accent); border-radius: 0 3px 3px 0;
 }
 .sw-admin-nav button[data-active="true"] .sw-nav-ic { color: var(--accent); opacity: 1; }
 .sw-admin-side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 0.75rem; font-family: var(--font-mono); font-size: 0.8rem; }
