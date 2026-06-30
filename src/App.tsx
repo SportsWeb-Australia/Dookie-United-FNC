@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Routes, Route, useLocation, Navigate } from "react-router-dom";
-import { club as staticClub } from "./content/club.config";
+import { emptyClub } from "./content/emptyClub";
 import { getClubConfig } from "./lib/loadClub";
 import { isPlatformHost, hasPreviewClub } from "./lib/supabase";
 import { ClubContext } from "./components/ClubContext";
@@ -61,8 +61,10 @@ function PlatformFront() {
 
 export default function App() {
   // Static config renders instantly; live Supabase content swaps in when ready.
-  const [club, setClub] = useState<ClubConfig>(staticClub);
-  const [variant, setVariant] = useState<DesignVariant>(staticClub.variant);
+  // Seed with the neutral base, not the demo club, so a non-demo club never paints
+  // Dookie's name/content for a frame before getClubConfig() resolves.
+  const [club, setClub] = useState<ClubConfig>(emptyClub);
+  const [variant, setVariant] = useState<DesignVariant>(emptyClub.variant);
   const location = useLocation();
   const isAdmin = location.pathname.startsWith("/admin");
   const isTrial = location.pathname.startsWith("/start");

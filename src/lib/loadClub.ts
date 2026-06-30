@@ -1,6 +1,7 @@
 import { supabase, resolveClubSlug } from "./supabase";
 import { slugify } from "./slug";
 import { club as staticClub } from "../content/club.config";
+import { emptyClub } from "../content/emptyClub";
 import type { ClubConfig, DesignVariant, Sponsor, NewsPost, ClubEvent, TeamGroup, Person, BrandColours, Fixture, Result, LadderRow } from "../content/types";
 
 /** SportsWeb One template_key -> this template's design variant. */
@@ -58,8 +59,9 @@ function formatMatchDate(value: string | null): string {
  */
 export async function getClubConfig(): Promise<ClubConfig> {
   if (!supabase) return staticClub;
+  let slug = "";
   try {
-    const slug = await resolveClubSlug();
+    slug = await resolveClubSlug();
     let clubRow: Record<string, any> | null = null;
     const direct = await supabase.from("clubs").select("*").eq("slug", slug).maybeSingle();
     clubRow = direct.data ?? null;
@@ -74,10 +76,12 @@ export async function getClubConfig(): Promise<ClubConfig> {
       clubRow = Array.isArray(rpcRow) ? (rpcRow[0] ?? null) : (rpcRow ?? null);
     }
 
-    if (!clubRow) return staticClub;
+    // Read failure: only the demo slug falls back to the demo config; any other
+    // (real) club falls back to the neutral base, never to Dookie's content.
+    if (!clubRow) return slug === staticClub.identity.slug ? staticClub : emptyClub;
     return await buildClubConfig(clubRow);
   } catch {
-    return staticClub;
+    return slug === staticClub.identity.slug ? staticClub : emptyClub;
   }
 }
 
@@ -87,7 +91,7 @@ export async function getClubConfig(): Promise<ClubConfig> {
  * chosen by the operator rather than resolved from the host.
  */
 export async function getClubConfigById(clubId: string): Promise<ClubConfig> {
-  if (!supabase || !clubId) return staticClub;
+  if (!supabase || !clubId) return emptyClub;
   try {
     let clubRow: Record<string, any> | null = null;
     const direct = await supabase.from("clubs").select("*").eq("id", clubId).maybeSingle();
@@ -105,16 +109,18 @@ export async function getClubConfigById(clubId: string): Promise<ClubConfig> {
       clubRow = Array.isArray(rpcRow) ? (rpcRow[0] ?? null) : (rpcRow ?? null);
     }
 
-    if (!clubRow) return staticClub;
+    // Read failure for a club opened by id (admin act-as): fall back to the neutral
+    // base, never to Dookie. Dookie itself loads via a successful row read.
+    if (!clubRow) return emptyClub;
     return await buildClubConfig(clubRow);
   } catch {
-    return staticClub;
+    return emptyClub;
   }
 }
 
 /** Build a complete ClubConfig from a clubs row (shared by both loaders). */
 async function buildClubConfig(clubRow: Record<string, any>): Promise<ClubConfig> {
-  if (!supabase) return staticClub;
+  if (!supabase) return (clubRow.slug ?? "") === staticClub.identity.slug ? staticClub : emptyClub;
   const clubId = clubRow.id;
 
     const [newsRes, eventsRes, sponsorsRes, teamsRes, peopleRes, matchesRes, ladderRes, templateRes] = await Promise.all([
@@ -130,25 +136,26 @@ async function buildClubConfig(clubRow: Record<string, any>): Promise<ClubConfig
         : Promise.resolve({ data: null }),
     ]);
 
-    const cfg: ClubConfig = { ...staticClub };
-
-    // Is this the built-in demo/template club (Dookie)? Only the demo keeps the
-    // rich sample identity + content. EVERY other club is a clean slate that
-    // shows only its own data — never Dookie's logo, sports, hero copy, etc.
+    // Is this the built-in demo/template club (Dookie)? The demo keeps its rich
+    // sample identity + content (staticClub). EVERY other club builds from a
+    // neutral, content-free base (emptyClub) and shows only its own data, so none
+    // of Dookie's logo, sports, hero copy, footer, contact, etc. can ever leak in.
     const isDemoClub = (clubRow.slug ?? "") === staticClub.identity.slug;
+    const base: ClubConfig = isDemoClub ? staticClub : emptyClub;
+    const cfg: ClubConfig = { ...base };
 
     // Identity + colours
     const colours = deriveColours(
       clubRow.primary_colour ?? null,
       clubRow.secondary_colour ?? null,
       clubRow.tertiary_colour ?? null,
-      staticClub.identity.colours
+      base.identity.colours
     );
-    const clubName: string = clubRow.name ?? staticClub.identity.name;
+    const clubName: string = clubRow.name ?? base.identity.name;
     cfg.identity = {
-      ...staticClub.identity,
+      ...base.identity,
       name: clubName,
-      slug: clubRow.slug ?? staticClub.identity.slug,
+      slug: clubRow.slug ?? base.identity.slug,
       colours,
       logo:
         clubRow.logo_url ??
@@ -170,36 +177,21 @@ async function buildClubConfig(clubRow: Record<string, any>): Promise<ClubConfig
           }),
     };
 
-    // A non-demo club starts empty: strip Dookie's sample identity-led content
-    // so nothing of Dookie's leaks in. The club's own DB data fills these below.
+    // Non-demo clubs need no "strip" step: the base (emptyClub) is already empty,
+    // so anything the club hasn't supplied stays blank rather than showing Dookie's.
+    // For non-demo, give About a sensible default heading from the club's own name.
     if (!isDemoClub) {
-      cfg.hero = { ...staticClub.hero, eyebrow: "", title: clubName, subtitle: "", backgroundImage: undefined };
-      cfg.announcement = { ...staticClub.announcement, enabled: false };
-      cfg.president = { ...staticClub.president, name: "", body: [], portrait: undefined, signoff: undefined };
-      cfg.about = { ...staticClub.about, heading: `About ${clubName}`, body: [], values: [], history: [], facts: [] };
-      cfg.join = { ...staticClub.join, blurb: "" };
-      cfg.quickLinks = [
-        { label: "Fixtures", href: "/fixtures" },
-        { label: "Register", href: "/register" },
-        { label: "Volunteer", href: "/register" },
-      ];
-      cfg.news = [];
-      cfg.events = [];
-      cfg.sponsors = [];
-      cfg.teams = [];
-      cfg.committee = [];
-      cfg.documents = [];
-      cfg.matchCentre = { ...staticClub.matchCentre, fixtures: [], results: [], ladder: [] };
+      cfg.about = { ...cfg.about, heading: `About ${clubName}` };
     }
 
-    // Contact
+    // Contact (from the clubs row; falls back to the base, which is empty for non-demo).
     cfg.contact = {
-      ...staticClub.contact,
-      email: clubRow.contact_email ?? staticClub.contact.email,
-      phone: clubRow.phone ?? staticClub.contact.phone,
-      instagram: clubRow.instagram_url ?? staticClub.contact.instagram,
-      facebook: clubRow.facebook_url ?? staticClub.contact.facebook,
-      addressLine: clubRow.address ?? staticClub.contact.addressLine,
+      ...base.contact,
+      email: clubRow.contact_email ?? base.contact.email,
+      phone: clubRow.phone ?? base.contact.phone,
+      instagram: clubRow.instagram_url ?? base.contact.instagram,
+      facebook: clubRow.facebook_url ?? base.contact.facebook,
+      addressLine: clubRow.address ?? base.contact.addressLine,
     };
 
     // Design variant from selected template
@@ -360,7 +352,7 @@ async function buildClubConfig(clubRow: Record<string, any>): Promise<ClubConfig
         })
       );
       cfg.matchCentre = {
-        ...staticClub.matchCentre,
+        ...base.matchCentre,
         mode: "manual",
         placeholder: false,
         fixtures,

@@ -10,7 +10,7 @@ import {
 import { supabase } from "../lib/supabase";
 import { getClubConfigById } from "../lib/loadClub";
 import { ClubContext, useClub } from "../components/ClubContext";
-import { club as staticClub } from "../content/club.config";
+import { emptyClub } from "../content/emptyClub";
 import type { ClubConfig } from "../content/types";
 import { useAuth } from "../lib/auth";
 
@@ -92,7 +92,7 @@ export function ActiveClubProvider({ children }: { children: ReactNode }) {
 
   const [clubs, setClubs] = useState<SwitchableClub[]>([]);
   const [activeId, setActiveId] = useState<string>("");
-  const [cfg, setCfg] = useState<ClubConfig>(staticClub);
+  const [cfg, setCfg] = useState<ClubConfig>(emptyClub);
   const [ready, setReady] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -138,7 +138,7 @@ export function ActiveClubProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let alive = true;
     if (!activeId) {
-      setCfg(staticClub);
+      setCfg(emptyClub);
       return;
     }
     setLoading(true);
