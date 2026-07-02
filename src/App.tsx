@@ -144,6 +144,10 @@ export default function App() {
     root.style.setProperty("--club-paper", c.paper);
     root.style.setProperty("--club-accent", c.accent);
     root.style.setProperty("--club-silver", c.silver);
+    // Colour-forward fill + its readable on-colour (computed in deriveColours).
+    // Falls back to accent/paper for the static Dookie config, which has neither.
+    root.style.setProperty("--brand-fill", c.primary ?? c.accent);
+    root.style.setProperty("--brand-fill-on", c.primaryOn ?? c.paper);
   }, [club]);
 
   useEffect(() => {

@@ -51,6 +51,14 @@ export interface BrandColours {
   silver: string;
   /** Optional third club colour (Dookie: white). Falls back to paper when unset. */
   tertiary?: string;
+  /** Raw club primary, preserved for colour-forward variants' fills.
+   *  Undefined when the club has no stored colour → the :root default is used. */
+  primary?: string;
+  /** Readable text colour computed for `primary` (white or ink): the JS
+   *  contrast guarantee for brand-filled panels. */
+  primaryOn?: string;
+  /** Reserved per-variant treatment hint; unused in phase 1. */
+  colourTreatment?: "forward" | "editorial";
 }
 
 export interface LinkRef {

@@ -553,5 +553,19 @@ function deriveColours(
   )[0];
   const accent = accentPick ? accentPick.hex : fallback.accent;
 
-  return { ink, paper: fallback.paper, accent, silver: fallback.silver, tertiary: tertiaryHex };
+  // Colour-forward fill: use the club's raw primary only when it reads as a
+  // bold mid-tone; otherwise fall back to the derived accent (guaranteed a
+  // saturated mid-tone). Near-white / near-black primaries would make a weak
+  // or muddy hero, so they don't fill.
+  const pRgb = primary ? hexToRgb(primary) : null;
+  const primaryBoldEnough = !!pRgb && lum(pRgb) > 0.12 && lum(pRgb) < 0.9;
+  const fillHex = primaryBoldEnough ? (primary as string) : accent;
+  // On-colour flips at the classic luma crossover (~128/255): white text on
+  // dark fills, ink on light fills — balanced against the gate's boundaries.
+  const primaryOn = lum(hexToRgb(fillHex)!) < 0.5 ? "#ffffff" : ink;
+
+  return {
+    ink, paper: fallback.paper, accent, silver: fallback.silver,
+    tertiary: tertiaryHex, primary: fillHex, primaryOn,
+  };
 }

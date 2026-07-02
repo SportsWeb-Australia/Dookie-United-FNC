@@ -17,6 +17,12 @@
   --club-accent: #1f8ca7;
   --club-silver: #9b9b9b;
 
+  /* Colour-forward fill tokens (overridden at runtime by App.tsx from the
+   * club's primary). Present globally but referenced only by variants that
+   * opt into a colour-forward treatment. */
+  --brand-fill: var(--club-accent);
+  --brand-fill-on: #ffffff;
+
   /* Derived accents (computed once here). */
   --accent: var(--club-accent);
   --accent-deep: color-mix(in srgb, var(--club-accent) 72%, #000000);
@@ -126,8 +132,8 @@
   --text-soft: color-mix(in srgb, var(--club-ink) 66%, var(--club-paper));
   --text-invert: var(--club-paper);
   --border: color-mix(in srgb, var(--club-ink) 24%, var(--club-paper));
-  --hero-bg: var(--club-ink);
-  --hero-text: #ffffff;
+  --hero-bg: var(--brand-fill);
+  --hero-text: var(--brand-fill-on);
   --header-bg: color-mix(in srgb, var(--club-paper) 90%, transparent);
   --header-text: var(--club-ink);
   --shadow: none;
@@ -247,8 +253,8 @@
   --text-soft: color-mix(in srgb, var(--club-ink) 64%, var(--club-paper));
   --text-invert: var(--club-paper);
   --border: color-mix(in srgb, var(--club-ink) 16%, var(--club-paper));
-  --hero-bg: var(--club-ink);
-  --hero-text: #ffffff;
+  --hero-bg: var(--brand-fill);
+  --hero-text: var(--brand-fill-on);
   --header-bg: color-mix(in srgb, var(--club-paper) 90%, transparent);
   --header-text: var(--club-ink);
   --shadow: 0 1px 2px rgba(0, 0, 0, 0.08), 0 12px 30px rgba(0, 0, 0, 0.12);
