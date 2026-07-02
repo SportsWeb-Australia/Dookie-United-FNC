@@ -1,2 +1,8 @@
 # macOS Finder metadata
 .DS_Store
+
+# Dependencies (package-lock.json stays tracked)
+node_modules/
+
+# Build output
+dist/
